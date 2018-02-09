@@ -12,6 +12,7 @@
 
 \echo :_TITLE'010-trm':_O                     \ir './010-trm.sql'
 \echo :_TITLE'011-bar':_O                     \ir './011-bar.sql'
+\echo :_TITLE'012-time':_O                    \ir './012-time.sql'
 \echo :_TITLE'020-extensions':_O              \ir './020-extensions.sql'
 \echo :_TITLE'025-sql':_O                     \ir './025-sql.sql'
 \echo :_TITLE'030-utilities':_O               \ir './030-utilities.sql'

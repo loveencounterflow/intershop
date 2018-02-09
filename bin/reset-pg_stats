@@ -5,6 +5,5 @@ cd "$home"
 source bin/_prepare-environment
 set -ex
 
-
-sudo -u postgres psql -d $its_db_name -p $its_psql_port -c 'select pg_stat_reset();' >> /dev/null
+sudo_postgres_unpaged -c 'select pg_stat_reset();' >> /dev/null
 
