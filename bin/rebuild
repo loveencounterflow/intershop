@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+cd "$home"
+
+source bin/prepare-environment
+
+sudo -u postgres psql                                   -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 -f db/teardown.sql
+                 psql -U $its_user_name -d $its_db_name -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 -f db/000-main.sql
+
+

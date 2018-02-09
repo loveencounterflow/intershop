@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# set -ex
+set -e
+home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+cd "$home"
+source bin/_prepare-environment
+
+
+#-----------------------------------------------------------------------------------------------------------
+psql -U $its_user_name -d $its_db_name -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 -f ./db/update-os-env.sql
+PAGER="postgres-pager -s 6 --less-status-bar" psql -U $its_user_name -d $its_db_name -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 "$@"
+
+

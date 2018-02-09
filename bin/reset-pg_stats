@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-
-
-cd "$(readlink -f "$0" | xargs dirname)"/..
+set -e
+home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+cd "$home"
+source bin/_prepare-environment
 set -ex
 
-sudo -u postgres psql -p 5433 bmo -c 'select pg_stat_reset();' >> /dev/null
+
+sudo -u postgres psql -d $its_db_name -p $its_psql_port -c 'select pg_stat_reset();' >> /dev/null
 

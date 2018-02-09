@@ -11,26 +11,31 @@ cd "$home"
 # truncate -s 0 /tmp/psql-signals
 
 #-----------------------------------------------------------------------------------------------------------
-bmo_python_path="$home"/python_modules      ; export bmo_python_path
-bmo_psql_output_path='/tmp/bmo-psql-output' ; export bmo_psql_output_path
-bmo_psql_port='5433'                        ; export bmo_psql_port
+its_db_name=intershop
+its_user_name=intershop
+its_python_path="$home"/python_modules                          ; export its_python_path
+its_tmppath='/tmp/intershop'                                    ; export its_tmppath
+its_psql_output_path=$its_tmppath'/psql-output'                 ; export its_psql_output_path
+its_psql_port='5433'                                            ; export its_psql_port
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
 # tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
 # # Thx to https://stackoverflow.com/a/8048493/7568091
 # # for the idea to redirect to a subshell to preserve the PID of the first command:
-# ( tail -f "$bmo_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+# ( tail -f "$its_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 # make sure output file exists with the correct rights:
-touch $bmo_psql_output_path
-chmod 0666 $bmo_psql_output_path
-truncate -s 0 $bmo_psql_output_path
-( tail -f $bmo_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+mkdir -p $its_tmppath
+chmod 0666 $its_psql_output_path
+touch $its_psql_output_path
+chmod 0666 $its_psql_output_path
+truncate -s 0 $its_psql_output_path
+( tail -f $its_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
 trap 'kill $psql_tailer_pid' EXIT
-# echo 'helo world' >> $bmo_psql_output_path; ls -AlF /tmp/bmo*; exit 1
+# echo 'helo world' >> $its_psql_output_path; ls -AlF /tmp/intershop*; exit 1
 
 
 
