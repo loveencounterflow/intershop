@@ -37,7 +37,6 @@ create schema TRM;
 \set Xcolor       :orange
 \set OUT          :yellow'output written to ':lime
 \set X            :plum
-\set out          '/tmp/psql-output'
 \set devnull      '/dev/null'
 
 -- \echo :F'trm.meta.sql':O

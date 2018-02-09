@@ -13,7 +13,7 @@
 -- \ir '/home/flow/io/bookmarks-organizer/aquameta/core/000-meta/002-utils.sql'
 
 \echo :_TITLE'001-frontmatter':O              \ir './001-frontmatter.sql'
-\echo :_TITLE'101-app':O                      \ir './101-app.sql'
+-- \echo :_TITLE'101-app':O                      \ir './101-app.sql'
 
 
 

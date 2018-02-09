@@ -22,7 +22,7 @@
 \echo :_TITLE'060-filelinereader':_O          \ir './060-filelinereader.sql'
 \echo :_TITLE'070-catalog':_O                 \ir './070-catalog.sql'
 \echo :_TITLE'080-units':_O                   \ir './080-units.sql'
-\echo :_TITLE'199-bye':_O                     \ir './199-bye.sql'
+\echo :_TITLE'999-bye':_O                     \ir './999-bye.sql'
 
 
 

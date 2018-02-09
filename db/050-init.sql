@@ -63,13 +63,13 @@ create function INIT.py_init() returns void language plpython3u as $$
       plan  = plpy.prepare( sql, [ 'text', ] )
       rows  = plpy.execute( plan, [ key, ] )
       if len( rows ) != 1:
-        raise Exception( "unable to find setting  bmo_python_path in OS.env" )
+        raise Exception( "unable to find setting  intershop_python_path in OS.env" )
       return rows[ 0 ][ 'value' ]
     #.......................................................................................................
     ctx.get_os_env_value = get_os_env_value
     #.......................................................................................................
-    ctx.python_path       = ctx.get_os_env_value( 'bmo_python_path'       )
-    ctx.psql_output_path  = ctx.get_os_env_value( 'bmo_psql_output_path'  )
+    ctx.python_path       = ctx.get_os_env_value( 'intershop_python_path'       )
+    ctx.psql_output_path  = ctx.get_os_env_value( 'intershop_psql_output_path'  )
     sys.path.insert( 0, ctx.python_path )
     #.......................................................................................................
     def log( *P ):
@@ -84,8 +84,8 @@ create function INIT.py_init() returns void language plpython3u as $$
     #.......................................................................................................
     ctx.log = log
     #.......................................................................................................
-    import bmo_main
-    bmo_main.setup( ctx )
+    import intershop_main
+    intershop_main.setup( ctx )
     #.......................................................................................................
     $$;
 
