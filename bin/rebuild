@@ -3,9 +3,10 @@ set -e
 home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 cd "$home"
 
-source bin/prepare-environment
+source bin/_prepare-environment
 
-sudo -u postgres psql                                   -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 -f db/teardown.sql
-                 psql -U $its_user_name -d $its_db_name -p $its_psql_port --set QUIET=on --set ON_ERROR_STOP=1 -f db/000-main.sql
+sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+postgres_unpaged      -f db/000-main.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+
 
 

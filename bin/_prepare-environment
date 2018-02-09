@@ -11,31 +11,60 @@ cd "$home"
 # truncate -s 0 /tmp/psql-signals
 
 #-----------------------------------------------------------------------------------------------------------
-its_db_name=intershop
-its_user_name=intershop
-its_python_path="$home"/python_modules                          ; export its_python_path
-its_tmppath='/tmp/intershop'                                    ; export its_tmppath
-its_psql_output_path=$its_tmppath'/psql-output'                 ; export its_psql_output_path
-its_psql_port='5433'                                            ; export its_psql_port
+intershop_db_name=intershop
+intershop_user_name=intershop
+intershop_python_path="$home"/python_modules                          ; export intershop_python_path
+intershop_tmppath='/tmp/intershop'                                    ; export intershop_tmppath
+intershop_psql_output_path=$intershop_tmppath'/psql-output'           ; export intershop_psql_output_path
+intershop_psql_port='5433'                                            ; export intershop_psql_port
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
 # tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
 # # Thx to https://stackoverflow.com/a/8048493/7568091
 # # for the idea to redirect to a subshell to preserve the PID of the first command:
-# ( tail -f "$its_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+# ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 # make sure output file exists with the correct rights:
-mkdir -p $its_tmppath
-chmod 0666 $its_psql_output_path
-touch $its_psql_output_path
-chmod 0666 $its_psql_output_path
-truncate -s 0 $its_psql_output_path
-( tail -f $its_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+mkdir -p $intershop_tmppath
+chmod 0777 $intershop_tmppath
+touch $intershop_psql_output_path
+chmod 0666 $intershop_psql_output_path
+truncate -s 0 $intershop_psql_output_path
+( tail -f $intershop_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
 trap 'kill $psql_tailer_pid' EXIT
-# echo 'helo world' >> $its_psql_output_path; ls -AlF /tmp/intershop*; exit 1
+# echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
+
+
+#-----------------------------------------------------------------------------------------------------------
+function postgres_paged () {
+  PAGER="postgres-pager -s 6 --less-status-bar" psql                                \
+    -U $intershop_user_name -d $intershop_db_name -p $intershop_psql_port           \
+    --set=app_user="$intershop_user_name"                                           \
+    --set=app_db="$intershop_db_name"                                               \
+    --set=out="$intershop_psql_output_path"                                         \
+    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+
+#-----------------------------------------------------------------------------------------------------------
+function postgres_unpaged () {
+  psql                                                                              \
+    -U $intershop_user_name -d $intershop_db_name -p $intershop_psql_port           \
+    --set=app_user="$intershop_user_name"                                           \
+    --set=app_db="$intershop_db_name"                                               \
+    --set=out="$intershop_psql_output_path"                                         \
+    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+
+#-----------------------------------------------------------------------------------------------------------
+function sudo_postgres_unpaged () {
+  sudo -u postgres psql                                                             \
+    -p $intershop_psql_port                                                         \
+    --set=app_user="$intershop_user_name"                                           \
+    --set=app_db="$intershop_db_name"                                               \
+    --set=out="$intershop_psql_output_path"                                         \
+    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+
 
 
 
