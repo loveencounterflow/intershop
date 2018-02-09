@@ -1,10 +1,23 @@
 
-\set app_user     bmo
-\set app_db       bmo
-\echo targetting app user :app_user
-\echo targetting app DB   :app_db
+\ir './010-trm.sql'
 \pset pager off
 \pset tuples_only on
+
+\echo
+\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':reset
+\echo :yellow'          In case the below command fails with an error message like             ':reset
+\echo
+\echo :yellow'          ERROR:  syntax error at or near ":"                                    ':reset
+\echo
+\echo :yellow'          make sure psql variables :app_user and :app_db are properly set        ':reset
+\echo :yellow'          (e.g. by running this script via the `bin/rebuild executable)          ':reset
+\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':reset
+\echo
+
+-- \set app_user     intershop
+-- \set app_db       intershop
+\echo :X'targetting app user ':white:app_user :O
+\echo :X'targetting app DB   ':white:app_db   :O
 
 select count( pg_terminate_backend( pid ) )
 from pg_stat_activity
