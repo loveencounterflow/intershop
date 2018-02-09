@@ -4,27 +4,28 @@
 \pset tuples_only on
 
 \echo
-\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':reset
-\echo :yellow'          In case the below command fails with an error message like             ':reset
+\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':O
+\echo :yellow'          In case the below command fails with an error message like             ':O
 \echo
-\echo :yellow'          ERROR:  syntax error at or near ":"                                    ':reset
+\echo :yellow'          ERROR:  syntax error at or near ":"                                    ':O
 \echo
-\echo :yellow'          make sure psql variables :app_user and :app_db are properly set        ':reset
-\echo :yellow'          (e.g. by running this script via the `bin/rebuild executable)          ':reset
-\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':reset
+\echo :yellow'          make sure psql variables :intershop_db_user and                        ':O
+\echo :yellow'          :intershop_db_name are properly set                                    ':O
+\echo :yellow'          (e.g. by running this script via the `bin/rebuild executable)          ':O
+\echo :yellow'—————————————————————————————————————————————————————————————————————————————————':O
 \echo
 
--- \set app_user     intershop
--- \set app_db       intershop
-\echo :X'targetting app user ':white:app_user :O
-\echo :X'targetting app DB   ':white:app_db   :O
+-- \set intershop_db_user     intershop
+-- \set intershop_db_name       intershop
+\echo :X'targetting app user ':white:intershop_db_user :O
+\echo :X'targetting app DB   ':white:intershop_db_name :O
 
 select count( pg_terminate_backend( pid ) )
 from pg_stat_activity
-where datname = :'app_db';
+where datname = :'intershop_db_name';
 
-drop database if exists :app_db;
-drop role if exists :app_user;
+drop database if exists :intershop_db_name;
+drop role if exists :intershop_db_user;
 -- drop role if exists dba;
 
 /* thx to https://pastebin.com/bgFDhNvP */
@@ -35,7 +36,7 @@ do $$
       end if;
     end $$;
 
-create user :app_user with
+create user :intershop_db_user with
   nocreatedb
   nocreaterole
   noinherit
@@ -44,8 +45,8 @@ create user :app_user with
   nobypassrls
   in role dba;
 
-create database :app_db with owner = :app_user;
-\echo created db :app_db owned by :app_user
+create database :intershop_db_name with owner = :intershop_db_user;
+\echo created db :intershop_db_name owned by :intershop_db_user
 
 
 /* Prepare: */
@@ -59,8 +60,8 @@ set row_security                = off;
 
 /* Recreate DB: */
 \connect postgres
-drop database if exists :app_db;
-create database :app_db with
+drop database if exists :intershop_db_name;
+create database :intershop_db_name with
   template    = template0
   encoding    = 'UTF8'
   lc_collate  = 'C'
@@ -69,9 +70,9 @@ create database :app_db with
   -- lc_ctype    = 'C.UTF-8';
 -- select current_user;
 -- xxx;
-alter database :app_db owner to :app_user;
--- grant create on database :app_db to :app_user;
-\connect :app_db
+alter database :intershop_db_name owner to :intershop_db_user;
+-- grant create on database :intershop_db_name to :intershop_db_user;
+\connect :intershop_db_name
 
 /* Restate environmental settings: */
 set statement_timeout           = 0;

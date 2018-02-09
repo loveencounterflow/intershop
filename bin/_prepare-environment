@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # set -ex
 set -e
+set -o pipefail
 home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 cd "$home"
-
+source bin/_trm
 
 # # make sure output file exists with the correct rights:
 # touch /tmp/psql-signals
@@ -11,12 +12,30 @@ cd "$home"
 # truncate -s 0 /tmp/psql-signals
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_db_name=intershop
-intershop_user_name=intershop
+intershop_db_name=intershop                                           ; export intershop_db_name
+intershop_db_user=intershop                                           ; export intershop_db_user
+intershop_db_port='5433'                                              ; export intershop_db_port
 intershop_python_path="$home"/python_modules                          ; export intershop_python_path
-intershop_tmppath='/tmp/intershop'                                    ; export intershop_tmppath
+intershop_tmppath='/tmp/'$intershop_db_name                           ; export intershop_tmppath
 intershop_psql_output_path=$intershop_tmppath'/psql-output'           ; export intershop_psql_output_path
-intershop_psql_port='5433'                                            ; export intershop_psql_port
+
+#-----------------------------------------------------------------------------------------------------------
+set +e
+set_environment=$(node lib/_print_env_for_bash.js)
+exit_code=$?
+if [[ $exit_code != 0 ]]; then
+  printf $red'%san error occurred; terminating%s'$reset'\n'
+  exit $exit_code
+  fi
+set -e
+
+eval $set_environment
+echo -e "$blue"'intershop_db_name:          ' "$white$intershop_db_name          $reset"
+echo -e "$blue"'intershop_db_user:          ' "$white$intershop_db_user          $reset"
+echo -e "$blue"'intershop_db_port:          ' "$white$intershop_db_port          $reset"
+echo -e "$blue"'intershop_python_path:      ' "$white$intershop_python_path      $reset"
+echo -e "$blue"'intershop_tmppath:          ' "$white$intershop_tmppath          $reset"
+echo -e "$blue"'intershop_psql_output_path: ' "$white$intershop_psql_output_path $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
@@ -41,29 +60,31 @@ trap 'kill $psql_tailer_pid' EXIT
 #-----------------------------------------------------------------------------------------------------------
 function postgres_paged () {
   PAGER="postgres-pager -s 6 --less-status-bar" psql                                \
-    -U $intershop_user_name -d $intershop_db_name -p $intershop_psql_port           \
-    --set=app_user="$intershop_user_name"                                           \
-    --set=app_db="$intershop_db_name"                                               \
+    -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
+    --set=intershop_db_user="$intershop_db_user"                                    \
+    --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
 function postgres_unpaged () {
   psql                                                                              \
-    -U $intershop_user_name -d $intershop_db_name -p $intershop_psql_port           \
-    --set=app_user="$intershop_user_name"                                           \
-    --set=app_db="$intershop_db_name"                                               \
+    -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
+    --set=intershop_db_user="$intershop_db_user"                                    \
+    --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
 function sudo_postgres_unpaged () {
   sudo -u postgres psql                                                             \
-    -p $intershop_psql_port                                                         \
-    --set=app_user="$intershop_user_name"                                           \
-    --set=app_db="$intershop_db_name"                                               \
+    -p $intershop_db_port                                                           \
+    --set=intershop_db_user="$intershop_db_user"                                    \
+    --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
-    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+    --set QUIET=on --set ON_ERROR_STOP=1 "$@";
+  if [[ $? != 0 ]]; then exit 123; fi
+  }
 
 
 

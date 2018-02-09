@@ -18,10 +18,17 @@
 -- ---------------------------------------------------------------------------------------------------------
 -- select 'U.variables' \g :out
 \echo
-\echo :out
-\echo 'U.variables'
--- select * from U.variables \g :out
-select * from U.variables where key ~ '^OS/machine/' order by key \g :out
+-- do $$ begin perform log(); end; $$;
+-- do $$ begin perform log( 'U.variables' ); end; $$;
+-- select * from U.variables order by key \g :out
+
+do $$ begin perform log(); end; $$;
+do $$ begin perform log( 'U.variables (excerpt):' ); end; $$;
+select * from U.variables
+  where key ~ '^OS/machine/|intershop'
+  order by key \g :out
+
+do $$ begin perform log( 'PostGreSQL version:', version() ); end; $$;
 do $$ begin perform log( 'is dev:', U.truth( OS.is_dev() ) ); end; $$;
 
 
