@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
+intershop_app_home=$(pwd)
 home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 cd "$home"
-
 source bin/_prepare-environment
 
 sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always

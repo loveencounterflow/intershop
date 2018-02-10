@@ -2,40 +2,52 @@
 # set -ex
 set -e
 set -o pipefail
-home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
-cd "$home"
-source bin/_trm
 
-# # make sure output file exists with the correct rights:
-# touch /tmp/psql-signals
-# chmod 0666 /tmp/psql-signals
-# truncate -s 0 /tmp/psql-signals
+#-----------------------------------------------------------------------------------------------------------
+# thx to https://stackoverflow.com/a/20579006/7568091
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+intershop_bin_path="$(dirname "$script_path")"
+intershop_module_home="$(realpath "$intershop_bin_path"/..)"
+
+#-----------------------------------------------------------------------------------------------------------
+cd "$intershop_module_home"
+source bin/_trm
+echo -e "$blue"'intershop_app_home:         ' "$white$intershop_app_home         $reset"
+echo -e "$blue"'intershop_module_home:      ' "$white$intershop_module_home      $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_db_name=intershop                                           ; export intershop_db_name
 intershop_db_user=intershop                                           ; export intershop_db_user
-intershop_db_port='5433'                                              ; export intershop_db_port
+intershop_db_port='5432'                                              ; export intershop_db_port
 intershop_python_path="$home"/python_modules                          ; export intershop_python_path
 intershop_tmppath='/tmp/'$intershop_db_name                           ; export intershop_tmppath
 intershop_psql_output_path=$intershop_tmppath'/psql-output'           ; export intershop_psql_output_path
 
 #-----------------------------------------------------------------------------------------------------------
+printenv_path='lib/_print_env_for_bash.js'
+echo -e "$blue"'printenv_path:              ' "$white$printenv_path              $reset"
+#...........................................................................................................
+cd "$intershop_app_home"
 set +e
-set_environment=$(node lib/_print_env_for_bash.js)
+set_environment=$(node "$printenv_path")
 exit_code=$?
+cd "$intershop_module_home"
 if [[ $exit_code != 0 ]]; then
-  printf $red'%san error occurred; terminating%s'$reset'\n'
+  printf $red'an error occurred; terminating'$reset'\n'
   exit $exit_code
   fi
-set -e
 
+#-----------------------------------------------------------------------------------------------------------
+set -e
 eval $set_environment
+# printf $yellow"$set_environment"'\n'$reset
 echo -e "$blue"'intershop_db_name:          ' "$white$intershop_db_name          $reset"
 echo -e "$blue"'intershop_db_user:          ' "$white$intershop_db_user          $reset"
 echo -e "$blue"'intershop_db_port:          ' "$white$intershop_db_port          $reset"
 echo -e "$blue"'intershop_python_path:      ' "$white$intershop_python_path      $reset"
 echo -e "$blue"'intershop_tmppath:          ' "$white$intershop_tmppath          $reset"
 echo -e "$blue"'intershop_psql_output_path: ' "$white$intershop_psql_output_path $reset"
+echo $app_home
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
