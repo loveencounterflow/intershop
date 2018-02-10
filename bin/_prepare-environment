@@ -4,10 +4,17 @@ set -e
 set -o pipefail
 
 #-----------------------------------------------------------------------------------------------------------
+if [ -z ${intershop_app_home+x} ]; then
+  echo 'need variable $intershop_app_home'
+  exit 1
+  fi
+export intershop_app_home
+
+#-----------------------------------------------------------------------------------------------------------
 # thx to https://stackoverflow.com/a/20579006/7568091
 script_path="$(realpath "${BASH_SOURCE[0]}")"
-intershop_bin_path="$(dirname "$script_path")"
-intershop_module_home="$(realpath "$intershop_bin_path"/..)"
+intershop_bin_path="$(dirname "$script_path")"                        ; export intershop_bin_path
+intershop_module_home="$(realpath "$intershop_bin_path"/..)"          ; export intershop_module_home
 
 #-----------------------------------------------------------------------------------------------------------
 cd "$intershop_module_home"
@@ -24,12 +31,13 @@ intershop_tmppath='/tmp/'$intershop_db_name                           ; export i
 intershop_psql_output_path=$intershop_tmppath'/psql-output'           ; export intershop_psql_output_path
 
 #-----------------------------------------------------------------------------------------------------------
-printenv_path='lib/_print_env_for_bash.js'
-echo -e "$blue"'printenv_path:              ' "$white$printenv_path              $reset"
+intershop_printenv_path='lib/intershop-printenv.js' ; export intershop_printenv_path
+echo -e "$blue"'intershop_printenv_path:    ' "$white$intershop_printenv_path              $reset"
 #...........................................................................................................
 cd "$intershop_app_home"
+intershop_printenv_path=$(realpath "$intershop_printenv_path")
 set +e
-set_environment=$(node "$printenv_path")
+set_environment=$(node "$intershop_printenv_path")
 exit_code=$?
 cd "$intershop_module_home"
 if [[ $exit_code != 0 ]]; then
@@ -47,7 +55,6 @@ echo -e "$blue"'intershop_db_port:          ' "$white$intershop_db_port         
 echo -e "$blue"'intershop_python_path:      ' "$white$intershop_python_path      $reset"
 echo -e "$blue"'intershop_tmppath:          ' "$white$intershop_tmppath          $reset"
 echo -e "$blue"'intershop_psql_output_path: ' "$white$intershop_psql_output_path $reset"
-echo $app_home
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
