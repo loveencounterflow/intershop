@@ -36,7 +36,7 @@ create function FILELINEREADER.is_comment_or_blank( ¶line text ) returns boolea
 set role dba;
 create function FILELINEREADER.read_lines( path_ text ) returns setof U.line_facet
   volatile language plpython3u as $$
-  # plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  # plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   with open( path_, 'rb' ) as input:
     for line_idx, line in enumerate( input ):
       yield [ line_idx + 1, line.decode( 'utf-8' ).rstrip(), ]

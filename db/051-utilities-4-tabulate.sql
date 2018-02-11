@@ -7,7 +7,7 @@
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U.tabulate( data_ jsonb ) returns text strict immutable language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import json
   data  = json.loads( data_ )
   return ctx.tabulate.tabulate( data )
@@ -22,7 +22,7 @@ create function U.tabulate( ¶data json ) returns text strict immutable language
 set role dba;
 create function U.query_as_jsonb( q_ text ) returns jsonb strict immutable language plpython3u as $$
   import json as JSON
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   rows  = plpy.execute( q_ )
   names = rows.colnames()
   R     = [ names, ]
@@ -52,7 +52,7 @@ create type U.url as (
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U.parse_url( url_ text ) returns U.url strict immutable language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   ctx.url_parser.parse( url_ );
   $$;
 reset role;
@@ -60,7 +60,7 @@ reset role;
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U.parse_url_words( url_ text ) returns text[] strict immutable language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   return ctx.url_parser.parse_words( url_ );
   $$;
 reset role;

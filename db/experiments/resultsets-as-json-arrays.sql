@@ -44,7 +44,7 @@ select * from _RA_.solar_system order by anr, snr;
 set role dba;
 create function _RA_.query_as_jsonb( q_ text ) returns jsonb strict immutable language plpython3u as $$
   import json as JSON
-  plpy.execute( 'select INIT.py_init()' )
+  plpy.execute( 'select U.py_init()' )
   ctx   = GD[ 'ctx' ]
   rows  = plpy.execute( q_ )
   names = rows.colnames()

@@ -2,25 +2,24 @@
 
 /*
 
-8888888            d8b  888
-  888              Y8P  888
-  888                   888
-  888    88888b.   888  888888
-  888    888 "88b  888  888
-  888    888  888  888  888
-  888    888  888  888  Y88b.
-8888888  888  888  888   "Y888
+                             d8b          d8b 888
+                             Y8P          Y8P 888
+                                              888
+88888b.  888  888            888 88888b.  888 888888
+888 "88b 888  888            888 888 "88b 888 888
+888  888 888  888            888 888  888 888 888
+888 d88P Y88b 888            888 888  888 888 Y88b.
+88888P"   "Y88888  88888888  888 888  888 888  "Y888
+888           888
+888      Y8b d88P
+888       "Y88P"
 
 */
 
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists INIT cascade;
-create schema INIT;
-
--- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function INIT.py_init() returns void language plpython3u as $$
+create function U.py_init() returns void language plpython3u as $$
     if 'ctx' in GD: return
     import sys
     import os
@@ -82,8 +81,7 @@ create function INIT.py_init() returns void language plpython3u as $$
 set role dba;
 drop function if exists log( variadic text[] ) cascade;
 create function log( value variadic text[] ) returns void language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' )
-  ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   value_ = [ str( e ) for e in value ]
   with open( ctx.psql_output_path, 'ab' ) as o:
     o.write( ' '.join( value_ ).encode( 'utf-8' ) + b'\n' )
@@ -99,14 +97,14 @@ do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function INIT._test() returns void language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' )
+create function U._test_py_init() returns void language plpython3u as $$
+  plpy.execute( 'select U.py_init()' )
   ctx = GD[ 'ctx' ]
   import sys
   for idx, path in enumerate( sys.path ):
     ctx.log( idx + 1, path )
   # ctx.log( ctx )
-  ctx.log( "INIT.py_init OK" )
+  ctx.log( "U.py_init OK" )
   import signals
   ctx.log( 'signals', signals )
   ctx.log( ctx.url_parser )
@@ -118,7 +116,7 @@ reset role;
 
 /* ###################################################################################################### */
 
-do $$ begin perform INIT._test(); end; $$;
+do $$ begin perform U._test_py_init(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit

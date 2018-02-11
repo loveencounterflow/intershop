@@ -1,6 +1,6 @@
 
 /* ###################################################################################################### */
--- select * from OS.nodejs_versions;
+-- select * from U.nodejs_versions;
 -- select * from OS.env;
 -- \set log          '/tmp/psql-output'
 -- do $$ begin perform log( 'machine:' ); end; $$;

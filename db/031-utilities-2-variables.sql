@@ -1,29 +1,26 @@
 
-
-/*
-
- .d88888b.    .d8888b.
-d88P" "Y88b  d88P  Y88b
-888     888  Y88b.
-888     888   "Y888b.
-888     888      "Y88b.
-888     888        "888
-Y88b. .d88P  Y88b  d88P
- "Y88888P"    "Y8888P"
-
-*/
-
+-- =========================================================================================================
+-- VARIABLES
+-- ---------------------------------------------------------------------------------------------------------
+create table U.variables of U.text_facet ( key unique not null primary key );
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists OS cascade;
-create schema OS;
+drop function if exists ¶( text ) cascade;
+create function ¶( ¶key text ) returns text volatile language sql as $$
+  select value from U.variables where key = ¶key; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+drop function if exists ¶( text, anyelement ) cascade;
+create function ¶( ¶key text, ¶value anyelement ) returns void volatile language sql as $$
+  insert into U.variables values ( ¶key, ¶value )
+  on conflict ( key ) do update set value = ¶value; $$;
 
 
 -- =========================================================================================================
 -- NODEJS
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function OS._nodejs_versions() returns jsonb volatile language plsh as $$#!/usr/local/bin/node
+create function U._nodejs_versions() returns jsonb volatile language plsh as $$#!/usr/local/bin/node
   console.log( JSON.stringify( process.versions ) ); $$;
   -- R = ( { key: value, } for key, value of process.versions )
   -- $$#!/usr/local/bin/coffee
@@ -32,18 +29,18 @@ create function OS._nodejs_versions() returns jsonb volatile language plsh as $$
 reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
-create materialized view OS.nodejs_versions as (
-  select * from jsonb_each_text( OS._nodejs_versions() ) );
+create materialized view U.nodejs_versions as (
+  select * from jsonb_each_text( U._nodejs_versions() ) );
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function OS._get_hostname() returns text language plpython3u as $$
+create function U._get_hostname() returns text language plpython3u as $$
   import socket as _SOCKET; return _SOCKET.gethostname() $$;
 reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function OS._get_architecture_etc() returns jsonb volatile language plsh as $$#!/usr/local/bin/node
+create function U._get_architecture_etc() returns jsonb volatile language plsh as $$#!/usr/local/bin/node
   console.log( JSON.stringify( {
     architecture: process.arch,
     platform:     process.platform,
@@ -58,11 +55,11 @@ reset role;
 --   select ¶( 'os/env/NODE_ENV' ) = 'dev'; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function OS._set_env_variable( ¶key text, ¶value text ) returns void volatile language sql as $$
+create function U._set_env_variable( ¶key text, ¶value text ) returns void volatile language sql as $$
   select ¶( 'os/env/' || ¶key, substring( ¶value for 50 ) ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function OS._get_env_variable( ¶key text ) returns text stable language sql as $$
+create function U._get_env_variable( ¶key text ) returns text stable language sql as $$
   select ¶( 'os/env/' || ¶key ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------

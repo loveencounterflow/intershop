@@ -194,34 +194,6 @@ returns text immutable language plpgsql as $$
   --   end;
   --   $$;
 
--- =========================================================================================================
--- VARIABLES
--- ---------------------------------------------------------------------------------------------------------
-create table U.variables of U.text_facet ( key unique not null primary key );
-
-/*
--- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text ) cascade;
-create function ¶( ¶key text ) returns text stable language plpgsql as $$
-  begin return current_setting( 'xxx.' || ¶key ); end; $$;
-
--- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text, text ) cascade;
-create function ¶( ¶key text, ¶value anyelement ) returns void stable language plpgsql as $$
-  begin perform set_config( 'xxx.' || ¶key, ¶value, false ); end; $$;
-*/
-
--- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text ) cascade;
-create function ¶( ¶key text ) returns text volatile language sql as $$
-  select value from U.variables where key = ¶key; $$;
-
--- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text, anyelement ) cascade;
-create function ¶( ¶key text, ¶value anyelement ) returns void volatile language sql as $$
-  insert into U.variables values ( ¶key, ¶value )
-  on conflict ( key ) do update set value = ¶value; $$;
-
 -- -- ---------------------------------------------------------------------------------------------------------
 -- do $$ begin
 --   perform ¶( 'username', current_user );
@@ -245,7 +217,7 @@ set role dba;
 /* Expects an SQL query as text that delivers two columns, the first being names and the second JSONb
   values of the object to be built. */
 create function U.facets_as_jsonb_object( sql_ text ) returns jsonb stable language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import json as JSON
   R             = {}
   result        = plpy.execute( sql_ )
@@ -264,7 +236,7 @@ drop function if exists U.row_as_jsonb_object cascade;
 /* Expects an SQL query as text that delivers two columns, the first being names and the second JSONb
   values of the object to be built. */
 create function U.row_as_jsonb_object( sql_ text ) returns jsonb stable language plpython3u as $$
-  plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import json as JSON
   R                   = {}
   result              = plpy.execute( sql_ )
