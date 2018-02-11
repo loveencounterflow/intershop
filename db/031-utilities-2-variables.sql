@@ -56,7 +56,7 @@ reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function U._set_env_variable( ¶key text, ¶value text ) returns void volatile language sql as $$
-  select ¶( 'os/env/' || ¶key, substring( ¶value for 50 ) ); $$;
+  select ¶( 'os/env/' || ¶key, ¶value ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function U._get_env_variable( ¶key text ) returns text stable language sql as $$
