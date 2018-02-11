@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -e
 intershop_paths_app=$(pwd)
-home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+# home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# echo '28282', $intershop_paths_app
+# echo '28282', $home
+# echo '28282', "${BASH_SOURCE[0]}"
+# echo '28282', "$(realpath "${BASH_SOURCE[0]}")"
 cd "$home"
 source bin/_prepare-environment
 

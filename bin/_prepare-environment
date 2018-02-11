@@ -23,16 +23,16 @@ echo -e "$blue"'intershop_paths_app:                           ' "$white$intersh
 echo -e "$blue"'intershop_paths_npm_module:                    ' "$white$intershop_paths_npm_module                 $reset"
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_db_name=intershop                                     ; export intershop_db_name
-intershop_db_user=intershop                                     ; export intershop_db_user
-intershop_db_port='5432'                                        ; export intershop_db_port
-intershop_paths_npm_module_python_modules="$home"/python_modules           ; export intershop_paths_npm_module_python_modules
-intershop_paths_app_python_modules="$intershop_paths_app"/python_modules           ; export intershop_paths_app_python_modules
-intershop_paths_tmp='/tmp/'$intershop_db_name                   ; export intershop_paths_tmp
-intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'  ; export intershop_paths_psql_output
+intershop_db_name=intershop                                               ; export intershop_db_name
+intershop_db_user=intershop                                               ; export intershop_db_user
+intershop_db_port='5432'                                                  ; export intershop_db_port
+intershop_paths_npm_module_python_modules="$home"/python_modules          ; export intershop_paths_npm_module_python_modules
+intershop_paths_app_python_modules="$intershop_paths_app"/python_modules  ; export intershop_paths_app_python_modules
+intershop_paths_tmp='/tmp/'$intershop_db_name                             ; export intershop_paths_tmp
+intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'            ; export intershop_paths_psql_output
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_paths_printenv='lib/intershop-printenv.js'            ; export intershop_paths_printenv
+intershop_paths_printenv='lib/intershop-printenv.js'                      ; export intershop_paths_printenv
 echo -e "$blue"'intershop_paths_printenv:                      ' "$white$intershop_paths_printenv                   $reset"
 #...........................................................................................................
 cd "$intershop_paths_app"
