@@ -31,23 +31,6 @@ create type U.jsonbl_facet            as ( linenr integer,  value jsonb     );
 create type U.integer_facet           as ( key    text,     value integer   );
 create type U.float_facet             as ( key    text,     value float     );
 
--- ---------------------------------------------------------------------------------------------------------
-drop schema if exists NAMEOF cascade;
-create schema NAMEOF;
-
--- ---------------------------------------------------------------------------------------------------------
-/* aliases for names of DB objects; see table at https://www.postgresql.org/docs/current/static/datatype-oid.html */
-create domain NAMEOF.function   as regproc;         /* pg_proc       */
-create domain NAMEOF.operator   as regoper;         /* pg_operator   */
-create domain NAMEOF.relation   as regclass;        /* pg_class      */
-create domain NAMEOF.data_type  as regtype;         /* pg_type       */
-create domain NAMEOF.role       as regrole;         /* pg_authid     */
-create domain NAMEOF.schema     as regnamespace;    /* pg_namespace  */
--- create domain NAMEOF.numeric_object_identifier     as oid;             /* any           */
--- create domain NAMEOF.function_with_atypes          as regprocedure;    /* pg_proc       */
--- create domain NAMEOF.operator_with_atypes          as regoperator;     /* pg_operator   */
--- create domain NAMEOF.text_search_configuration     as regconfig;       /* pg_ts_config  */
--- create domain NAMEOF.text_search_dictionary        as regdictionary;   /* pg_ts_dict    */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  */
 /* thx to https://stackoverflow.com/a/24006432/7568091 */
