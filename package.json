@@ -1,6 +1,6 @@
 {
   "name": "intershop",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "An application basework built on PostGreSQL, with sprinkles of JavaScript and plPython3u",
   "main": "lib/main.js",
   "directories": {
