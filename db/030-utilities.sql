@@ -222,10 +222,10 @@ create function ¶( ¶key text, ¶value anyelement ) returns void volatile langu
   insert into U.variables values ( ¶key, ¶value )
   on conflict ( key ) do update set value = ¶value; $$;
 
--- ---------------------------------------------------------------------------------------------------------
-do $$ begin
-  perform ¶( 'username', current_user );
-  end; $$;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- do $$ begin
+--   perform ¶( 'username', current_user );
+--   end; $$;
 
 -- =========================================================================================================
 -- CONVERSION TO JSONB

@@ -18,22 +18,7 @@
 drop schema if exists INIT cascade;
 create schema INIT;
 
-
--- -- ---------------------------------------------------------------------------------------------------------
--- create table PUBLIC.kbm_settings (
---   key   text unique not null primary key,
---   value text        not null
---   );
-
--- -- ---------------------------------------------------------------------------------------------------------
--- insert into PUBLIC.kbm_settings
---   select
---       lower( regexp_replace( key, '^kbm_', '' ) ) as key,
---       value
---     from INIT.environment
---     where key ~ '^kbm_'
---     -- order by key asc
---   ;
+select * from U.variables order by key;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
@@ -58,18 +43,24 @@ create function INIT.py_init() returns void language plpython3u as $$
     ctx.execute   = plpy.execute
     ctx.notice    = plpy.notice
     #.......................................................................................................
-    def get_os_env_value( key ):
-      sql   = """select value from OS.env where key = $1"""
+    def get_variable( key ):
+      sql   = """select ¶( $1 ) as value"""
       plan  = plpy.prepare( sql, [ 'text', ] )
       rows  = plpy.execute( plan, [ key, ] )
       if len( rows ) != 1:
-        raise Exception( "unable to find setting  intershop_python_path in OS.env" )
+        raise Exception( "unable to find setting " + repr( key ) + " in U.variables" )
       return rows[ 0 ][ 'value' ]
     #.......................................................................................................
-    ctx.get_os_env_value = get_os_env_value
+    def set_variable( key, value ):
+      sql   = """select ¶( $1, $2 )"""
+      plan  = plpy.prepare( sql, [ 'void', ] )
+      rows  = plpy.execute( plan, [ key, value, ] )
     #.......................................................................................................
-    ctx.python_path       = ctx.get_os_env_value( 'intershop_python_path'       )
-    ctx.psql_output_path  = ctx.get_os_env_value( 'intershop_psql_output_path'  )
+    ctx.get_variable = get_variable
+    ctx.set_variable = set_variable
+    #.......................................................................................................
+    ctx.python_path       = ctx.get_variable( 'intershop/paths/python_modules'  )
+    ctx.psql_output_path  = ctx.get_variable( 'intershop/paths/psql_output'     )
     sys.path.insert( 0, ctx.python_path )
     #.......................................................................................................
     def log( *P ):

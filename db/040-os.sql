@@ -50,33 +50,23 @@ create function OS._get_architecture_etc() returns jsonb volatile language plsh 
     } ) ); $$;
 reset role;
 
--- -- ---------------------------------------------------------------------------------------------------------
--- create materialized view OS.machine as (
---   select * from jsonb_each_text( OS._get_architecture_etc() ) union all
---   select 'hostname' as key, OS._get_hostname() as value );
-
 
 -- =========================================================================================================
 -- ABSORB OS ENVIRONMENT
+-- -- ---------------------------------------------------------------------------------------------------------
+-- create function OS.is_dev() returns boolean volatile language sql as $$
+--   select ¶( 'os/env/NODE_ENV' ) = 'dev'; $$;
+
 -- ---------------------------------------------------------------------------------------------------------
-create table OS.env (
-  key   text unique not null primary key,
-  value text        not null );
+create function OS._set_env_variable( ¶key text, ¶value text ) returns void volatile language sql as $$
+  select ¶( 'os/env/' || ¶key, substring( ¶value for 50 ) ); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function OS._get_env_variable( ¶key text ) returns text stable language sql as $$
+  select ¶( 'os/env/' || ¶key ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 \ir './update-os-env.sql'
-
-
--- ---------------------------------------------------------------------------------------------------------
-/* ### TAINT use environment to check for this */
-create function OS.is_dev() returns boolean volatile language sql as $$
-select count(*) > 0 from OS.env where key = 'NODE_ENV' $$;
-
--- ---------------------------------------------------------------------------------------------------------
-do $$ begin perform ¶( 'OS/nodejs/versions/'   || key, value ) from jsonb_each_text( OS._nodejs_versions() );         end; $$;
-do $$ begin perform ¶( 'OS/machine/'           || key, value ) from jsonb_each_text( OS._get_architecture_etc() ) ;   end; $$;
-do $$ begin perform ¶( 'OS/machine/hostname',          OS._get_hostname() );                                          end; $$;
-do $$ begin perform ¶( 'OS/env/' || key,               substring( value for 50 ) ) from OS.env;                       end; $$;
 
 -- \set pwd `pwd`
 -- \echo :pwd

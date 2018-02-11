@@ -4,42 +4,42 @@ set -e
 set -o pipefail
 
 #-----------------------------------------------------------------------------------------------------------
-if [ -z ${intershop_app_home+x} ]; then
-  echo 'need variable $intershop_app_home'
-  exit 1
-  fi
-export intershop_app_home
-
-#-----------------------------------------------------------------------------------------------------------
 # thx to https://stackoverflow.com/a/20579006/7568091
 script_path="$(realpath "${BASH_SOURCE[0]}")"
-intershop_bin_path="$(dirname "$script_path")"                        ; export intershop_bin_path
-intershop_module_home="$(realpath "$intershop_bin_path"/..)"          ; export intershop_module_home
+intershop_paths_bin="$(dirname "$script_path")"                       ; export intershop_paths_bin
+intershop_paths_npm_module="$(realpath "$intershop_paths_bin"/..)"    ; export intershop_paths_npm_module
 
 #-----------------------------------------------------------------------------------------------------------
-cd "$intershop_module_home"
+if [ -z ${intershop_paths_app+x} ]; then
+  echo "$script_path"': need variable $intershop_paths_app'
+  exit 1
+  fi
+export intershop_paths_app
+
+#-----------------------------------------------------------------------------------------------------------
+cd "$intershop_paths_npm_module"
 source bin/_trm
-echo -e "$blue"'intershop_app_home:         ' "$white$intershop_app_home         $reset"
-echo -e "$blue"'intershop_module_home:      ' "$white$intershop_module_home      $reset"
+echo -e "$blue"'intershop_paths_app:                ' "$white$intershop_paths_app             $reset"
+echo -e "$blue"'intershop_paths_npm_module:         ' "$white$intershop_paths_npm_module      $reset"
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_db_name=intershop                                           ; export intershop_db_name
-intershop_db_user=intershop                                           ; export intershop_db_user
-intershop_db_port='5432'                                              ; export intershop_db_port
-intershop_python_path="$home"/python_modules                          ; export intershop_python_path
-intershop_tmppath='/tmp/'$intershop_db_name                           ; export intershop_tmppath
-intershop_psql_output_path=$intershop_tmppath'/psql-output'           ; export intershop_psql_output_path
+intershop_db_name=intershop                                     ; export intershop_db_name
+intershop_db_user=intershop                                     ; export intershop_db_user
+intershop_db_port='5432'                                        ; export intershop_db_port
+intershop_paths_python_modules="$home"/python_modules           ; export intershop_paths_python_modules
+intershop_paths_tmp='/tmp/'$intershop_db_name                   ; export intershop_paths_tmp
+intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'  ; export intershop_paths_psql_output
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_printenv_path='lib/intershop-printenv.js' ; export intershop_printenv_path
-echo -e "$blue"'intershop_printenv_path:    ' "$white$intershop_printenv_path              $reset"
+intershop_paths_printenv='lib/intershop-printenv.js'            ; export intershop_paths_printenv
+echo -e "$blue"'intershop_paths_printenv:           ' "$white$intershop_paths_printenv        $reset"
 #...........................................................................................................
-cd "$intershop_app_home"
-intershop_printenv_path=$(realpath "$intershop_printenv_path")
+cd "$intershop_paths_app"
+intershop_paths_printenv=$(realpath "$intershop_paths_printenv")
 set +e
-set_environment=$(node "$intershop_printenv_path")
+set_environment=$(node "$intershop_paths_printenv")
 exit_code=$?
-cd "$intershop_module_home"
+cd "$intershop_paths_npm_module"
 if [[ $exit_code != 0 ]]; then
   printf $red'an error occurred; terminating'$reset'\n'
   exit $exit_code
@@ -49,31 +49,31 @@ if [[ $exit_code != 0 ]]; then
 set -e
 eval $set_environment
 # printf $yellow"$set_environment"'\n'$reset
-echo -e "$blue"'intershop_db_name:          ' "$white$intershop_db_name          $reset"
-echo -e "$blue"'intershop_db_user:          ' "$white$intershop_db_user          $reset"
-echo -e "$blue"'intershop_db_port:          ' "$white$intershop_db_port          $reset"
-echo -e "$blue"'intershop_python_path:      ' "$white$intershop_python_path      $reset"
-echo -e "$blue"'intershop_tmppath:          ' "$white$intershop_tmppath          $reset"
-echo -e "$blue"'intershop_psql_output_path: ' "$white$intershop_psql_output_path $reset"
+echo -e "$blue"'intershop_db_name:                  ' "$white$intershop_db_name               $reset"
+echo -e "$blue"'intershop_db_user:                  ' "$white$intershop_db_user               $reset"
+echo -e "$blue"'intershop_db_port:                  ' "$white$intershop_db_port               $reset"
+echo -e "$blue"'intershop_paths_python_modules:     ' "$white$intershop_paths_python_modules  $reset"
+echo -e "$blue"'intershop_paths_tmp:                ' "$white$intershop_paths_tmp             $reset"
+echo -e "$blue"'intershop_paths_psql_output:        ' "$white$intershop_paths_psql_output     $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
 # tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
 # # Thx to https://stackoverflow.com/a/8048493/7568091
 # # for the idea to redirect to a subshell to preserve the PID of the first command:
-# ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+# ( tail -f "$intershop_paths_psql_output" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 # make sure output file exists with the correct rights:
-mkdir -p $intershop_tmppath
-chmod 0777 $intershop_tmppath
-touch $intershop_psql_output_path
-chmod 0666 $intershop_psql_output_path
-truncate -s 0 $intershop_psql_output_path
-( tail -f $intershop_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+mkdir -p $intershop_paths_tmp
+chmod 0777 $intershop_paths_tmp
+touch $intershop_paths_psql_output
+chmod 0666 $intershop_paths_psql_output
+truncate -s 0 $intershop_paths_psql_output
+( tail -f $intershop_paths_psql_output 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
 trap 'kill $psql_tailer_pid' EXIT
-# echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
+# echo 'helo world' >> $intershop_paths_psql_output; ls -AlF /tmp/intershop*; exit 1
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ function postgres_paged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
+    --set=out="$intershop_paths_psql_output"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ function postgres_unpaged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
+    --set=out="$intershop_paths_psql_output"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ function sudo_postgres_unpaged () {
     -p $intershop_db_port                                                           \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
+    --set=out="$intershop_paths_psql_output"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@";
   if [[ $? != 0 ]]; then exit 123; fi
   }

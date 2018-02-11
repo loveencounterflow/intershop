@@ -25,11 +25,10 @@
 do $$ begin perform log(); end; $$;
 do $$ begin perform log( 'U.variables (excerpt):' ); end; $$;
 select * from U.variables
-  where key ~ '^OS/machine/|intershop'
+  where not key ~ '^os/'
   order by key \g :out
 
 do $$ begin perform log( 'PostGreSQL version:', version() ); end; $$;
-do $$ begin perform log( 'is dev:', U.truth( OS.is_dev() ) ); end; $$;
 
 
 \quit
