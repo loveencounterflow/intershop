@@ -6,6 +6,8 @@
 \ir '../010-trm.sql'
 \set _TITLE       :yellow:reverse'  ':O:yellow' '
 
-\echo :_TITLE'120-utp.test.sql':O   \ir './120-utp.test.sql'
--- \echo :_TITLE'125-fa.test.sql':O    \ir './125-fa.test.sql'
-
+-- \echo :_TITLE'start.test.sql':O                   \ir './start.test.sql'
+\echo :_TITLE'001-general.test.sql':O             \ir './001-general.test.sql'
+\echo :_TITLE'030-utilities.test.sql':O           \ir './030-utilities.test.sql'
+\echo :_TITLE'060-filelinereader.test.sql':O      \ir './060-filelinereader.test.sql'
+-- \echo :_TITLE'stop.test.sql':O                    \ir './stop.test.sql'

@@ -30,8 +30,8 @@ config                    = require 'config'
 echo "intershop_db_name='#{config.get 'db.name'}'"
 echo "intershop_db_user='#{config.get 'db.user'}'"
 echo "intershop_db_port='#{config.get 'db.port'}'"
-# echo "intershop_python_path='foobar'"
-# echo "intershop_tmppath='foobar'"
-# echo "intershop_psql_output_path='foobar'"
+# echo "intershop_paths_python_modules='foobar'"
+# echo "intershop_paths_tmp='foobar'"
+# echo "intershop_paths_psql_output='foobar'"
 
 

@@ -5,7 +5,7 @@
 -- \set ECHO all
 -- \set ECHO errors
 -- \set ECHO none
-\set ECHO queries
+-- \set ECHO queries
 
 /*
 
@@ -23,6 +23,12 @@
 -- ---------------------------------------------------------------------------------------------------------
 drop schema if exists _FLR_test_ cascade;
 create schema _FLR_test_;
+
+select * from U.variables;
+do $$ begin perform log( '77100', ¶( 'paths/home' ) ); end; $$;
+\quit
+
+
 
 -- ---------------------------------------------------------------------------------------------------------
 \echo :X'--=(1)=--':O
