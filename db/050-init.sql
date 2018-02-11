@@ -18,8 +18,6 @@
 drop schema if exists INIT cascade;
 create schema INIT;
 
-select * from U.variables order by key;
-
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function INIT.py_init() returns void language plpython3u as $$
