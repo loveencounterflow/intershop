@@ -1,40 +1,40 @@
 
 /*
 
-8888888888 888      8888888b.
-888        888      888   Y88b
-888        888      888    888
-8888888    888      888   d88P
-888        888      8888888P"
-888        888      888 T88b
-888        888      888  T88b
-888        88888888 888   T88b
+8888888888 d8b 888           888      d8b                    8888888b.                         888
+888        Y8P 888           888      Y8P                    888   Y88b                        888
+888            888           888                             888    888                        888
+8888888    888 888  .d88b.   888      888 88888b.   .d88b.   888   d88P  .d88b.   8888b.   .d88888  .d88b.  888d888
+888        888 888 d8P  Y8b  888      888 888 "88b d8P  Y8b  8888888P"  d8P  Y8b     "88b d88" 888 d8P  Y8b 888P"
+888        888 888 88888888  888      888 888  888 88888888  888 T88b   88888888 .d888888 888  888 88888888 888
+888        888 888 Y8b.      888      888 888  888 Y8b.      888  T88b  Y8b.     888  888 Y88b 888 Y8b.     888
+888        888 888  "Y8888   88888888 888 888  888  "Y8888   888   T88b  "Y8888  "Y888888  "Y88888  "Y8888  888
 
 */
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists FLR cascade;
-create schema FLR;
+drop schema if exists FILELINEREADER cascade;
+create schema FILELINEREADER;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function FLR.is_comment( ¶line text ) returns boolean
+create function FILELINEREADER.is_comment( ¶line text ) returns boolean
   immutable strict language sql as $$
   select ¶line ~ '^\s*#'; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function FLR.is_blank( ¶line text ) returns boolean
+create function FILELINEREADER.is_blank( ¶line text ) returns boolean
   immutable strict language sql as $$
   select ¶line ~ '^\s*$'; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 /* convenience function; could be optimized to use single RegEx */
-create function FLR.is_comment_or_blank( ¶line text ) returns boolean
+create function FILELINEREADER.is_comment_or_blank( ¶line text ) returns boolean
   immutable strict language sql as $$
-  select FLR.is_comment( ¶line ) or FLR.is_blank( ¶line ); $$;
+  select FILELINEREADER.is_comment( ¶line ) or FILELINEREADER.is_blank( ¶line ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-create function FLR.read_lines( path_ text ) returns setof U.line_facet
+create function FILELINEREADER.read_lines( path_ text ) returns setof U.line_facet
   volatile language plpython3u as $$
   # plpy.execute( 'select INIT.py_init()' ); ctx = GD[ 'ctx' ]
   with open( path_, 'rb' ) as input:
@@ -44,19 +44,19 @@ create function FLR.read_lines( path_ text ) returns setof U.line_facet
 reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function FLR.read_lines_skip( ¶path text ) returns setof U.line_facet
+create function FILELINEREADER.read_lines_skip( ¶path text ) returns setof U.line_facet
   volatile language sql as $$
-    select * from FLR.read_lines( ¶path ) where not FLR.is_comment_or_blank( line ); $$;
+    select * from FILELINEREADER.read_lines( ¶path ) where not FILELINEREADER.is_comment_or_blank( line ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function FLR.read_jsonbl( ¶path text ) returns setof U.jsonbl_facet
+create function FILELINEREADER.read_jsonbl( ¶path text ) returns setof U.jsonbl_facet
   volatile language sql as $$
-  select linenr, line::jsonb as value from FLR.read_lines( ¶path ); $$;
+  select linenr, line::jsonb as value from FILELINEREADER.read_lines( ¶path ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function FLR.read_jsonbl_skip( ¶path text ) returns setof U.jsonbl_facet
+create function FILELINEREADER.read_jsonbl_skip( ¶path text ) returns setof U.jsonbl_facet
   volatile language sql as $$
-  select linenr, line::jsonb as value from FLR.read_lines_skip( ¶path ); $$;
+  select linenr, line::jsonb as value from FILELINEREADER.read_lines_skip( ¶path ); $$;
 
 
 

@@ -33,7 +33,7 @@ do $$ begin perform log( '77100', ¶( 'paths/home' ) ); end; $$;
 -- ---------------------------------------------------------------------------------------------------------
 \echo :X'--=(1)=--':O
 create view _FLR_test_._sample_000_raw as (
-  select * from FLR.read_lines(
+  select * from FILELINEREADER.read_lines(
     ¶( 'paths/home' ) || '/db/experiments/' || 'line-json-test.json'
     ) );
 
@@ -69,7 +69,7 @@ select * from _FLR_test_._sample_020_as_jsonb;
 -- ---------------------------------------------------------------------------------------------------------
 \echo :X'--=(4)=--':O
 create view _FLR_test_._sample_100_lines_skip as (
-  select * from FLR.read_lines_skip(
+  select * from FILELINEREADER.read_lines_skip(
     ¶( 'paths/home' ) || '/db/experiments/' || 'line-json-test.json'
     ) );
 
@@ -79,7 +79,7 @@ select * from _FLR_test_._sample_100_lines_skip;
 -- ---------------------------------------------------------------------------------------------------------
 \echo :X'--=(5)=--':O
 create view _FLR_test_._sample_200_jsonbl_skip as (
-  select * from FLR.read_jsonbl_skip(
+  select * from FILELINEREADER.read_jsonbl_skip(
     ¶( 'paths/home' ) || '/db/experiments/' || 'line-json-test.json'
     ) );
 
