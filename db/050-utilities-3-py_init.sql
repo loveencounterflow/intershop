@@ -75,9 +75,22 @@ create function U.py_init() returns void language plpython3u as $$
         o.write( R.encode( 'utf-8' ) + b'\n' )
       return R
     #.......................................................................................................
-    ctx.log = log
+    def log_python_path():
+      ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
+      ctx.log( "Python path:" )
+      for idx, path in enumerate( sys.path ):
+        ctx.log( idx + 1, path )
+      ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
     #.......................................................................................................
-    import intershop_main
+    ctx.log             = log
+    ctx.log_python_path = log_python_path
+    #.......................................................................................................
+    try:
+      import intershop_main
+    except ImportError:
+      log( "Unable to locate module `intershop_main`")
+      ctx.log_python_path()
+      raise
     intershop_main.setup( ctx )
     #.......................................................................................................
     $$;
@@ -103,18 +116,8 @@ do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U._test_py_init() returns void language plpython3u as $$
-  plpy.execute( 'select U.py_init()' )
-  ctx = GD[ 'ctx' ]
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import sys
-  ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
-  ctx.log( "Python path:"                 )
-  for idx, path in enumerate( sys.path ):
-    ctx.log( idx + 1, path )
-  ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
-  # ctx.log( ctx )
-  ctx.log( "U.py_init OK" )
-  import signals
-  ctx.log( 'signals', signals )
   ctx.log( ctx.url_parser )
   $$;
 reset role;
