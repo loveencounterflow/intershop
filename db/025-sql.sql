@@ -64,8 +64,6 @@ update SQL.oids_and_types set name = 'integer[]'  where oid =     'integer[]'::r
 update SQL.oids_and_types set name = 'float[]'    where oid =       'float[]'::regtype::oid;
 update SQL.oids_and_types set name = 'bigint[]'   where oid =      'bigint[]'::regtype::oid;
 
-select * from SQL.oids_and_types where oid = 1009;
-
 -- ---------------------------------------------------------------------------------------------------------
 /* aliases for names of DB objects; see table at https://www.postgresql.org/docs/current/static/datatype-oid.html */
 create domain SQL.name_of_function   as regproc;         /* pg_proc       */
