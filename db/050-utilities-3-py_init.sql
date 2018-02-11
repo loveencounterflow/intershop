@@ -108,7 +108,6 @@ create function U._test_py_init() returns void language plpython3u as $$
   import signals
   ctx.log( 'signals', signals )
   ctx.log( ctx.url_parser )
-  return
   $$;
 reset role;
 
