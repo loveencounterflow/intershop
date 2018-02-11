@@ -19,20 +19,21 @@ export intershop_paths_app
 #-----------------------------------------------------------------------------------------------------------
 cd "$intershop_paths_npm_module"
 source bin/_trm
-echo -e "$blue"'intershop_paths_app:                ' "$white$intershop_paths_app             $reset"
-echo -e "$blue"'intershop_paths_npm_module:         ' "$white$intershop_paths_npm_module      $reset"
+echo -e "$blue"'intershop_paths_app:                           ' "$white$intershop_paths_app                        $reset"
+echo -e "$blue"'intershop_paths_npm_module:                    ' "$white$intershop_paths_npm_module                 $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_db_name=intershop                                     ; export intershop_db_name
 intershop_db_user=intershop                                     ; export intershop_db_user
 intershop_db_port='5432'                                        ; export intershop_db_port
-intershop_paths_python_modules="$home"/python_modules           ; export intershop_paths_python_modules
+intershop_paths_npm_module_python_modules="$home"/python_modules           ; export intershop_paths_npm_module_python_modules
+intershop_paths_app_python_modules="$intershop_paths_app"/python_modules           ; export intershop_paths_app_python_modules
 intershop_paths_tmp='/tmp/'$intershop_db_name                   ; export intershop_paths_tmp
 intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'  ; export intershop_paths_psql_output
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_paths_printenv='lib/intershop-printenv.js'            ; export intershop_paths_printenv
-echo -e "$blue"'intershop_paths_printenv:           ' "$white$intershop_paths_printenv        $reset"
+echo -e "$blue"'intershop_paths_printenv:                      ' "$white$intershop_paths_printenv                   $reset"
 #...........................................................................................................
 cd "$intershop_paths_app"
 intershop_paths_printenv=$(realpath "$intershop_paths_printenv")
@@ -49,12 +50,13 @@ if [[ $exit_code != 0 ]]; then
 set -e
 eval $set_environment
 # printf $yellow"$set_environment"'\n'$reset
-echo -e "$blue"'intershop_db_name:                  ' "$white$intershop_db_name               $reset"
-echo -e "$blue"'intershop_db_user:                  ' "$white$intershop_db_user               $reset"
-echo -e "$blue"'intershop_db_port:                  ' "$white$intershop_db_port               $reset"
-echo -e "$blue"'intershop_paths_python_modules:     ' "$white$intershop_paths_python_modules  $reset"
-echo -e "$blue"'intershop_paths_tmp:                ' "$white$intershop_paths_tmp             $reset"
-echo -e "$blue"'intershop_paths_psql_output:        ' "$white$intershop_paths_psql_output     $reset"
+echo -e "$blue"'intershop_db_name:                             ' "$white$intershop_db_name                          $reset"
+echo -e "$blue"'intershop_db_user:                             ' "$white$intershop_db_user                          $reset"
+echo -e "$blue"'intershop_db_port:                             ' "$white$intershop_db_port                          $reset"
+echo -e "$blue"'intershop_paths_npm_module_python_modules:     ' "$white$intershop_paths_npm_module_python_modules  $reset"
+echo -e "$blue"'intershop_paths_app_python_modules:            ' "$white$intershop_paths_app_python_modules         $reset"
+echo -e "$blue"'intershop_paths_tmp:                           ' "$white$intershop_paths_tmp                        $reset"
+echo -e "$blue"'intershop_paths_psql_output:                   ' "$white$intershop_paths_psql_output                $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:

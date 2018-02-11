@@ -16,6 +16,7 @@
 
 */
 
+-- select * from U.variables where key ~ 'intershop' order by key;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
@@ -56,9 +57,13 @@ create function U.py_init() returns void language plpython3u as $$
     ctx.get_variable = get_variable
     ctx.set_variable = set_variable
     #.......................................................................................................
-    ctx.python_path       = ctx.get_variable( 'intershop/paths/python_modules'  )
-    ctx.psql_output_path  = ctx.get_variable( 'intershop/paths/psql_output'     )
-    sys.path.insert( 0, ctx.python_path )
+    ctx.paths_npm_module_python_modules = ctx.get_variable( 'intershop/paths/app/python_modules'  )
+    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/npm_module/python_modules'  )
+    ctx.psql_output_path                = ctx.get_variable( 'intershop/paths/psql_output'     )
+    #.......................................................................................................
+    if ctx.paths_npm_module_python_modules != ctx.paths_app_python_modules:
+      sys.path.insert( 0, ctx.paths_npm_module_python_modules )
+    sys.path.insert( 0, ctx.paths_app_python_modules )
     #.......................................................................................................
     def log( *P ):
       R = []
@@ -101,8 +106,11 @@ create function U._test_py_init() returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' )
   ctx = GD[ 'ctx' ]
   import sys
+  ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
+  ctx.log( "Python path:"                 )
   for idx, path in enumerate( sys.path ):
     ctx.log( idx + 1, path )
+  ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
   # ctx.log( ctx )
   ctx.log( "U.py_init OK" )
   import signals
