@@ -16,7 +16,6 @@
 \echo :_TITLE'020-extensions':_O              \ir './020-extensions.sql'
 \echo :_TITLE'025-sql':_O                     \ir './025-sql.sql'
 \echo :_TITLE'030-utilities':_O               \ir './030-utilities.sql'
-\echo :_TITLE'035-sh':_O                      \ir './035-sh.sql'
 \echo :_TITLE'040-os':_O                      \ir './040-os.sql'
 \echo :_TITLE'050-init':_O                    \ir './050-init.sql'
 \echo :_TITLE'051-python-functions':_O        \ir './051-python-functions.sql'
