@@ -22,6 +22,25 @@ sudo apt install postgresql-10-unit
 # sudo apt install postgresql-plperl-9.6
 ```
 
+##### Statement-Level Statistics
+
+In `postgresql.conf`:
+
+```
+shared_preload_libraries = 'pg_stat_statements'     # (change requires restart)
+```
+
+(must restart with `sudo /etc/init.d/postgresql restart 10` or similar after change; note that errors
+in this settings might not lead to visible error messages, but still prevent the server from restarting).
+
+Otherwise, comment this out in `020-extensions.sql`:
+
+```
+create extension if not exists pg_stat_statements;
+```
+
+Also see [here](https://pganalyze.com/docs/install/01_enabling_pg_stat_statements).
+
 #### Python
 
 ```sh
