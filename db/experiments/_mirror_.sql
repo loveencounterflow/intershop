@@ -51,7 +51,7 @@ reset role;
 -- ---------------------------------------------------------------------------------------------------------
 /* ### TAINT use CH domain */
 /* ### TAINT unsure how delete, then insert behaves under concurrency */
-create function _MIRROR_.content_hash_from_path( ¶path text ) returns text volatile strict
+create function _MIRROR_._read_ch_and_update( ¶path text ) returns text volatile strict
   language plpgsql as $$
   declare
     R       text  :=  _MIRROR_._content_hash_from_path( ¶path );
@@ -66,8 +66,9 @@ create function _MIRROR_.content_hash_from_path( ¶path text ) returns text vola
     delete from _MIRROR_.paths_and_chs where path = ¶path;
     perform log( '98987', 'ch', R );
     --......................................................................................................
-    /* Try to delete old CH and insert new CH: */
-    delete from _MIRROR_.chs where ch = ¶old_ch;
+    /* Delete old CH and insert new CH: */
+    delete from _MIRROR_.chs where ch = ¶old_ch and not exists (
+      select 1 from _MIRROR_.paths_and_chs where ch = ¶old_ch );
     insert into _MIRROR_.chs ( ch ) values ( R ) on conflict do nothing;
     --......................................................................................................
     insert into _MIRROR_.paths_and_chs ( path, ch ) values ( ¶path, R );
@@ -76,17 +77,18 @@ create function _MIRROR_.content_hash_from_path( ¶path text ) returns text vola
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
--- create function _MIRROR_.read( ¶path text ) returns setof U.ch_line_facet volatile strict
 /* ### TAINT use CH domain */
-create function _MIRROR_.read( ¶path text ) returns void volatile strict
+create function _MIRROR_.cache_lines( ¶path text ) returns void volatile strict
   language plpgsql as $$
   declare
-    ¶ch   text  :=  _MIRROR_.content_hash_from_path( ¶path );
+    ¶ch   text  :=  _MIRROR_._read_ch_and_update( ¶path );
   begin
     -- delete from _MIRROR_.lines where ch = ¶ch;
-    insert into _MIRROR_.lines ( ch, linenr, line )
-      select ¶ch, r.linenr, r.line
-      from FILELINEREADER.read_lines( ¶path ) as r;
+    if not exists ( select 1 from _MIRROR_.lines where ch = ¶ch ) then
+      insert into _MIRROR_.lines ( ch, linenr, line )
+        select ¶ch, r.linenr, r.line
+        from FILELINEREADER.read_lines( ¶path ) as r;
+      end if;
     end;
   $$;
 
