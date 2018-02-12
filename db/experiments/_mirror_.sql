@@ -8,15 +8,34 @@ drop schema if exists _MIRROR_ cascade;
 create schema _MIRROR_;
 
 -- ---------------------------------------------------------------------------------------------------------
-create table _MIRROR_.paths_and_chs (
-  path  text unique not null,
-  ch    text unique not null,
-  primary key ( path, ch ) );
+/* ### TAINT use CH domain */
+create table _MIRROR_.chs (
+  ch    text unique not null primary key );
 
 -- ---------------------------------------------------------------------------------------------------------
+/* ### TAINT use CH domain */
+create table _MIRROR_.paths_and_chs (
+  path  text unique not null,
+  ch    text not null references _MIRROR_.chs ( ch ) on delete cascade,
+  primary key ( path, ch ) );
+
+-- -- ---------------------------------------------------------------------------------------------------------
+-- create function _MIRROR_.on_before_update_paths_and_chs() returns trigger language plpgsql as $$
+--   begin
+--     perform log( '88872' );
+--     delete from _MIRROR_.paths_and_chs where ch = old.ch;
+--     return new; end; $$;
+
+-- -- ---------------------------------------------------------------------------------------------------------
+-- create trigger on_before_update_paths_and_chs before update on _MIRROR_.paths_and_chs
+-- for each row execute procedure _MIRROR_.on_before_update_paths_and_chs();
+
+-- ---------------------------------------------------------------------------------------------------------
+/* ### TAINT use CH domain */
+/* ### TAINT linenr must be >= 1, consecutive */
 create table _MIRROR_.lines (
-  ch      text    not null,           /* ### TAINT use CH domain */
-  linenr  integer not null,           /* ### TAINT must be >= 1, consecutive */
+  ch      text    not null references _MIRROR_.chs ( ch ) on delete cascade,
+  linenr  integer not null,
   line    text    not null,
   primary key ( ch, linenr ) );
 
@@ -31,13 +50,28 @@ reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
 /* ### TAINT use CH domain */
+/* ### TAINT unsure how delete, then insert behaves under concurrency */
 create function _MIRROR_.content_hash_from_path( ¶path text ) returns text volatile strict
   language plpgsql as $$
   declare
-    R text := _MIRROR_._content_hash_from_path( ¶path );
+    R       text  :=  _MIRROR_._content_hash_from_path( ¶path );
+    ¶old_ch text;
   begin
-    insert into _MIRROR_.paths_and_chs ( path, ch ) values ( ¶path, R )
-      on conflict ( path, ch ) do update set ch = R;
+    --......................................................................................................
+    /* Retrieve previous CH, if any: */
+    -- select into ¶old_ch ch from _MIRROR_.paths_and_chs where path = ¶path;
+    ¶old_ch := ch from _MIRROR_.paths_and_chs where path = ¶path;
+    --......................................................................................................
+    /* Remove association between path and CH: */
+    delete from _MIRROR_.paths_and_chs where path = ¶path;
+    perform log( '98987', 'ch', R );
+    --......................................................................................................
+    /* Try to delete old CH and insert new CH: */
+    delete from _MIRROR_.chs where ch = ¶old_ch;
+    insert into _MIRROR_.chs ( ch ) values ( R ) on conflict do nothing;
+    --......................................................................................................
+    insert into _MIRROR_.paths_and_chs ( path, ch ) values ( ¶path, R );
+      -- on conflict ( path, ch ) do update set ch = R;
     return R;
     end; $$;
 
@@ -49,7 +83,7 @@ create function _MIRROR_.read( ¶path text ) returns void volatile strict
   declare
     ¶ch   text  :=  _MIRROR_.content_hash_from_path( ¶path );
   begin
-    delete from _MIRROR_.lines where ch = ¶ch;
+    -- delete from _MIRROR_.lines where ch = ¶ch;
     insert into _MIRROR_.lines ( ch, linenr, line )
       select ¶ch, r.linenr, r.line
       from FILELINEREADER.read_lines( ¶path ) as r;
@@ -60,13 +94,6 @@ create function _MIRROR_.read( ¶path text ) returns void volatile strict
 /* ###################################################################################################### */
 
 
-
--- select ¶( 'intershop/paths/app' );
-select ¶( '_mirror_/paths/readme', ¶( 'intershop/paths/app' ) || '/README.md' );
-select _MIRROR_.read( ¶( '_mirror_/paths/readme' ) );
-select _MIRROR_.content_hash_from_path( ¶( '_mirror_/paths/readme' ) ) as ch;
-select * from _MIRROR_.paths_and_chs;
-select * from _MIRROR_.lines limit 15;
-
+\ir './_mirror_.test.sql'
 
 
