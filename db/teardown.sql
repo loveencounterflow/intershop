@@ -36,7 +36,7 @@ do $$
       end if;
     end $$;
 
-create user :intershop_db_user with
+create role :intershop_db_user with
   nocreatedb
   nocreaterole
   noinherit
