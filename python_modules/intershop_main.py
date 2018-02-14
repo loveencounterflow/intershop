@@ -22,8 +22,10 @@ def find_modules( ctx ):
     if filename == my_name:                      continue
     if not  isfile( join( my_path, filename ) ): continue
     #.......................................................................................................
-    module_name         = splitext( filename )[ 0 ]
-    ctx[ module_name ]  = import_module( module_name )
+    module_name             = splitext( filename )[ 0 ]
+    ctx[ module_name ]      = import_module( module_name )
+    # Make `ctx` implicitly available in modules:
+    ctx[ module_name ].ctx  = ctx
 
 #-----------------------------------------------------------------------------------------------------------
 def add_type_mappings( ctx ):
