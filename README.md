@@ -41,6 +41,14 @@ create extension if not exists pg_stat_statements;
 
 Also see [here](https://pganalyze.com/docs/install/01_enabling_pg_stat_statements).
 
+#### Redis
+
+```sh
+sudo add-apt-repository ppa:chris-lea/redis-server
+sudo apt update
+sudo apt install redis-server
+```
+
 #### Python
 
 ```sh
