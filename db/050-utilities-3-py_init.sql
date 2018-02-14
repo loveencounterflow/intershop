@@ -120,8 +120,21 @@ create function U._test_py_init() returns void language plpython3u as $$
   import sys
   ctx.log( ctx.url_parser )
   ctx.log_python_path()
+  keys = [ key for key in ctx ]
+  keys.sort()
+  for key in keys:
+    ctx.log( 'ctx.' + key )
+    ctx.rds.publish( ctx, 'intershop/info', 'ctx.' + key )
+  for key in dir( ctx.rds ):
+    if key.startswith( '_' ): continue
+    ctx.log( 'ctx.rds.' + key )
+  ctx.rds.set( ctx, 'bar', 'some value' )
+  ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( ctx, 'add', { 'a': 42, 'b': 108, } ) )
+  xxx
   $$;
 reset role;
+  -- # ctx.redis.set( 'bar', '\u5fc3' )
+-- r.set( 'foo', '心' )
 
 
 
