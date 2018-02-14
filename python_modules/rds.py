@@ -19,8 +19,7 @@ implicit        = {}
 
 #-----------------------------------------------------------------------------------------------------------
 def _on_rpc_a( message ):
-  ctx.log( '28882', repr( message ) )
-  # xxx_log( '28882', repr( data.get( 'data' ) ) )
+  # ctx.log( '28882', repr( message ) )
   try:
     if message.get( 'type' ) != 'message': return
     data = message.get( 'data' )
@@ -29,31 +28,30 @@ def _on_rpc_a( message ):
     if not hasattr( data, 'get' ): return
     rpcid = data.get( 'rpcid' )
     if rpcid is None: return
-    rpc_results[ rpcid ] = data
+    rpc_results[ rpcid ] = data.get( 'result' )
   except Exception:
     raise
 
 #-----------------------------------------------------------------------------------------------------------
 def get_rpc_a( rpcid ):
-  R     = None
-  delta = 1 / 4
-  count = 0
+  R       = None
+  delta   = 1 / 1000
+  pdt     = 0 # pseudo delta-time (in seconds)
+  timeout = 1
   while True:
-    count += +delta
-    if count > 1: break
-    rpc_a_listener.get_message()
-    ctx.log( '77621', rpc_results )
     R = rpc_results.get( rpcid )
+    if R is not None: break
+    pdt += +delta
+    if pdt > timeout: break
     _TIME.sleep( delta )
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 rpc_a_listener  = new_redis().pubsub( ignore_subscribe_messages = True )
 rpc_a_listener.subscribe( **{ 'intershop/rpc/a': _on_rpc_a, } )
+thread = rpc_a_listener.run_in_thread( sleep_time = 1 / 1000 )
 # # throw away subscription message:
 # rpc_a_listener.get_message()
-# r = _REDIS.StrictRedis( host = 'localhost', port = 6379, db = 0 )
-# print( r.get( 'foo' ) )
 
 #-----------------------------------------------------------------------------------------------------------
 def set( key, value ):
@@ -76,17 +74,5 @@ def rpc( command, data ):
   publish( 'intershop/rpc/q', _JSON.dumps( { 'command': command, 'rpcid': rpcid, 'data': data, } ) )
   # ctx.log( '77621', rpc_a_listener.get_message() )
   return get_rpc_a( rpcid )
-
-  # for rsp in rpc_a_listener.listen():
-  #   break
-    # try:
-    #   # value = _JSON.loads( rsp )
-    #   if rsp.get( 'rpcid' ) == rpcid:
-    #     break
-    # except Exception as e:
-    #   raise
-
-
-
 
 

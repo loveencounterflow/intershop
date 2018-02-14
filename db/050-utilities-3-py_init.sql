@@ -129,7 +129,8 @@ create function U._test_py_init() returns void language plpython3u as $$
     if key.startswith( '_' ): continue
     ctx.log( 'ctx.rds.' + key )
   ctx.rds.set( 'bar', 'some value' )
-  ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( 'add', { 'a': 42, 'b': 108, } ) )
+  for i in range( 0, 100 ):
+    ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( 'add', { 'a': 42, 'b': i, } ) )
   xxx
   $$;
 reset role;

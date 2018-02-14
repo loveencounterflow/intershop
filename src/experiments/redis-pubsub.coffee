@@ -47,7 +47,9 @@ sub.on 'pmessage', ( pattern, channel, message ) ->
     urge rpr value
     { rpcid, } = value
     rpcid ?= 1 # 'no RPC ID'
-    pub.publish 'intershop/rpc/a', jr { rpcid, glamour: 42 + 108, foobar: 'something', }
+    data = value.data ? null
+    ### TAINT implement error protocol for requests with unexpected data ###
+    pub.publish 'intershop/rpc/a', jr { rpcid, result: ( data.a ? 0 ) + ( data.b ? 0 ), }
   # msg_count += 1
   # if msg_count is 3
   #   sub.unsubscribe()
