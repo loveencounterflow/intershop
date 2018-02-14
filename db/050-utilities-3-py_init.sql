@@ -124,12 +124,12 @@ create function U._test_py_init() returns void language plpython3u as $$
   keys.sort()
   for key in keys:
     ctx.log( 'ctx.' + key )
-    ctx.rds.publish( ctx, 'intershop/info', 'ctx.' + key )
+    ctx.rds.publish( 'intershop/info', 'ctx.' + key )
   for key in dir( ctx.rds ):
     if key.startswith( '_' ): continue
     ctx.log( 'ctx.rds.' + key )
-  ctx.rds.set( ctx, 'bar', 'some value' )
-  ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( ctx, 'add', { 'a': 42, 'b': 108, } ) )
+  ctx.rds.set( 'bar', 'some value' )
+  ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( 'add', { 'a': 42, 'b': 108, } ) )
   xxx
   $$;
 reset role;

@@ -7,16 +7,6 @@ import time   as _TIME
 import json   as _JSON
 import redis  as _REDIS
 
-def xxx_log( *P ):
-  R = []
-  for p in P:
-    if isinstance( p, str ):  R.append( p )
-    else:                     R.append( repr( p ) )
-  R = ' '.join( R )
-  with open( '/tmp/intershop/psql-output', 'ab' ) as o:
-    o.write( R.encode( 'utf-8' ) + b'\n' )
-  return R
-
 #-----------------------------------------------------------------------------------------------------------
 def new_redis():
   return _REDIS.StrictRedis( host = 'localhost', port = 6379, db = 0, decode_responses = True )
@@ -25,11 +15,11 @@ def new_redis():
 last_rpcid      = 0
 r               = new_redis()
 rpc_results     = {}
+implicit        = {}
 
 #-----------------------------------------------------------------------------------------------------------
 def _on_rpc_a( message ):
-  xxx_log( '28882', repr( message ) )
-  xxx_log( '28882', repr( message.get( 'data' ) ) )
+  ctx.log( '28882', repr( message ) )
   # xxx_log( '28882', repr( data.get( 'data' ) ) )
   try:
     if message.get( 'type' ) != 'message': return
@@ -44,7 +34,7 @@ def _on_rpc_a( message ):
     raise
 
 #-----------------------------------------------------------------------------------------------------------
-def get_rpc_a( ctx, rpcid ):
+def get_rpc_a( rpcid ):
   R     = None
   delta = 1 / 4
   count = 0
@@ -66,26 +56,26 @@ rpc_a_listener.subscribe( **{ 'intershop/rpc/a': _on_rpc_a, } )
 # print( r.get( 'foo' ) )
 
 #-----------------------------------------------------------------------------------------------------------
-def set( ctx, key, value ):
+def set( key, value ):
   r.set( key, value )
 
 #-----------------------------------------------------------------------------------------------------------
-def get( ctx, key, value ):
+def get( key, value ):
   r.get( key, value )
 
 #-----------------------------------------------------------------------------------------------------------
-def publish( ctx, channel, value ):
+def publish( channel, value ):
   r.publish( channel, value )
   # pubsub.execute_command( 'publish', channel, value )
 
 #-----------------------------------------------------------------------------------------------------------
-def rpc( ctx, command, data ):
+def rpc( command, data ):
   global last_rpcid
   last_rpcid += 1
   rpcid       = last_rpcid
-  publish( ctx, 'intershop/rpc/q', _JSON.dumps( { 'command': command, 'rpcid': rpcid, 'data': data, } ) )
+  publish( 'intershop/rpc/q', _JSON.dumps( { 'command': command, 'rpcid': rpcid, 'data': data, } ) )
   # ctx.log( '77621', rpc_a_listener.get_message() )
-  return get_rpc_a( ctx, rpcid )
+  return get_rpc_a( rpcid )
 
   # for rsp in rpc_a_listener.listen():
   #   break
