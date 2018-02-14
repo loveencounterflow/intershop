@@ -17,7 +17,7 @@ create schema _MIRROR_test;
 set role dba;
 create function _MIRROR_test.write_to_testfile( ¶path text ) returns void stable strict
   language plsh as $$#!/bin/bash
-  echo 'helo world' > "$1"
+  sudo -u flow echo 'helo world' > "$1"
   $$;
 reset role;
 

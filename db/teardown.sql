@@ -20,6 +20,7 @@
 \echo :X'targetting app user ':white:intershop_db_user :O
 \echo :X'targetting app DB   ':white:intershop_db_name :O
 
+-- select * from pg_stat_activity;
 select count( pg_terminate_backend( pid ) )
 from pg_stat_activity
 where datname = :'intershop_db_name';
