@@ -24,8 +24,7 @@ echo                      = CND.echo
 ### https://github.com/felixge/bash ###
 BASH                      = require 'bash'
 #...........................................................................................................
-### https://github.com/dominictarr/rc ###
-new_rc                    = require 'rc'
+pkgConf                   = require 'pkg-conf'
 #...........................................................................................................
 defaults =
   app:
@@ -52,15 +51,22 @@ _get_all_entries = ( x, stack ) ->
     if CND.isa_pod value
       R = [ R..., ( _get_all_entries value, stack )..., ]
     else
-      name_rpr  = 'intershop_' + ( BASH.escape k for k in stack ).join '_'
-      value_rpr = BASH.escape value
-      R.push "#{name_rpr}=#{value_rpr}"
+      # name_rpr  = 'intershop_' + ( BASH.escape k for k in stack ).join '_'
+      # value_rpr = BASH.escape value
+      # R.push "#{name_rpr}=#{value_rpr}"
+      R.push "intershop_#{stack.join '_'}='#{value}'"
     stack.pop()
   return R
 
 
 ############################################################################################################
-C = new_rc 'intershop', defaults
-echo entry for entry in get_all_entries C
+C = null
+do ->
+  C = await pkgConf 'intershop'
+  # debug '10111', C
+  # C = new_rc 'intershop', defaults
+  echo entry for entry in get_all_entries C
+
+
 
 
