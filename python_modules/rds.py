@@ -32,15 +32,17 @@ def _on_rpc_a( message ):
   except Exception:
     raise
 
+delta   = 1 / 10000
 #-----------------------------------------------------------------------------------------------------------
 def get_rpc_a( rpcid ):
   R       = None
-  delta   = 1 / 1000
   pdt     = 0 # pseudo delta-time (in seconds)
   timeout = 1
   while True:
     R = rpc_results.get( rpcid )
-    if R is not None: break
+    if R is not None:
+      del rpc_results[ rpcid ]
+      break
     pdt += +delta
     if pdt > timeout: break
     _TIME.sleep( delta )
@@ -49,7 +51,7 @@ def get_rpc_a( rpcid ):
 #-----------------------------------------------------------------------------------------------------------
 rpc_a_listener  = new_redis().pubsub( ignore_subscribe_messages = True )
 rpc_a_listener.subscribe( **{ 'intershop/rpc/a': _on_rpc_a, } )
-thread = rpc_a_listener.run_in_thread( sleep_time = 1 / 1000 )
+thread = rpc_a_listener.run_in_thread( sleep_time = delta )
 # # throw away subscription message:
 # rpc_a_listener.get_message()
 

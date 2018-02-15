@@ -118,6 +118,7 @@ set role dba;
 create function U._test_py_init() returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import sys
+  import time
   ctx.log( ctx.url_parser )
   ctx.log_python_path()
   keys = [ key for key in ctx ]
@@ -129,8 +130,14 @@ create function U._test_py_init() returns void language plpython3u as $$
     if key.startswith( '_' ): continue
     ctx.log( 'ctx.rds.' + key )
   ctx.rds.set( 'bar', 'some value' )
-  for i in range( 0, 100 ):
-    ctx.log( '!!!!!!!!!!!', ctx.rds.rpc( 'add', { 'a': 42, 'b': i, } ) )
+  n = 10000
+  t0 = time.time()
+  for i in range( 0, n ):
+    R = ctx.rds.rpc( 'add', { 'a': 42, 'b': i, } )
+    # ctx.log( '!!!!!!!!!!!', R )
+  t1  = time.time()
+  dt  = t1 - t0
+  ctx.log( '29091', 'n', n, 'dt', dt )
   xxx
   $$;
 reset role;

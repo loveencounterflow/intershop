@@ -41,10 +41,10 @@ sub.on 'psubscribe', ( channel, count ) ->
   pub.publish 'intershop/foo', "third message."
 
 sub.on 'pmessage', ( pattern, channel, message ) ->
-  info "sub channel #{pattern} -> #{channel}: #{rpr message}"
+  # info "sub channel #{pattern} -> #{channel}: #{rpr message}"
   if channel == 'intershop/rpc/q'
     value = JSON.parse message
-    urge rpr value
+    # urge rpr value
     { rpcid, } = value
     rpcid ?= 1 # 'no RPC ID'
     data = value.data ? null
