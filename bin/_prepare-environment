@@ -31,6 +31,9 @@ intershop_paths_npm_module_python_modules="$home"/python_modules          ; expo
 intershop_paths_app_python_modules="$intershop_paths_app"/python_modules  ; export intershop_paths_app_python_modules
 intershop_paths_tmp='/tmp/'$intershop_db_name                             ; export intershop_paths_tmp
 intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'            ; export intershop_paths_psql_output
+intershop_rpc_port='33333'                                                ; export intershop_rpc_port
+intershop_rpc_host='localhost'                                            ; export intershop_rpc_port
+intershop_rpc_host='unknown'                                              ; export intershop_rpc_port
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_paths_printenv='lib/intershop-printenv.js'                      ; export intershop_paths_printenv
@@ -58,6 +61,9 @@ echo -e "$blue"'intershop_paths_npm_module_python_modules:     ' "$white$intersh
 echo -e "$blue"'intershop_paths_app_python_modules:            ' "$white$intershop_paths_app_python_modules         $reset"
 echo -e "$blue"'intershop_paths_tmp:                           ' "$white$intershop_paths_tmp                        $reset"
 echo -e "$blue"'intershop_paths_psql_output:                   ' "$white$intershop_paths_psql_output                $reset"
+echo -e "$blue"'intershop_rpc_port:                            ' "$white$intershop_rpc_port                         $reset"
+echo -e "$blue"'intershop_rpc_host:                            ' "$white$intershop_rpc_host                         $reset"
+echo -e "$blue"'intershop_rpc_pid:                             ' "$white$intershop_rpc_pid                          $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:

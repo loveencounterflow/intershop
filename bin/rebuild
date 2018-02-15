@@ -9,9 +9,11 @@ home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 # echo '28282', "$(realpath "${BASH_SOURCE[0]}")"
 cd "$home"
 source bin/_prepare-environment
+bin/_restart-rpc-server
 
-sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
-postgres_unpaged      -f db/000-main.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+echo '33909', '........................................'
+# sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+# postgres_unpaged      -f db/000-main.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
 
 
 

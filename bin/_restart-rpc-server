@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# set -e
+cd "$(readlink -f "$0" | xargs dirname)"/..
+
+#-----------------------------------------------------------------------------------------------------------
+if [ -z ${intershop_rpc_port+x} ]; then
+  script_path="$(realpath "${BASH_SOURCE[0]}")"
+  echo "$script_path"': need variable $intershop_rpc_port'
+  exit 1
+  fi
+
+#-----------------------------------------------------------------------------------------------------------
+node lib/intershop-rpc-server-primary.js &
+intershop_rpc_pid="$!" ; export intershop_rpc_pid
+
+

@@ -14,6 +14,7 @@
 \echo :_TITLE'011-bar':_O                     \ir './011-bar.sql'
 \echo :_TITLE'012-time':_O                    \ir './012-time.sql'
 \echo :_TITLE'020-extensions':_O              \ir './020-extensions.sql'
+\echo :_TITLE'021-ipc':_O                     \ir './021-ipc.sql'
 \echo :_TITLE'025-sql':_O                     \ir './025-sql.sql'
 \echo :_TITLE'030-utilities-1':_O             \ir './030-utilities-1.sql'
 \echo :_TITLE'031-utilities-2-variables':_O   \ir './031-utilities-2-variables.sql'
