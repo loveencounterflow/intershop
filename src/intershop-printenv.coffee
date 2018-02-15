@@ -21,7 +21,11 @@ urge                      = CND.get_logger 'urge',      badge
 info                      = CND.get_logger 'info',      badge
 echo                      = CND.echo
 #...........................................................................................................
+### https://github.com/felixge/bash ###
 BASH                      = require 'bash'
+#...........................................................................................................
+### https://github.com/dominictarr/rc ###
+new_rc                    = require 'rc'
 #...........................................................................................................
 defaults =
   app:
@@ -56,7 +60,7 @@ _get_all_entries = ( x, stack ) ->
 
 
 ############################################################################################################
-C = ( require 'rc') 'intershop', defaults
+C = new_rc 'intershop', defaults
 echo entry for entry in get_all_entries C
 
 
