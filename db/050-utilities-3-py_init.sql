@@ -57,9 +57,11 @@ create function U.py_init() returns void language plpython3u as $$
     ctx.get_variable = get_variable
     ctx.set_variable = set_variable
     #.......................................................................................................
-    ctx.paths_npm_module_python_modules = ctx.get_variable( 'intershop/paths/app/python_modules'  )
-    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/npm_module/python_modules'  )
-    ctx.psql_output_path                = ctx.get_variable( 'intershop/paths/psql_output'     )
+    ctx.paths_npm_module_python_modules = ctx.get_variable( 'intershop/paths/app/python_modules'        )
+    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/npm_module/python_modules' )
+    ctx.psql_output_path                = ctx.get_variable( 'intershop/paths/psql_output'               )
+    ctx.rpc_port                        = int( ctx.get_variable( 'intershop/rpc/port'                 ) )
+    ctx.rpc_host                        = ctx.get_variable( 'intershop/rpc/host'                        )
     #.......................................................................................................
     if ctx.paths_npm_module_python_modules != ctx.paths_app_python_modules:
       sys.path.insert( 0, ctx.paths_npm_module_python_modules )
@@ -146,6 +148,7 @@ reset role;
 
 /* ###################################################################################################### */
 
+-- select * from U.variables where key ~ 'intershop' order by key;
 do $$ begin perform U._test_py_init(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 

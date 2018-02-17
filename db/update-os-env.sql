@@ -22,6 +22,7 @@ do $$
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_npm_module_', 'intershop/paths/npm_module/' );
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_npm_module',  'intershop/paths/npm_module'  );
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_',            'intershop/paths/'            );
+      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_rpc_',              'intershop/rpc/'              );
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_db_',               'intershop/db/'               );
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_',                  'intershop/'                  );
       perform ¶( ¶row.key, ¶row.value );
