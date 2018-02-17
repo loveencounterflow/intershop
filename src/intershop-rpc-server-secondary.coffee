@@ -58,10 +58,9 @@ O                         = require './options'
     #.......................................................................................................
     pipeline.push source
     pipeline.push PS.$split()
-    pipeline.push PS.$show()
+    # pipeline.push PS.$show()
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
-    # pipeline.push PS.$show()
     pipeline.push on_stop.add PS.$drain()
     #.......................................................................................................
     PS.pull pipeline...
@@ -69,7 +68,6 @@ O                         = require './options'
   #.........................................................................................................
   handler ?= =>
     { address: host, port, family, } = server.address()
-    debug '00111', server.address()
     help "#{O.app.name} RPC server listening on #{family} #{host}:#{port}"
   #.........................................................................................................
   # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
@@ -99,7 +97,6 @@ O                         = require './options'
     # debug '27211', ( rpr method ), ( rpr parameters )
     #.......................................................................................................
     switch method
-      when 'helo'     then help rpr parameters
       when 'error'    then @send_error S, parameters
       #.....................................................................................................
       ### Send `stop` signal to primary and exit secondary: ###
@@ -143,6 +140,10 @@ O                         = require './options'
 # RPC METHODS
 #-----------------------------------------------------------------------------------------------------------
 # { IDL, IDLX, }            = require 'mojikura-idl'
+
+#-----------------------------------------------------------------------------------------------------------
+@rpc_helo = ( S, P ) ->
+  return "helo #{rpr P}"
 
 #-----------------------------------------------------------------------------------------------------------
 @rpc_add = ( S, P ) ->

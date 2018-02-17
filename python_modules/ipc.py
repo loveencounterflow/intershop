@@ -27,7 +27,7 @@ def _prepare():
   _cache[ 'SIGNALS.client_socket'       ] = client_socket
   _cache[ 'SIGNALS.client_socket_rfile' ] = client_socket_rfile
   # _write_line( '{"data":"helo","role":"q","channel":"all","command":"helo"}' )
-  _send( 'helo', _JSON.dumps( '++helo++' ) )
+  rpc( 'helo', [ 'some', 'data', ] )
 
 #-----------------------------------------------------------------------------------------------------------
 def _write_line( line ):
@@ -43,11 +43,12 @@ def _read_line():
 ### TAINT must implement RPC result buffer ###
 def rpc( method, parameters ):
   _write_line( _JSON.dumps( [ method, parameters, ] ) )
-  R = _JSON.loads( _read_line() )
-  if R.get( 'command' ) == 'error':
-    message = R.get( 'data' )
-    if not message: message = "Unknown error when calling `ipc.rpc()`"
-    raise RuntimeError( message )
+  try:
+    R = _JSON.loads( _read_line() )
+    command   = R[ 0 ]
+    data      = R[ 1 ]
+  except Exception:
+    raise
   return R
 
 

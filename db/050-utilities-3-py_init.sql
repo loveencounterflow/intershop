@@ -118,11 +118,12 @@ do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U._benchmark_rpc() returns void language plpython3u as $$
+  import time
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   n = 10000
   t0 = time.time()
   for i in range( 0, n ):
-    R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
+    R = ctx.ipc.rpc( 'add', [ 42, i, ] )
     # ctx.log( '!!!!!!!!!!!', R )
   t1  = time.time()
   dt  = t1 - t0
@@ -135,7 +136,6 @@ set role dba;
 create function U._test_py_init() returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import sys
-  import time
   ctx.log( ctx.url_parser )
   ctx.log_python_path()
   keys = [ key for key in ctx ]
@@ -145,10 +145,8 @@ create function U._test_py_init() returns void language plpython3u as $$
   for key in dir( ctx.ipc ):
     # if key.startswith( '_' ): continue
     ctx.log( 'ctx.ipc.' + key )
-  n = 10
-  for i in range( 0, n ):
-    R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
-    ctx.log( '87321', 'RPC result:', repr( R ) )
+  for i in range( 0, 3 ):
+    ctx.log( '87321', 'RPC result:', repr( ctx.ipc.rpc( 'add', [ 42, i, ] ) ) )
   $$;
 reset role;
 
@@ -157,7 +155,7 @@ reset role;
 
 -- select * from U.variables where key ~ 'intershop' order by key;
 do $$ begin perform U._test_py_init(); end; $$;
--- do $$ begin perform U._benchmark_rpc(); end; $$;
+do $$ begin perform U._benchmark_rpc(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit
