@@ -13,8 +13,12 @@ if [ -z ${intershop_rpc_port+x} ]; then echo "$script_path"': need variable $int
 if [ -z ${intershop_rpc_host+x} ]; then echo "$script_path"': need variable $intershop_rpc_host' ; exit 1 ;fi
 
 #-----------------------------------------------------------------------------------------------------------
+# echo "trying to restart RPC server at $intershop_rpc_path"
 echo "trying to restart RPC server at $intershop_rpc_host:$intershop_rpc_port"
 set +e
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# echo '{"command":"restart"}' | netcat -U "$intershop_rpc_path"
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 echo '{"command":"restart"}' | netcat "$intershop_rpc_host" "$intershop_rpc_port"
 status=$?
 set -e

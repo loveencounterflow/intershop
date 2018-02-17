@@ -125,20 +125,18 @@ create function U._test_py_init() returns void language plpython3u as $$
   keys.sort()
   for key in keys:
     ctx.log( 'ctx.' + key )
-  #    ctx.ipc.emit( 'intershop/info', 'ctx.' + key )
-  #  for key in dir( ctx.ipc ):
-  #    if key.startswith( '_' ): continue
-  #    ctx.log( 'ctx.ipc.' + key )
-  #  ctx.ipc.set( 'bar', 'some value' )
-  #  n = 10000
-  #  t0 = time.time()
-  #  for i in range( 0, n ):
-  #    R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
-  #    # ctx.log( '!!!!!!!!!!!', R )
-  #  t1  = time.time()
-  #  dt  = t1 - t0
-  #  ctx.log( '29091', 'n', n, 'dt', dt )
-  #  xxx
+  for key in dir( ctx.ipc ):
+    # if key.startswith( '_' ): continue
+    ctx.log( 'ctx.ipc.' + key )
+  n = 10000
+  t0 = time.time()
+  for i in range( 0, n ):
+    R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
+    # ctx.log( '!!!!!!!!!!!', R )
+  t1  = time.time()
+  dt  = t1 - t0
+  ctx.log( '29091', 'n', n, 'dt', dt )
+  xxx
   $$;
 reset role;
   -- # ctx.redis.set( 'bar', '\u5fc3' )

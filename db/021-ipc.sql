@@ -64,8 +64,8 @@ create function IPC._send( channel text, command text, role text, data anyelemen
 /* ### TAINT this function should only exist in Python module */
 set role dba;
 create function IPC._write_line( line text ) returns void volatile language plpython3u as $$
-  from mojikura_python_modules import ipc as _IPC
-  return _IPC._write_line( line )
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  return ctx.ipc._write_line( line )
   $$;
 reset role;
 
@@ -89,21 +89,18 @@ reset role;
 -- create function IPC.rpc( channel text,  method text, parameters anyelement ) returns jsonb volatile language plpgsql as $$ begin return IPC._rpc( channel, method, to_jsonb( parameters       ) ); end; $$;
 -- create function IPC.rpc( channel text,  method text, parameters text       ) returns jsonb volatile language plpgsql as $$ begin return IPC._rpc( channel, method, to_jsonb( parameters       ) ); end; $$;
 -- create function IPC.rpc( channel text,  method text, parameters unknown    ) returns jsonb volatile language plpgsql as $$ begin return IPC._rpc( channel, method, to_jsonb( parameters::text ) ); end; $$;
-create function IPC.rpc( channel text,  method text, parameters jsonb ) returns jsonb volatile language plpgsql as $$ begin return IPC._rpc( channel, method, parameters ); end; $$;
+create function IPC.rpc( method text, parameters jsonb ) returns jsonb volatile language plpgsql as $$
+  begin
+    return IPC._rpc( method, parameters );
+    end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function IPC._rpc( channel text, method text, parameters jsonb )
+create function IPC._rpc( method text, parameters jsonb )
   returns text volatile language plpgsql as $$
     declare
       R text;
     begin
-      perform IPC._send(
-        channel,
-        'rpc',
-        'q',
-        jsonb_build_object(
-          'method',     method,
-          'parameters', parameters ) );
+      perform IPC._send( channel, 'rpc', jsonb_build_object( 'method', method, 'parameters', parameters ) );
       R := IPC._read_line();
       return R;
       end; $$;
@@ -111,8 +108,8 @@ create function IPC._rpc( channel text, method text, parameters jsonb )
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function IPC._read_line() returns text volatile language plpython3u as $$
-  from mojikura_python_modules import ipc as _SIGNALS
-  return _SIGNALS._read_line()
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  return ctx.ipc._read_line()
   $$;
 reset role;
 

@@ -3,24 +3,20 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+sudo echo # make sure password prompt won't pop up later, be perhaps hard to detect
 # set -e
 intershop_paths_app=$(pwd)
 # home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
-# echo '28282', $intershop_paths_app
-# echo '28282', $home
-# echo '28282', "${BASH_SOURCE[0]}"
-# echo '28282', "$(realpath "${BASH_SOURCE[0]}")"
 cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
 source bin/_prepare-environment
-echo '09911' 'intershop_rpc_port:' "$intershop_rpc_port"
-echo '09911' 'intershop_rpc_host:' "$intershop_rpc_host"
-export intershop_rpc_port
-export intershop_rpc_host
 bin/_restart-rpc-server
 
-# sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
-# postgres_unpaged      -f db/000-main.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+#-----------------------------------------------------------------------------------------------------------
+sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+postgres_unpaged      -f db/000-main.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
 
 
 

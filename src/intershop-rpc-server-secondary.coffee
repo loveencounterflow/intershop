@@ -14,6 +14,7 @@ urge                      = CND.get_logger 'urge',      badge
 info                      = CND.get_logger 'info',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
+FS                        = require 'fs'
 NET                       = require 'net'
 #...........................................................................................................
 PS                        = require 'pipestreams'
@@ -58,7 +59,7 @@ O                         = require './options'
     pipeline.push source
     pipeline.push PS.$split()
     pipeline.push @$parse_signal()
-    pipeline.push PS.$show()
+    # pipeline.push PS.$show()
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
     # pipeline.push PS.$show()
@@ -69,8 +70,13 @@ O                         = require './options'
   #.........................................................................................................
   handler ?= =>
     { address: host, port, family, } = server.address()
+    debug '00111', server.address()
     help "#{O.app.name} RPC server listening on #{family} #{host}:#{port}"
   #.........................................................................................................
+  # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+  # try FS.unlinkSync O.rpc.path catch error then warn error
+  # server.listen O.rpc.path, handler
+  # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
   server.listen O.rpc.port, O.rpc.host, handler
   return null
 

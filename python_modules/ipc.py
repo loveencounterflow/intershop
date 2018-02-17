@@ -21,15 +21,17 @@ GD = {}
 #-----------------------------------------------------------------------------------------------------------
 def _prepare():
   if GD.get( 'SIGNALS.client_socket_rfile', None ) != None: return
+  """!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
   host                                = 'localhost'
-  port                                = 21567
+  port                                = 23001
+  """!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
   client_socket                       = _SOCKET.socket( _SOCKET.AF_INET, _SOCKET.SOCK_STREAM )
   client_socket.connect( ( host, port, ) )
   client_socket_rfile                 = _OS.fdopen( client_socket.fileno(), 'r', encoding = 'utf-8' )
   GD[ 'SIGNALS.client_socket'       ] = client_socket
   GD[ 'SIGNALS.client_socket_rfile' ] = client_socket_rfile
   # _write_line( '{"data":"helo","role":"q","channel":"all","command":"helo"}' )
-  _send( 'all', 'helo', 'q', _JSON.dumps( '++helo++' ) )
+  _send( 'helo', _JSON.dumps( '++helo++' ) )
 
 #-----------------------------------------------------------------------------------------------------------
 def _write_line( line ):
@@ -42,9 +44,14 @@ def _read_line():
   return GD[ 'SIGNALS.client_socket_rfile' ].readline().strip()
 
 #-----------------------------------------------------------------------------------------------------------
-def _send( channel, command, role, data ):
+def _send( command, data ):
   _prepare()
-  event = { 'channel':  channel, 'command':  command, 'role':  role, 'data': data, }
+  event = { 'command': command, 'data': data, }
   _write_line( _JSON.dumps( event ) )
+
+#-----------------------------------------------------------------------------------------------------------
+def rpc( method, parameters ):
+  _send( 'rpc', { 'method': method, 'parameters': parameters, } )
+  return _read_line()
 
 
