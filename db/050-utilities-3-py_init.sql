@@ -117,6 +117,21 @@ do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
+create function U._benchmark_rpc() returns void language plpython3u as $$
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  n = 10000
+  t0 = time.time()
+  for i in range( 0, n ):
+    R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
+    # ctx.log( '!!!!!!!!!!!', R )
+  t1  = time.time()
+  dt  = t1 - t0
+  ctx.log( '29091', 'n', n, 'dt', dt )
+  $$;
+reset role;
+
+-- ---------------------------------------------------------------------------------------------------------
+set role dba;
 create function U._test_py_init() returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import sys
@@ -130,26 +145,19 @@ create function U._test_py_init() returns void language plpython3u as $$
   for key in dir( ctx.ipc ):
     # if key.startswith( '_' ): continue
     ctx.log( 'ctx.ipc.' + key )
-  n = 10000
-  t0 = time.time()
+  n = 10
   for i in range( 0, n ):
     R = ctx.ipc.rpc( 'add', { 'a': 42, 'b': i, } )
-    # ctx.log( '!!!!!!!!!!!', R )
-  t1  = time.time()
-  dt  = t1 - t0
-  ctx.log( '29091', 'n', n, 'dt', dt )
-  xxx
+    ctx.log( '87321', 'RPC result:', repr( R ) )
   $$;
 reset role;
-  -- # ctx.redis.set( 'bar', '\u5fc3' )
--- r.set( 'foo', '心' )
-
 
 
 /* ###################################################################################################### */
 
 -- select * from U.variables where key ~ 'intershop' order by key;
 do $$ begin perform U._test_py_init(); end; $$;
+-- do $$ begin perform U._benchmark_rpc(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit

@@ -58,8 +58,7 @@ O                         = require './options'
     #.......................................................................................................
     pipeline.push source
     pipeline.push PS.$split()
-    pipeline.push @$parse_signal()
-    # pipeline.push PS.$show()
+    pipeline.push PS.$show()
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
     # pipeline.push PS.$show()
@@ -89,23 +88,19 @@ O                         = require './options'
     return null
 
 #-----------------------------------------------------------------------------------------------------------
-@$parse_signal = ( S ) ->
-  return PS.map ( line ) =>
-    try
-      R = JSON.parse line
-    catch error
-      warn "#{error.message} (in #{rpr line})"
-      R = line
-    return R
-
-#-----------------------------------------------------------------------------------------------------------
 @$dispatch = ( S ) ->
-  return $ ( event, send ) =>
-    { command, data, } = event
-    switch command
-      when 'helo'     then help rpr data
-      when 'data'     then urge rpr data
-      when 'rpc'      then @do_rpc S, event
+  return $ ( line, send ) =>
+    try
+      event                   = JSON.parse line
+      [ method, parameters, ] = event
+    catch error
+      method      = 'error'
+      parameters  = "An error occurred while trying to parse #{rpr event}:\n#{error.message}"
+    # debug '27211', ( rpr method ), ( rpr parameters )
+    #.......................................................................................................
+    switch method
+      when 'helo'     then help rpr parameters
+      when 'error'    then @send_error S, parameters
       #.....................................................................................................
       ### Send `stop` signal to primary and exit secondary: ###
       when 'stop'
@@ -115,29 +110,32 @@ O                         = require './options'
       ### exit and have primary restart secondary: ###
       when 'restart'
         process.exit()
+      #.....................................................................................................
       else
-        warn "unable to interpret #{rpr event}"
-    send data
+        @do_rpc S, method, parameters
+    #.......................................................................................................
+    send event
 
 #-----------------------------------------------------------------------------------------------------------
-@do_rpc = ( S, event ) ->
-  S.counts.rpcs                                  += +1
-  { command, method: method_name, parameters, }   = event
-  method                                          = @[ "rpc_#{method_name}" ]
-  return @_write_a S, 'error', "no such method: #{rpr method_name}" unless method?
+@do_rpc = ( S, method_name, parameters ) ->
+  S.counts.rpcs  += +1
+  method          = @[ "rpc_#{method_name}" ]
+  return @send_error S, "no such method: #{rpr method_name}" unless method?
   #.........................................................................................................
   try
     result = method.call @, S, parameters
   catch error
-    debug '44938', error
     S.counts.errors += +1
-    return @_write_a S, 'error', error.message
-  @_write_a S, command, result
+    return @send_error S, error.message
+  @_write S, method_name, result
 
 #-----------------------------------------------------------------------------------------------------------
-@_write_a = ( S, command, data ) ->
-  line = ( JSON.stringify { command, data, } )
-  S.socket.write line + '\n'
+@send_error = ( S, message ) ->
+  @_write S, 'error', message
+
+#-----------------------------------------------------------------------------------------------------------
+@_write = ( S, method, parameters ) ->
+  S.socket.write ( JSON.stringify [ method, parameters, ] ) + '\n'
   return null
 
 

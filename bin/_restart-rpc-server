@@ -19,7 +19,7 @@ set +e
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # echo '{"command":"restart"}' | netcat -U "$intershop_rpc_path"
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-echo '{"command":"restart"}' | netcat "$intershop_rpc_host" "$intershop_rpc_port"
+echo '["restart"]' | netcat "$intershop_rpc_host" "$intershop_rpc_port"
 status=$?
 set -e
 echo "status: $status"

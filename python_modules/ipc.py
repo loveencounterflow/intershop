@@ -1,14 +1,14 @@
 
 """
 
- .d8888b. 8888888 .d8888b.  888b    888        d8888 888      .d8888b.
-d88P  Y88b  888  d88P  Y88b 8888b   888       d88888 888     d88P  Y88b
-Y88b.       888  888    888 88888b  888      d88P888 888     Y88b.
- "Y888b.    888  888        888Y88b 888     d88P 888 888      "Y888b.
-    "Y88b.  888  888  88888 888 Y88b888    d88P  888 888         "Y88b.
-      "888  888  888    888 888  Y88888   d88P   888 888           "888
-Y88b  d88P  888  Y88b  d88P 888   Y8888  d8888888888 888     Y88b  d88P
- "Y8888P" 8888888 "Y8888P88 888    Y888 d88P     888 88888888 "Y8888P"
+8888888 8888888b.   .d8888b.
+  888   888   Y88b d88P  Y88b
+  888   888    888 888    888
+  888   888   d88P 888
+  888   8888888P"  888
+  888   888        888    888
+  888   888        Y88b  d88P
+8888888 888         "Y8888P"
 
 """
 
@@ -40,14 +40,18 @@ def _read_line():
   return _cache[ 'SIGNALS.client_socket_rfile' ].readline().strip()
 
 #-----------------------------------------------------------------------------------------------------------
-def _send( command, data ):
-  _prepare()
-  event = { 'command': command, 'data': data, }
-  _write_line( _JSON.dumps( event ) )
-
-#-----------------------------------------------------------------------------------------------------------
+### TAINT must implement RPC result buffer ###
 def rpc( method, parameters ):
-  _send( 'rpc', { 'method': method, 'parameters': parameters, } )
-  return _read_line()
+  _write_line( _JSON.dumps( [ method, parameters, ] ) )
+  R = _JSON.loads( _read_line() )
+  if R.get( 'command' ) == 'error':
+    message = R.get( 'data' )
+    if not message: message = "Unknown error when calling `ipc.rpc()`"
+    raise RuntimeError( message )
+  return R
+
+
+
+
 
 
