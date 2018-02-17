@@ -36,10 +36,10 @@ intershop_rpc_host='localhost'                                            ; expo
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_paths_printenv='lib/intershop-printenv.js'                      ; export intershop_paths_printenv
-echo -e "$blue"'intershop_paths_printenv:                      ' "$white$intershop_paths_printenv                   $reset"
 #...........................................................................................................
 cd "$intershop_paths_app"
 intershop_paths_printenv=$(realpath "$intershop_paths_printenv")
+echo -e "$blue"'intershop_paths_printenv:                      ' "$white$intershop_paths_printenv                   $reset"
 set +e
 set_environment=$(node "$intershop_paths_printenv")
 exit_code=$?
@@ -51,7 +51,7 @@ if [[ $exit_code != 0 ]]; then
 
 #-----------------------------------------------------------------------------------------------------------
 set -e
-# echo 'set_environment:' $set_environment
+echo 'set_environment:' $set_environment
 eval $set_environment
 # printf $yellow"$set_environment"'\n'$reset
 echo -e "$blue"'intershop_db_name:                             ' "$white$intershop_db_name                          $reset"
