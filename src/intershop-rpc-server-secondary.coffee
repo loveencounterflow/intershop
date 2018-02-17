@@ -1,9 +1,10 @@
 
+'use strict'
 
 ############################################################################################################
 CND                       = require 'cnd'
 rpr                       = CND.rpr
-badge                     = 'RCP-SERVER'
+badge                     = 'INTERSHOP/RPC/SECONDARY'
 debug                     = CND.get_logger 'debug',     badge
 alert                     = CND.get_logger 'alert',     badge
 whisper                   = CND.get_logger 'whisper',   badge
@@ -57,7 +58,7 @@ O                         = require './options'
     pipeline.push source
     pipeline.push PS.$split()
     pipeline.push @$parse_signal()
-    # pipeline.push PS.$show()
+    pipeline.push PS.$show()
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
     # pipeline.push PS.$show()
@@ -94,33 +95,42 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @$dispatch = ( S ) ->
   return $ ( event, send ) =>
-    { channel, command, role, data, } = event
+    { command, data, } = event
     switch command
-      when 'helo' then help rpr data
-      when 'data' then urge rpr data
-      when 'rpc'  then @do_rpc S, channel, command, data
+      when 'helo'     then help rpr data
+      when 'data'     then urge rpr data
+      when 'rpc'      then @do_rpc S, event
+      #.....................................................................................................
+      ### Send `stop` signal to primary and exit secondary: ###
+      when 'stop'
+        process.send 'stop'
+        process.exit()
+      #.....................................................................................................
+      ### exit and have primary restart secondary: ###
+      when 'restart'
+        process.exit()
       else
         warn "unable to interpret #{rpr event}"
     send data
 
 #-----------------------------------------------------------------------------------------------------------
-@do_rpc = ( S, channel, command, data ) ->
-  S.counts.rpcs                        += +1
-  { method: method_name, parameters, }  = data
-  method                                = @[ "rpc_#{method_name}" ]
-  return @_write_a S, channel, 'error', "no such method: #{rpr method_name}" unless method?
+@do_rpc = ( S, event ) ->
+  S.counts.rpcs                                  += +1
+  { command, method: method_name, parameters, }   = event
+  method                                          = @[ "rpc_#{method_name}" ]
+  return @_write_a S, 'error', "no such method: #{rpr method_name}" unless method?
   #.........................................................................................................
   try
     result = method.call @, S, parameters
   catch error
     debug '44938', error
     S.counts.errors += +1
-    return @_write_a S, channel, 'error', error.message
-  @_write_a S, channel, command, result
+    return @_write_a S, 'error', error.message
+  @_write_a S, command, result
 
 #-----------------------------------------------------------------------------------------------------------
-@_write_a = ( S, channel, command, data ) ->
-  line = ( JSON.stringify { channel, command, role: 'a', data, } )
+@_write_a = ( S, command, data ) ->
+  line = ( JSON.stringify { command, data, } )
   S.socket.write line + '\n'
   return null
 

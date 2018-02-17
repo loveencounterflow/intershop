@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
-# set -e
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+# set -euo pipefail
+set -eo pipefail
+IFS=$'\n\t'
+
+#-----------------------------------------------------------------------------------------------------------
 cd "$(readlink -f "$0" | xargs dirname)"/..
+script_path="$(realpath "${BASH_SOURCE[0]}")"
 
 #-----------------------------------------------------------------------------------------------------------
-if [ -z ${intershop_rpc_port+x} ]; then
-  script_path="$(realpath "${BASH_SOURCE[0]}")"
-  echo "$script_path"': need variable $intershop_rpc_port'
-  exit 1
+if [ -z ${intershop_rpc_port+x} ]; then echo "$script_path"': need variable $intershop_rpc_port' ; exit 1 ;fi
+if [ -z ${intershop_rpc_host+x} ]; then echo "$script_path"': need variable $intershop_rpc_host' ; exit 1 ;fi
+
+#-----------------------------------------------------------------------------------------------------------
+echo "trying to restart RPC server at $intershop_rpc_host:$intershop_rpc_port"
+set +e
+echo '{"command":"restart"}' | netcat "$intershop_rpc_host" "$intershop_rpc_port"
+status=$?
+set -e
+echo "status: $status"
+if [[ $status -eq 0 ]]; then
+  echo 'OK'
+else
+  echo 'failed, launching RPC server...'
+  node lib/intershop-rpc-server-primary.js &
   fi
-
-#-----------------------------------------------------------------------------------------------------------
-node lib/intershop-rpc-server-primary.js &
-intershop_rpc_pid="$!" ; export intershop_rpc_pid
 
 
