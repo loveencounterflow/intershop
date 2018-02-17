@@ -155,7 +155,7 @@ reset role;
 
 -- select * from U.variables where key ~ 'intershop' order by key;
 do $$ begin perform U._test_py_init(); end; $$;
-do $$ begin perform U._benchmark_rpc(); end; $$;
+-- do $$ begin perform U._benchmark_rpc(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit
