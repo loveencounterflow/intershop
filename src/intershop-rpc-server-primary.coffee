@@ -18,13 +18,10 @@ echo                      = CND.echo.bind CND
 ### https://github.com/mafintosh/respawn ###
 respawn                   = require 'respawn'
 #...........................................................................................................
-config                    = require 'config'
+O                         = require './options'
 
+monitor = respawn O.respawn
 #-----------------------------------------------------------------------------------------------------------
-settings =
-  # command:            [ 'node', 'app.js', ],
-  command:            [ 'lib/intershop-rpc-server-secondary.js', ],
-  name:               'intershop-rpc-server'        # set monitor name
   env:                { key: 'value', }             # set env vars
   cwd:                '.'                           # set cwd
   maxRestarts:        -1                            # how many restarts are allowed within 60s or -1 for infinite restarts
@@ -32,6 +29,7 @@ settings =
   kill:               30000                         # wait 30s before force killing after stopping
   # stdio:              [...]                         # forward stdio options
   fork:               true                          # fork instead of spawn
+monitor.on 'spawn',   ( data ) -> urge 'spawn',   '>>>>>>>>>>>', "New child process has been spawned"
 
 # #-----------------------------------------------------------------------------------------------------------
 # respan = ( settings ) ->

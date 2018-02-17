@@ -24,18 +24,7 @@ echo                      = CND.echo
 ### https://github.com/felixge/bash ###
 BASH                      = require 'bash'
 #...........................................................................................................
-pkgConf                   = require 'pkg-conf'
-#...........................................................................................................
-defaults =
-  app:
-    name: 'intershop'
-  db:
-    port: 5433
-    name: 'intershop'
-    user: 'intershop'
-  rpc:
-    port: 22222
-    host: 'localhost'
+O                         = require './options'
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -60,12 +49,8 @@ _get_all_entries = ( x, stack ) ->
 
 
 ############################################################################################################
-C = null
 do ->
-  C = await pkgConf 'intershop'
-  # debug '10111', C
-  # C = new_rc 'intershop', defaults
-  echo entry for entry in get_all_entries C
+  echo entry for entry in get_all_entries O
 
 
 

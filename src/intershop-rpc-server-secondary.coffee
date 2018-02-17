@@ -19,9 +19,7 @@ PS                        = require 'pipestreams'
 { $
   $async }                = PS
 #...........................................................................................................
-config                    = require 'config'
-rpc_port                  = config.get 'rpc.port'
-rpc_host                  = config.get 'rpc.host'
+O                         = require './options'
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -70,9 +68,9 @@ rpc_host                  = config.get 'rpc.host'
   #.........................................................................................................
   handler ?= =>
     { address: host, port, family, } = server.address()
-    help "listening on #{family} #{host}:#{port}"
+    help "#{O.app.name} RPC server listening on #{family} #{host}:#{port}"
   #.........................................................................................................
-  server.listen rpc_port, rpc_host, handler
+  server.listen O.rpc.port, O.rpc.host, handler
   return null
 
 #-----------------------------------------------------------------------------------------------------------
