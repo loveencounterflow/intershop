@@ -28,6 +28,8 @@ if [[ $status -eq 0 ]]; then
 else
   echo 'failed, launching RPC server...'
   node lib/intershop-rpc-server-primary.js &
+  # primary_pid=$!
+  # echo "PID of RPC primary: $primary_pid"
   fi
 
 

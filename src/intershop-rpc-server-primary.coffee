@@ -22,7 +22,6 @@ O                         = require './options'
 
 monitor = respawn O.respawn
 monitor.on 'crash',   ( data ) -> urge 'crash',   '>>>>>>>>>>>', "The monitor has crashed (too many restarts or spawn error)."
-monitor.on 'exit',    ( data ) -> urge 'exit',    '>>>>>>>>>>>', "code, signal) child process has exited"
 monitor.on 'sleep',   ( data ) -> urge 'sleep',   '>>>>>>>>>>>', "monitor is sleeping"
 monitor.on 'spawn',   ( data ) -> urge 'spawn',   '>>>>>>>>>>>', "New child process has been spawned"
 monitor.on 'start',   ( data ) -> urge 'start',   '>>>>>>>>>>>', "The monitor has started"
@@ -30,6 +29,13 @@ monitor.on 'stderr',  ( data ) -> urge 'stderr',  '>>>>>>>>>>>', "child process 
 monitor.on 'stdout',  ( data ) -> urge 'stdout',  '>>>>>>>>>>>', "child process stdout has emitted data"; whisper data
 monitor.on 'stop',    ( data ) -> urge 'stop',    '>>>>>>>>>>>', "The monitor has fully stopped and the process is killed"
 monitor.on 'warn',    ( data ) -> urge 'warn',    '>>>>>>>>>>>', "child process has emitted an error"; warn data
+
+#-----------------------------------------------------------------------------------------------------------
+monitor.on 'exit', ( code, signal ) ->
+  urge 'exit', '>>>>>>>>>>>', "child process has exited with code #{rpr code}, signal #{rpr signal}"
+  if code isnt 0
+    urge "terminating RPC server primary"
+    process.exit code
 
 #-----------------------------------------------------------------------------------------------------------
 monitor.on 'message', ( message ) ->
