@@ -41,12 +41,18 @@ create extension if not exists pg_stat_statements;
 
 Also see [here](https://pganalyze.com/docs/install/01_enabling_pg_stat_statements).
 
-#### Redis
+#### Peru
+
+[Peru](https://github.com/buildinspace/peru) is "a tool for including other
+people's code in your projects"; it is the most convenient and promising way
+I've yet found to compose one application by drawing together from various
+sources crossing languages and access methods. It can be conveniently installed
+via the [Peru PPA](https://launchpad.net/%7Ebuildinspace/+archive/ubuntu/peru):
 
 ```sh
-sudo add-apt-repository ppa:chris-lea/redis-server
+sudo add-apt-repository ppa:buildinspace/peru
 sudo apt update
-sudo apt install redis-server
+sudo apt install peru
 ```
 
 #### Python
