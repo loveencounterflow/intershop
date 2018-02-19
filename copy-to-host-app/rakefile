@@ -1,0 +1,66 @@
+
+# puts Gem.available? /-?rcov$/
+if Gem::Specification::find_all_by_name( 'gemname' ).any?
+  puts 'available'
+else
+  puts 'not available'
+  end
+
+require_relative './intershop/ruby_modules/ptv_reader'
+
+# puts split_ptv_line 'respawn/sleep               unit            1 s'
+options = ptv_hash_from_path './intershop.ptv'
+
+puts options_as_facet_json    options
+puts options_as_untyped_json  options
+exit
+
+
+#-----------------------------------------------------------------------------------------------------------
+task :default => :update
+task :update  => :peru_update
+
+#-----------------------------------------------------------------------------------------------------------
+task :peru_sync do
+  sh 'peru sync'
+  Rake::Task[ 'intershop_npm_install' ].invoke
+  Rake::Task[ 'intershop_copy_configuration_if_missing' ].invoke
+  end
+
+#-----------------------------------------------------------------------------------------------------------
+task :peru_update do
+  sh 'peru reup'
+  Rake::Task[ 'intershop_npm_install' ].invoke
+  Rake::Task[ 'intershop_copy_configuration_if_missing' ].invoke
+  end
+
+#-----------------------------------------------------------------------------------------------------------
+task :intershop_npm_install do
+  sh '( cd intershop && npm install )'
+  end
+
+#-----------------------------------------------------------------------------------------------------------
+task :intershop_copy_configuration_if_missing do
+  target_path = './intershop.json'
+  if File.exist? target_path
+    puts "file #{target_path} exists; skipping"
+  else
+    cp 'intershop/intershop.json', target_path, :verbose => true
+    end
+  end
+
+
+
+# thx to https://stackoverflow.com/a/1290119/7568091
+# This always executes the task, but it doesn't execute its dependencies:
+
+# Rake::Task["build"].execute
+
+# This one executes the dependencies, but it only executes the task if it has not already been invoked:
+
+# Rake::Task["build"].invoke
+
+# This first resets the task's already_invoked state, allowing the task to then be executed again, dependencies and all:
+
+# Rake::Task["build"].reenable
+# Rake::Task["build"].invoke

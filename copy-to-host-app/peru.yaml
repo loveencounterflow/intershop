@@ -1,0 +1,15 @@
+imports:
+    intershop: intershop
+    # helloworld: ./
+
+git module intershop:
+    url: https://github.com/loveencounterflow/intershop
+    rev: e1c63d86738c7c92b5fd799e62bc2ba6fbcf58bc
+
+# git module helloworld:
+#     url: https://github.com/leachim6/hello-world
+#     pick: c/c.c
+#     export: c/
+#     rev: cd59bd06fa2e54b098bc7684c4f4d5494cc159ba
+
+
