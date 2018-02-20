@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------------------------------------------
 def copy_if_new( source_path, target_path )
   if File.exist? target_path
-    log TRM::red "file #{target_path} exists; skip copy from #{source_path}"
+    log TRM.red "file #{target_path} exists; skip copy from #{source_path}"
   else
     cp source_path, target_path, :verbose => true
     end#if
