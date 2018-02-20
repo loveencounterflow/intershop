@@ -1,6 +1,9 @@
 
 module TRM
 
+
+  #=========================================================================================================
+  # OUTPUT METHODS
   #---------------------------------------------------------------------------------------------------------
   def self.rpr( x )
     return x.inspect
@@ -29,27 +32,56 @@ module TRM
     end#def
 
 
+  #=========================================================================================================
+  # COLORS
   #---------------------------------------------------------------------------------------------------------
-  def self.green()
-    return "\x1b[38;05;34m"
-    end
+  def self._colorize ( color_code, *p )
+    r         = [ color_code, ]
+    last_idx  = p.length - 1
+    p.each_with_index do | x, idx |
+      if ( x.is_a? String ) then r.push x else r.push self.rpr x end
+      if idx != last_idx
+        r.push color_code
+        r.push ' '
+        end#if
+      end#do
+    r.push "\x1b[0m" # @constants[ 'reset' ]
+    return r.join ''
+    end#def
+
+  #-----------------------------------------------------------------------------------------------------------
+  # Colors
+  #...........................................................................................................
+  def self.black(     *p ) self._colorize "\x1b[38;05;16m",   *p; end
+  def self.blue(      *p ) self._colorize "\x1b[38;05;27m",   *p; end
+  def self.green(     *p ) self._colorize "\x1b[38;05;34m",   *p; end
+  def self.cyan(      *p ) self._colorize "\x1b[38;05;51m",   *p; end
+  def self.sepia(     *p ) self._colorize "\x1b[38;05;52m",   *p; end
+  def self.indigo(    *p ) self._colorize "\x1b[38;05;54m",   *p; end
+  def self.steel(     *p ) self._colorize "\x1b[38;05;67m",   *p; end
+  def self.brown(     *p ) self._colorize "\x1b[38;05;94m",   *p; end
+  def self.olive(     *p ) self._colorize "\x1b[38;05;100m",  *p; end
+  def self.lime(      *p ) self._colorize "\x1b[38;05;118m",  *p; end
+  def self.red(       *p ) self._colorize "\x1b[38;05;124m",  *p; end
+  def self.crimson(   *p ) self._colorize "\x1b[38;05;161m",  *p; end
+  def self.plum(      *p ) self._colorize "\x1b[38;05;176m",  *p; end
+  def self.pink(      *p ) self._colorize "\x1b[38;05;199m",  *p; end
+  def self.orange(    *p ) self._colorize "\x1b[38;05;208m",  *p; end
+  def self.gold(      *p ) self._colorize "\x1b[38;05;214m",  *p; end
+  def self.tan(       *p ) self._colorize "\x1b[38;05;215m",  *p; end
+  def self.yellow(    *p ) self._colorize "\x1b[38;05;226m",  *p; end
+  def self.grey(      *p ) self._colorize "\x1b[38;05;240m",  *p; end
+  def self.darkgrey(  *p ) self._colorize "\x1b[38;05;234m",  *p; end
+  def self.white(     *p ) self._colorize "\x1b[38;05;255m",  *p; end
 
   #---------------------------------------------------------------------------------------------------------
-  def self.red()
-    return "\x1b[38;05;124m"
-    end
   end#module
-
-
-#-----------------------------------------------------------------------------------------------------------
-def log( *p )
-  TRM::log *p
-  end#def
+  #---------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------------
-def echo( *p )
-  TRM::echo *p
-  end#def
+def rpr(  *p ) TRM::rpr   *p; end
+def log(  *p ) TRM::log   *p; end
+def echo( *p ) TRM::echo  *p; end
 
 
 =begin
@@ -69,50 +101,6 @@ def echo( *p )
 @no_underline             = "\x1b[24m"
 @reset                    = "\x1b[0m"
 
-#-----------------------------------------------------------------------------------------------------------
-# Colors
-#...........................................................................................................
-@colors =
-  black:                    "\x1b[38;05;16m"
-  blue:                     "\x1b[38;05;27m"
-  green:                    "\x1b[38;05;34m"
-  cyan:                     "\x1b[38;05;51m"
-  sepia:                    "\x1b[38;05;52m"
-  indigo:                   "\x1b[38;05;54m"
-  steel:                    "\x1b[38;05;67m"
-  brown:                    "\x1b[38;05;94m"
-  olive:                    "\x1b[38;05;100m"
-  lime:                     "\x1b[38;05;118m"
-  red:                      "\x1b[38;05;124m"
-  crimson:                  "\x1b[38;05;161m"
-  plum:                     "\x1b[38;05;176m"
-  pink:                     "\x1b[38;05;199m"
-  orange:                   "\x1b[38;05;208m"
-  gold:                     "\x1b[38;05;214m"
-  tan:                      "\x1b[38;05;215m"
-  yellow:                   "\x1b[38;05;226m"
-  grey:                     "\x1b[38;05;240m"
-  darkgrey:                 "\x1b[38;05;234m"
-  white:                    "\x1b[38;05;255m"
-
-  # experimental:
-  # colors as defined by http://ethanschoonover.com/solarized
-  BASE03:                   "\x1b[38;05;234m"
-  BASE02:                   "\x1b[38;05;235m"
-  BASE01:                   "\x1b[38;05;240m"
-  BASE00:                   "\x1b[38;05;241m"
-  BASE0:                    "\x1b[38;05;244m"
-  BASE1:                    "\x1b[38;05;245m"
-  BASE2:                    "\x1b[38;05;254m"
-  BASE3:                    "\x1b[38;05;230m"
-  YELLOW:                   "\x1b[38;05;136m"
-  ORANGE:                   "\x1b[38;05;166m"
-  RED:                      "\x1b[38;05;124m"
-  MAGENTA:                  "\x1b[38;05;125m"
-  VIOLET:                   "\x1b[38;05;61m"
-  BLUE:                     "\x1b[38;05;33m"
-  CYAN:                     "\x1b[38;05;37m"
-  GREEN:                    "\x1b[38;05;64m"
 
 
 
