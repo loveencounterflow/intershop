@@ -16,7 +16,8 @@
 
 */
 
--- select * from U.variables where key ~ 'intershop' order by key;
+-- select * from U.variables order by key;
+select * from U.variables where key ~ 'intershop' order by key;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
@@ -57,15 +58,15 @@ create function U.py_init() returns void language plpython3u as $$
     ctx.get_variable = get_variable
     ctx.set_variable = set_variable
     #.......................................................................................................
-    ctx.paths_npm_module_python_modules = ctx.get_variable( 'intershop/paths/app/python_modules'        )
-    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/npm_module/python_modules' )
+    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/app/python_modules'        )
+    ctx.paths_own_python_modules        = ctx.get_variable( 'intershop/paths/own/python_modules'        )
     ctx.psql_output_path                = ctx.get_variable( 'intershop/paths/psql_output'               )
     ctx.rpc_port                        = int( ctx.get_variable( 'intershop/rpc/port'                 ) )
     ctx.rpc_host                        = ctx.get_variable( 'intershop/rpc/host'                        )
     #.......................................................................................................
-    if ctx.paths_npm_module_python_modules != ctx.paths_app_python_modules:
-      sys.path.insert( 0, ctx.paths_npm_module_python_modules )
-    sys.path.insert( 0, ctx.paths_app_python_modules )
+    if ctx.paths_app_python_modules != ctx.paths_own_python_modules:
+      sys.path.insert( 0, ctx.paths_app_python_modules )
+    sys.path.insert( 0, ctx.paths_own_python_modules )
     #.......................................................................................................
     def log( *P ):
       R = []

@@ -6,8 +6,16 @@ create table U.variables of U.text_facet ( key unique not null primary key );
 
 -- ---------------------------------------------------------------------------------------------------------
 drop function if exists ¶( text ) cascade;
-create function ¶( ¶key text ) returns text volatile language sql as $$
-  select value from U.variables where key = ¶key; $$;
+create function ¶( ¶key text ) returns text stable language plpgsql as $$
+  declare
+    ¶row_count  integer;
+    R           text;
+  begin
+    R := value from U.variables where key = ¶key;
+    get diagnostics ¶row_count = row_count;
+    if ¶row_count != 1 then raise exception 'variable not found: %', $1; end if;
+    return R;
+    end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 drop function if exists ¶( text, anyelement ) cascade;

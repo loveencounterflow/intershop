@@ -1,7 +1,23 @@
 #!/usr/bin/env bash
 # set -ex
 set -e
+set -u
 set -o pipefail
+
+#-----------------------------------------------------------------------------------------------------------
+function show () {
+  printf "$green%-50s $white%s$reset\n" "$1": "${!1}"; }
+
+#-----------------------------------------------------------------------------------------------------------
+function list () {
+  ( for name in $(printenv | grep -o -E "^[a-z][^=]*" | sort ); do show "$name"; done ) || true; }
+
+#-----------------------------------------------------------------------------------------------------------
+function on_error () {
+  echo -e "$red"'An error occurred; environment at this point:'"$reset"
+  list; }
+trap 'on_error' ERR
+
 
 #-----------------------------------------------------------------------------------------------------------
 # thx to https://stackoverflow.com/a/20579006/7568091
@@ -12,22 +28,30 @@ intershop_paths_npm_module="$(realpath "$intershop_paths_bin"/..)"    ; export i
 #-----------------------------------------------------------------------------------------------------------
 if [ -z ${intershop_paths_app+x} ]; then
   echo "$script_path"': need variable $intershop_paths_app'
+  echo "terminating"
   exit 1
   fi
 export intershop_paths_app
 
 #-----------------------------------------------------------------------------------------------------------
+intershop_paths_configuration="$intershop_paths_app"/intershop.ptv
+if ! [[ -f $intershop_paths_configuration ]]; then
+  echo "unable to find configuration file in $intershop_paths_configuration; terminating"
+  exit 1
+  fi
+
+#-----------------------------------------------------------------------------------------------------------
 cd "$intershop_paths_npm_module"
 source bin/_trm
-echo -e "$blue"'intershop_paths_app:                           ' "$white$intershop_paths_app                        $reset"
-echo -e "$blue"'intershop_paths_npm_module:                    ' "$white$intershop_paths_npm_module                 $reset"
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_system_user="$USER"                                             ; export intershop_system_user
+intershop_app_name=intershop                                              ; export intershop_app_name
 intershop_db_name=intershop                                               ; export intershop_db_name
 intershop_db_user=intershop                                               ; export intershop_db_user
 intershop_db_port='5432'                                                  ; export intershop_db_port
-intershop_paths_npm_module_python_modules="$home"/python_modules          ; export intershop_paths_npm_module_python_modules
+intershop_paths_own_js_modules="$home"/lib                                ; export intershop_paths_own_js_modules
+intershop_paths_own_python_modules="$home"/python_modules                 ; export intershop_paths_own_python_modules
 intershop_paths_app_python_modules="$intershop_paths_app"/python_modules  ; export intershop_paths_app_python_modules
 intershop_paths_tmp='/tmp/'$intershop_db_name                             ; export intershop_paths_tmp
 intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'            ; export intershop_paths_psql_output
@@ -35,34 +59,37 @@ intershop_rpc_port='33333'                                                ; expo
 intershop_rpc_host='localhost'                                            ; export intershop_rpc_host
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_paths_printenv='lib/intershop-printenv.js'                      ; export intershop_paths_printenv
-#...........................................................................................................
-cd "$intershop_paths_app"
-intershop_paths_printenv=$(realpath "$intershop_paths_printenv")
-echo -e "$blue"'intershop_paths_printenv:                      ' "$white$intershop_paths_printenv                   $reset"
-set +e
-set_environment=$(node "$intershop_paths_printenv")
-exit_code=$?
-cd "$intershop_paths_npm_module"
-if [[ $exit_code != 0 ]]; then
-  printf $red'an error occurred; terminating'$reset'\n'
-  exit $exit_code
-  fi
+_blank_pattern="^[ \t]*$"
+_comment_pattern="^[ \t]*#"
+_3_fields_pattern="^([^ ]+) +([^ ]+) +(.+)$"
 
 #-----------------------------------------------------------------------------------------------------------
-set -e
-echo 'set_environment:' $set_environment
-eval $set_environment
-# printf $yellow"$set_environment"'\n'$reset
-echo -e "$blue"'intershop_db_name:                             ' "$white$intershop_db_name                          $reset"
-echo -e "$blue"'intershop_db_user:                             ' "$white$intershop_db_user                          $reset"
-echo -e "$blue"'intershop_db_port:                             ' "$white$intershop_db_port                          $reset"
-echo -e "$blue"'intershop_paths_npm_module_python_modules:     ' "$white$intershop_paths_npm_module_python_modules  $reset"
-echo -e "$blue"'intershop_paths_app_python_modules:            ' "$white$intershop_paths_app_python_modules         $reset"
-echo -e "$blue"'intershop_paths_tmp:                           ' "$white$intershop_paths_tmp                        $reset"
-echo -e "$blue"'intershop_paths_psql_output:                   ' "$white$intershop_paths_psql_output                $reset"
-echo -e "$blue"'intershop_rpc_port:                            ' "$white$intershop_rpc_port                         $reset"
-echo -e "$blue"'intershop_rpc_host:                            ' "$white$intershop_rpc_host                         $reset"
+function _match_ptv_line () {
+  _ptv_key='';   export _ptv_key
+  _ptv_type='';  export _ptv_type
+  _ptv_value=''; export _ptv_value
+  if [[ $1 =~ $_3_fields_pattern ]]; then
+    _ptv_key="${BASH_REMATCH[1]}"
+    _ptv_type="${BASH_REMATCH[2]}"
+    _ptv_value="${BASH_REMATCH[3]}"
+    fi; }
+
+#-----------------------------------------------------------------------------------------------------------
+function update_settings_from_app_ptv () {
+  # thx to https://stackoverflow.com/a/10929511/7568091
+  while IFS='' read -r line || [[ -n "$line" ]]; do
+    if [[ $line =~ $_blank_pattern    ]]; then continue; fi
+    if [[ $line =~ $_comment_pattern  ]]; then continue; fi
+    _match_ptv_line "$line"
+    _ptv_key=intershop_${_ptv_key//\//_}
+    export "$_ptv_key"
+    # thx to https://stackoverflow.com/a/48590164/7568091
+    eval "$_ptv_key=\$_ptv_value"
+    done < "$1"; }
+
+update_settings_from_app_ptv "$intershop_paths_configuration"
+# xxx
+# echo 22821; exit 1
 
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
