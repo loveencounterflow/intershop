@@ -58,15 +58,25 @@ create function U.py_init() returns void language plpython3u as $$
     ctx.get_variable = get_variable
     ctx.set_variable = set_variable
     #.......................................................................................................
-    ctx.paths_app_python_modules        = ctx.get_variable( 'intershop/paths/app/python_modules'        )
-    ctx.paths_own_python_modules        = ctx.get_variable( 'intershop/paths/own/python_modules'        )
-    ctx.psql_output_path                = ctx.get_variable( 'intershop/paths/psql_output'               )
-    ctx.rpc_port                        = int( ctx.get_variable( 'intershop/rpc/port'                 ) )
-    ctx.rpc_host                        = ctx.get_variable( 'intershop/rpc/host'                        )
+    def _absorb_environment( ctx ):
+      sql   = """
+        select regexp_replace( key, '/', '_', 'g' ) as key, value
+          from U.variables where key ~ '^intershop/';"""
+      plan  = plpy.prepare( sql )
+      rows  = plpy.execute( plan )
+      for row in rows:
+        ctx[ row[ 'key' ] ] = row[ 'value' ]
+      ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+      ### TAINT for the moment we manually cast some values:
+      ctx.intershop_rpc_port = int( ctx.intershop_rpc_port )
+      ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
     #.......................................................................................................
-    if ctx.paths_app_python_modules != ctx.paths_own_python_modules:
-      sys.path.insert( 0, ctx.paths_app_python_modules )
-    sys.path.insert( 0, ctx.paths_own_python_modules )
+    ### TAINT some variables will have wrong type (stringly typed enviroment variables) ###
+    _absorb_environment( ctx )
+    #.......................................................................................................
+    if ctx.intershop_host_modules_path != ctx.intershop_guest_modules_path:
+      sys.path.insert( 0, ctx.intershop_host_modules_path )
+    sys.path.insert( 0, ctx.intershop_guest_modules_path )
     #.......................................................................................................
     def log( *P ):
       R = []
@@ -74,7 +84,7 @@ create function U.py_init() returns void language plpython3u as $$
         if isinstance( p, str ):  R.append( p )
         else:                     R.append( repr( p ) )
       R = ' '.join( R )
-      with open( ctx.psql_output_path, 'ab' ) as o:
+      with open( ctx.intershop_psql_output_path, 'ab' ) as o:
         o.write( R.encode( 'utf-8' ) + b'\n' )
       return R
     #.......................................................................................................
@@ -85,8 +95,9 @@ create function U.py_init() returns void language plpython3u as $$
         ctx.log( idx + 1, path )
       ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
     #.......................................................................................................
-    ctx.log             = log
-    ctx.log_python_path = log_python_path
+    ctx.log                 = log
+    ctx.log_python_path     = log_python_path
+    ctx._absorb_environment = _absorb_environment
     #.......................................................................................................
     try:
       import intershop_main
@@ -104,7 +115,7 @@ drop function if exists log( variadic text[] ) cascade;
 create function log( value variadic text[] ) returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   value_ = [ str( e ) for e in value ]
-  with open( ctx.psql_output_path, 'ab' ) as o:
+  with open( ctx.intershop_psql_output_path, 'ab' ) as o:
     o.write( ' '.join( value_ ).encode( 'utf-8' ) + b'\n' )
   $$;
 reset role;

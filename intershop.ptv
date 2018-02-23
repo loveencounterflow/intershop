@@ -19,7 +19,7 @@ respawn/command             json            [ "lib/intershop-rpc-server-secondar
 # set monitor name
 respawn/name                text            intershop-rpc-server
 # set env vars
-respawn/env                 json            { "key": "value", }
+respawn/env                 json            { "key": "value" }
 # set cwd
 respawn/cwd                 text            .
 # how many restarts are allowed within 60s or -1 for infinite restarts

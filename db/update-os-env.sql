@@ -17,15 +17,8 @@ do $$
     ¶row record;
   begin
     for ¶row in ( select key, value from U.variables where key ~ '^os/env/intershop_' ) loop
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_app_',        'intershop/paths/app/'        );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_app',         'intershop/paths/app'         );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_own_',        'intershop/paths/own/'        );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_own',         'intershop/paths/own'         );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_paths_',            'intershop/paths/'            );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_rpc_respawn_',      'intershop/rpc/respawn/'      );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_rpc_',              'intershop/rpc/'              );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_db_',               'intershop/db/'               );
-      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/intershop_',                  'intershop/'                  );
+      ¶row.key :=  regexp_replace( ¶row.key, '^os/env/',  ''        );
+      ¶row.key :=  regexp_replace( ¶row.key, '_',         '/', 'g'  );
       perform ¶( ¶row.key, ¶row.value );
       end loop;
     perform ¶( 'nodejs/versions/' || key, value ) from jsonb_each_text( U._nodejs_versions() );

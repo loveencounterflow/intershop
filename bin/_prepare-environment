@@ -18,45 +18,43 @@ function on_error () {
   list; }
 trap 'on_error' ERR
 
-
 #-----------------------------------------------------------------------------------------------------------
 # thx to https://stackoverflow.com/a/20579006/7568091
 script_path="$(realpath "${BASH_SOURCE[0]}")"
-intershop_paths_bin="$(dirname "$script_path")"                       ; export intershop_paths_bin
-intershop_paths_npm_module="$(realpath "$intershop_paths_bin"/..)"    ; export intershop_paths_npm_module
+intershop_bin_path="$(dirname "$script_path")"                ; export intershop_bin_path
+intershop_guest_path="$(realpath "$intershop_bin_path"/..)"   ; export intershop_guest_path
 
 #-----------------------------------------------------------------------------------------------------------
-if [ -z ${intershop_paths_app+x} ]; then
-  echo "$script_path"': need variable $intershop_paths_app'
+if [ -z ${intershop_host_path+x} ]; then
+  echo "$script_path"': need variable $intershop_host_path'
   echo "terminating"
   exit 1
   fi
-export intershop_paths_app
+export intershop_host_path
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_paths_configuration="$intershop_paths_app"/intershop.ptv
-if ! [[ -f $intershop_paths_configuration ]]; then
-  echo "unable to find configuration file in $intershop_paths_configuration; terminating"
+intershop_host_configuration_path="$intershop_host_path"/intershop.ptv ; export intershop_host_configuration_path
+if ! [[ -f $intershop_host_configuration_path ]]; then
+  echo "unable to find configuration file in $intershop_host_configuration_path; terminating"
   exit 1
   fi
 
 #-----------------------------------------------------------------------------------------------------------
-cd "$intershop_paths_npm_module"
+cd "$intershop_guest_path"
 source bin/_trm
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_system_user="$USER"                                             ; export intershop_system_user
-intershop_app_name=intershop                                              ; export intershop_app_name
-intershop_db_name=intershop                                               ; export intershop_db_name
-intershop_db_user=intershop                                               ; export intershop_db_user
-intershop_db_port='5432'                                                  ; export intershop_db_port
-intershop_paths_own_js_modules="$home"/lib                                ; export intershop_paths_own_js_modules
-intershop_paths_own_python_modules="$home"/python_modules                 ; export intershop_paths_own_python_modules
-intershop_paths_app_python_modules="$intershop_paths_app"/python_modules  ; export intershop_paths_app_python_modules
-intershop_paths_tmp='/tmp/'$intershop_db_name                             ; export intershop_paths_tmp
-intershop_paths_psql_output=$intershop_paths_tmp'/psql-output'            ; export intershop_paths_psql_output
-intershop_rpc_port='33333'                                                ; export intershop_rpc_port
-intershop_rpc_host='localhost'                                            ; export intershop_rpc_host
+intershop_system_user="$USER"                                         ; export intershop_system_user
+intershop_host_name=intershop                                         ; export intershop_host_name
+intershop_db_name=intershop                                           ; export intershop_db_name
+intershop_db_user=intershop                                           ; export intershop_db_user
+intershop_db_port='5432'                                              ; export intershop_db_port
+intershop_guest_modules_path="$home"/intershop_modules                ; export intershop_guest_modules_path
+intershop_host_modules_path="$intershop_host_path"/intershop_modules  ; export intershop_host_modules_path
+intershop_tmp_path='/tmp/'$intershop_db_name                          ; export intershop_tmp_path
+intershop_psql_output_path=$intershop_tmp_path'/psql-output'          ; export intershop_psql_output_path
+intershop_rpc_port='33333'                                            ; export intershop_rpc_port
+intershop_rpc_host='localhost'                                        ; export intershop_rpc_host
 
 #-----------------------------------------------------------------------------------------------------------
 _blank_pattern="^[ \t]*$"
@@ -75,7 +73,7 @@ function _match_ptv_line () {
     fi; }
 
 #-----------------------------------------------------------------------------------------------------------
-function update_settings_from_app_ptv () {
+function update_settings_from_host_ptv () {
   # thx to https://stackoverflow.com/a/10929511/7568091
   while IFS='' read -r line || [[ -n "$line" ]]; do
     if [[ $line =~ $_blank_pattern    ]]; then continue; fi
@@ -87,7 +85,8 @@ function update_settings_from_app_ptv () {
     eval "$_ptv_key=\$_ptv_value"
     done < "$1"; }
 
-update_settings_from_app_ptv "$intershop_paths_configuration"
+# update_settings_from_host_ptv "$intershop_guest_configuration_path"
+update_settings_from_host_ptv "$intershop_host_configuration_path"
 # xxx
 # echo 22821; exit 1
 
@@ -96,19 +95,19 @@ update_settings_from_app_ptv "$intershop_paths_configuration"
 # tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
 # # Thx to https://stackoverflow.com/a/8048493/7568091
 # # for the idea to redirect to a subshell to preserve the PID of the first command:
-# ( tail -f "$intershop_paths_psql_output" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+# ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 # make sure output file exists with the correct rights:
-mkdir -p $intershop_paths_tmp
-chmod 0777 $intershop_paths_tmp
-touch $intershop_paths_psql_output
-chmod 0666 $intershop_paths_psql_output
-truncate -s 0 $intershop_paths_psql_output
-( tail -f $intershop_paths_psql_output 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+mkdir -p $intershop_tmp_path
+chmod 0777 $intershop_tmp_path
+touch $intershop_psql_output_path
+chmod 0666 $intershop_psql_output_path
+truncate -s 0 $intershop_psql_output_path
+( tail -f $intershop_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
 trap 'kill $psql_tailer_pid' EXIT
-# echo 'helo world' >> $intershop_paths_psql_output; ls -AlF /tmp/intershop*; exit 1
+# echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -117,7 +116,7 @@ function postgres_paged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_paths_psql_output"                                        \
+    --set=out="$intershop_psql_output_path"                                        \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -126,7 +125,7 @@ function postgres_unpaged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_paths_psql_output"                                        \
+    --set=out="$intershop_psql_output_path"                                        \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -135,7 +134,7 @@ function sudo_postgres_unpaged () {
     -p $intershop_db_port                                                           \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_paths_psql_output"                                        \
+    --set=out="$intershop_psql_output_path"                                        \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@";
   if [[ $? != 0 ]]; then exit 123; fi
   }

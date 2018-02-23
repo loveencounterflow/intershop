@@ -3,9 +3,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-sudo echo # make sure password prompt won't pop up later, be perhaps hard to detect
+sudo printf '' # make sure password prompt won't pop up later, be perhaps hard to detect
 # set -e
-intershop_paths_app=$(pwd)
+intershop_host_path=$(pwd)
 # home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 cd "$home"

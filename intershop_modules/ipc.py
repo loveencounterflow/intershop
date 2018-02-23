@@ -22,7 +22,7 @@ _cache = {}
 def _prepare():
   if _cache.get( 'SIGNALS.client_socket_rfile', None ) != None: return
   client_socket                       = _SOCKET.socket( _SOCKET.AF_INET, _SOCKET.SOCK_STREAM )
-  client_socket.connect( ( ctx.rpc_host, ctx.rpc_port, ) )
+  client_socket.connect( ( ctx.intershop_rpc_host, ctx.intershop_rpc_port, ) )
   client_socket_rfile                 = _OS.fdopen( client_socket.fileno(), 'r', encoding = 'utf-8' )
   _cache[ 'SIGNALS.client_socket'       ] = client_socket
   _cache[ 'SIGNALS.client_socket_rfile' ] = client_socket_rfile
