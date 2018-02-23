@@ -3,10 +3,10 @@
 
 
 #-----------------------------------------------------------------------------------------------------------
-app/name                    text            intershop
+host/name                   text            intershop
 
 #-----------------------------------------------------------------------------------------------------------
-db/port                     integer         5433
+db/port                     integer         5432
 db/name                     text            intershop
 db/user                     text            intershop
 
@@ -15,22 +15,21 @@ rpc/port                    integer         23001
 rpc/host                    text            127.0.0.1
 
 #-----------------------------------------------------------------------------------------------------------
-respawn/command             json            [ "lib/intershop-rpc-server-secondary.js" ]
+rpc/respawn/command         json            [ "./intershop_modules/intershop-rpc-server-secondary.js" ]
 # set monitor name
-respawn/name                text            intershop-rpc-server
+rpc/respawn/name            text            intershop-rpc-server
 # set env vars
-respawn/env                 json            { "key": "value" }
+rpc/respawn/env             json            { "key": "value" }
 # set cwd
-respawn/cwd                 text            .
+rpc/respawn/cwd             text            .
 # how many restarts are allowed within 60s or -1 for infinite restarts
-respawn/maxRestarts         integer         6
+rpc/respawn/maxRestarts     integer         6
 # time to sleep between restarts
-respawn/sleep               unit            1 s
+rpc/respawn/sleep           unit            1 s
 # wait 30s before force killing after stopping
-respawn/kill                unit            30 s
+rpc/respawn/kill            unit            30 s
 # fork instead of spawn
-respawn/fork                boolean         true
-
+rpc/respawn/fork            boolean         true
 
 
 

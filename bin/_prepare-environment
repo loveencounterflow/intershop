@@ -33,6 +33,13 @@ if [ -z ${intershop_host_path+x} ]; then
 export intershop_host_path
 
 #-----------------------------------------------------------------------------------------------------------
+intershop_guest_configuration_path="$home"/intershop.ptv ; export intershop_guest_configuration_path
+if ! [[ -f $intershop_guest_configuration_path ]]; then
+  echo "unable to find configuration file in $intershop_guest_configuration_path; terminating"
+  exit 1
+  fi
+
+#-----------------------------------------------------------------------------------------------------------
 intershop_host_configuration_path="$intershop_host_path"/intershop.ptv ; export intershop_host_configuration_path
 if ! [[ -f $intershop_host_configuration_path ]]; then
   echo "unable to find configuration file in $intershop_host_configuration_path; terminating"
@@ -44,17 +51,21 @@ cd "$intershop_guest_path"
 source bin/_trm
 
 #-----------------------------------------------------------------------------------------------------------
+intershop_db_name=UNKNOWN                                             ; export intershop_db_name
+intershop_db_user=UNKNOWN                                             ; export intershop_db_user
+intershop_db_port=UNKNOWN                                             ; export intershop_db_port
+intershop_rpc_port=UNKNOWN                                            ; export intershop_rpc_port
+intershop_rpc_host=UNKNOWN                                            ; export intershop_rpc_host
+intershop_tmp_path=UNKNOWN                                            ; export intershop_tmp_path
+intershop_psql_output_path=UNKNOWN                                    ; export intershop_psql_output_path
+#...........................................................................................................
 intershop_system_user="$USER"                                         ; export intershop_system_user
 intershop_host_name=intershop                                         ; export intershop_host_name
-intershop_db_name=intershop                                           ; export intershop_db_name
-intershop_db_user=intershop                                           ; export intershop_db_user
-intershop_db_port='5432'                                              ; export intershop_db_port
 intershop_guest_modules_path="$home"/intershop_modules                ; export intershop_guest_modules_path
 intershop_host_modules_path="$intershop_host_path"/intershop_modules  ; export intershop_host_modules_path
-intershop_tmp_path='/tmp/'$intershop_db_name                          ; export intershop_tmp_path
-intershop_psql_output_path=$intershop_tmp_path'/psql-output'          ; export intershop_psql_output_path
-intershop_rpc_port='33333'                                            ; export intershop_rpc_port
-intershop_rpc_host='localhost'                                        ; export intershop_rpc_host
+intershop_guest_sql_path="$home"/db                                   ; export intershop_guest_sql_path
+intershop_host_sql_path="$intershop_host_path"/db                     ; export intershop_host_sql_path
+# intershop_guest_sql_filepaths=$(find "$intershop_guest_sql_path" -maxdepth 1 -type f -name '[0-9][0-9][0-9]-*' | sort)
 
 #-----------------------------------------------------------------------------------------------------------
 _blank_pattern="^[ \t]*$"
@@ -85,11 +96,18 @@ function update_settings_from_host_ptv () {
     eval "$_ptv_key=\$_ptv_value"
     done < "$1"; }
 
-# update_settings_from_host_ptv "$intershop_guest_configuration_path"
+#-----------------------------------------------------------------------------------------------------------
+update_settings_from_host_ptv "$intershop_guest_configuration_path"
 update_settings_from_host_ptv "$intershop_host_configuration_path"
-# xxx
-# echo 22821; exit 1
 
+#-----------------------------------------------------------------------------------------------------------
+intershop_tmp_path='/tmp/intershop-'$intershop_db_name                ; export intershop_tmp_path
+intershop_psql_output_path=$intershop_tmp_path'/psql-output'          ; export intershop_psql_output_path
+# xxx; echo 22821; exit 1
+
+
+#===========================================================================================================
+# PREPARE PSQL OUTPUT FILE
 #-----------------------------------------------------------------------------------------------------------
 # # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
 # tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
@@ -110,13 +128,33 @@ trap 'kill $psql_tailer_pid' EXIT
 # echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
 
 
+#===========================================================================================================
+# GENERATE GUEST SQL BUILDSCRIPT
+#-----------------------------------------------------------------------------------------------------------
+intershop_guest_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql  ; export intershop_guest_sql_buildscript_header_path
+intershop_guest_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql                ; export intershop_guest_sql_buildscript_path
+touch "$intershop_guest_sql_buildscript_path"
+cat "$intershop_guest_sql_buildscript_header_path" > "$intershop_guest_sql_buildscript_path"
+shopt -s extglob
+for sql_filepath in $( ls "$intershop_guest_sql_path"/@([0-9][0-9][0-9])-*.sql | sort ); do
+  echo '\echo :_intershop_trm_title'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_guest_sql_buildscript_path"
+  done
+
+#===========================================================================================================
+# ADD HOST SQL BUILDSCRIPT LINES
+#-----------------------------------------------------------------------------------------------------------
+# if [ "$intershop_guest_sql_buildscript_path" != "$intershop_host_sql_buildscript_path" ]
+
+
+#===========================================================================================================
+# DEFINE UTILITY FUNCTIONS FOR CALLING PSQL
 #-----------------------------------------------------------------------------------------------------------
 function postgres_paged () {
   PAGER="postgres-pager -s 6 --less-status-bar" psql                                \
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                        \
+    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -125,7 +163,7 @@ function postgres_unpaged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                        \
+    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -134,7 +172,7 @@ function sudo_postgres_unpaged () {
     -p $intershop_db_port                                                           \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                        \
+    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1 "$@";
   if [[ $? != 0 ]]; then exit 123; fi
   }
