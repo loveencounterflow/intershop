@@ -215,7 +215,6 @@ reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-drop function if exists U.row_as_jsonb_object cascade;
 /* Expects an SQL query as text that delivers two columns, the first being names and the second JSONb
   values of the object to be built. */
 create function U.row_as_jsonb_object( sql_ text ) returns jsonb stable language plpython3u as $$

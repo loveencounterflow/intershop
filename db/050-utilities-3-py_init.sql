@@ -17,7 +17,7 @@
 */
 
 -- select * from U.variables order by key;
-select * from U.variables where key ~ 'intershop' order by key;
+-- select * from U.variables where key ~ 'intershop' order by key;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
