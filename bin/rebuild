@@ -15,8 +15,8 @@ source bin/_prepare-environment
 bin/_restart-rpc-server
 
 #-----------------------------------------------------------------------------------------------------------
-sudo_postgres_unpaged -f db/teardown.sql 2>&1 | grep -P '^.*ERROR.*$|' --color=always
-postgres_unpaged      -f "$intershop_guest_sql_buildscript_path" 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+sudo_postgres_unpaged -f db/teardown.sql                    2>&1 | grep -P '^.*ERROR.*$|' --color=always
+postgres_unpaged      -f "$intershop_sql_buildscript_path"  2>&1 | grep -P '^.*ERROR.*$|' --color=always
 
 
 

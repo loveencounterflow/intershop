@@ -101,10 +101,14 @@ update_settings_from_host_ptv "$intershop_guest_configuration_path"
 update_settings_from_host_ptv "$intershop_host_configuration_path"
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_tmp_path='/tmp/intershop-'$intershop_db_name                ; export intershop_tmp_path
-intershop_psql_output_path=$intershop_tmp_path'/psql-output'          ; export intershop_psql_output_path
-# xxx; echo 22821; exit 1
-
+intershop_tmp_path='/tmp/intershop-'$intershop_db_name
+intershop_psql_output_path=$intershop_tmp_path'/psql-output'
+intershop_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql
+intershop_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql
+export intershop_tmp_path
+export intershop_psql_output_path
+export intershop_sql_buildscript_header_path
+export intershop_sql_buildscript_path
 
 #===========================================================================================================
 # PREPARE PSQL OUTPUT FILE
@@ -131,20 +135,23 @@ trap 'kill $psql_tailer_pid' EXIT
 #===========================================================================================================
 # GENERATE GUEST SQL BUILDSCRIPT
 #-----------------------------------------------------------------------------------------------------------
-intershop_guest_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql  ; export intershop_guest_sql_buildscript_header_path
-intershop_guest_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql                ; export intershop_guest_sql_buildscript_path
-touch "$intershop_guest_sql_buildscript_path"
-cat "$intershop_guest_sql_buildscript_header_path" > "$intershop_guest_sql_buildscript_path"
+touch "$intershop_sql_buildscript_path"
+cat "$intershop_sql_buildscript_header_path" > "$intershop_sql_buildscript_path"
 shopt -s extglob
+echo "adding guest SQL files from $intershop_guest_sql_path"
 for sql_filepath in $( ls "$intershop_guest_sql_path"/@([0-9][0-9][0-9])-*.sql | sort ); do
-  echo '\echo :_intershop_trm_title'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_guest_sql_buildscript_path"
+  echo '\echo :_intershop_trm_title'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_sql_buildscript_path"
   done
 
 #===========================================================================================================
 # ADD HOST SQL BUILDSCRIPT LINES
 #-----------------------------------------------------------------------------------------------------------
-# if [ "$intershop_guest_sql_buildscript_path" != "$intershop_host_sql_buildscript_path" ]
-
+if [ "$intershop_guest_sql_path" != "$intershop_host_sql_path" ]; then
+  echo "adding host SQL files from $intershop_host_sql_path"
+  for sql_filepath in $( ls "$intershop_host_sql_path"/@([0-9][0-9][0-9])-*.sql | sort ); do
+    echo '\echo :_intershop_trm_title'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_sql_buildscript_path"
+    done
+  fi
 
 #===========================================================================================================
 # DEFINE UTILITY FUNCTIONS FOR CALLING PSQL
