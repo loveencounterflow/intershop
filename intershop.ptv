@@ -3,33 +3,33 @@
 
 
 #-----------------------------------------------------------------------------------------------------------
-host/name                   text            intershop
+intershop/host/name                   text            intershop
 
 #-----------------------------------------------------------------------------------------------------------
-db/port                     integer         5432
-db/name                     text            intershop
-db/user                     text            intershop
+intershop/db/port                     integer         5432
+intershop/db/name                     text            intershop
+intershop/db/user                     text            intershop
 
 #-----------------------------------------------------------------------------------------------------------
-rpc/port                    integer         23001
-rpc/host                    text            127.0.0.1
+intershop/rpc/port                    integer         23001
+intershop/rpc/host                    text            127.0.0.1
 
 #-----------------------------------------------------------------------------------------------------------
-rpc/respawn/command         json            [ "./intershop_modules/intershop-rpc-server-secondary.js" ]
+intershop/rpc/respawn/command         json            [ "./intershop_modules/intershop-rpc-server-secondary.js" ]
 # set monitor name
-rpc/respawn/name            text            intershop-rpc-server
+intershop/rpc/respawn/name            text            intershop-rpc-server
 # set env vars
-rpc/respawn/env             json            { "key": "value" }
+intershop/rpc/respawn/env             json            { "key": "value" }
 # set cwd
-rpc/respawn/cwd             text            .
+intershop/rpc/respawn/cwd             text            .
 # how many restarts are allowed within 60s or -1 for infinite restarts
-rpc/respawn/maxRestarts     integer         6
+intershop/rpc/respawn/maxRestarts     integer         6
 # time to sleep between restarts
-rpc/respawn/sleep           unit            1 s
+intershop/rpc/respawn/sleep           unit            1 s
 # wait 30s before force killing after stopping
-rpc/respawn/kill            unit            30 s
+intershop/rpc/respawn/kill            unit            30 s
 # fork instead of spawn
-rpc/respawn/fork            boolean         true
+intershop/rpc/respawn/fork            boolean         true
 
 
 

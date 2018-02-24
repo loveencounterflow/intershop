@@ -17,7 +17,7 @@
 create schema BAR;
 
 -- ---------------------------------------------------------------------------------------------------------
-create or replace function BAR.bar( n integer ) returns text immutable language plpgsql as $$
+create function BAR.bar( n integer ) returns text immutable language plpgsql as $$
   declare
     R text;
   begin
@@ -39,15 +39,15 @@ create or replace function BAR.bar( n integer ) returns text immutable language 
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create or replace function BAR.bar( n bigint ) returns text immutable language sql as $$
+create function BAR.bar( n bigint ) returns text immutable language sql as $$
   select BAR.bar( n::integer ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create or replace function BAR.bar( n bigint, ref bigint ) returns text immutable language sql as $$
+create function BAR.bar( n bigint, ref bigint ) returns text immutable language sql as $$
   select BAR.bar( ( n::float / ref::float * 100 )::integer ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create or replace function BAR.bar( n float, ref float ) returns text immutable language sql as $$
+create function BAR.bar( n float, ref float ) returns text immutable language sql as $$
   select BAR.bar( ( n / ref * 100 )::integer ); $$;
 
 \quit

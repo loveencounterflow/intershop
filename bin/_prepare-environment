@@ -90,7 +90,7 @@ function update_settings_from_host_ptv () {
     if [[ $line =~ $_blank_pattern    ]]; then continue; fi
     if [[ $line =~ $_comment_pattern  ]]; then continue; fi
     _match_ptv_line "$line"
-    _ptv_key=intershop_${_ptv_key//\//_}
+    _ptv_key=${_ptv_key//\//_}
     export "$_ptv_key"
     # thx to https://stackoverflow.com/a/48590164/7568091
     eval "$_ptv_key=\$_ptv_value"
