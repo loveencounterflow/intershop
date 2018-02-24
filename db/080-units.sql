@@ -5,7 +5,6 @@
    for a PureScript / JavaScript equivalent */
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists UNITS cascade;
 create schema UNITS;
 
 -- \pset numericlocale on

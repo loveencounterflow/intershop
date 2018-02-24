@@ -1,7 +1,6 @@
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists TRM cascade;
-create schema TRM;
+-- create schema TRM;
 
 -- ---------------------------------------------------------------------------------------------------------
 \set blink        '\x1b[5m'
@@ -77,5 +76,25 @@ create schema TRM;
 --   ( 'darkgrey',       :'darkgrey'     ),
 --   ( 'white',          :'white'        );
 
+\quit
 
-
+\echo :blue:reverse'  ':reset:blue'This is blue':reset
+\echo :green:reverse'  ':reset:green'This is green':reset
+\echo :cyan:reverse'  ':reset:cyan'This is cyan':reset
+\echo :sepia:reverse'  ':reset:sepia'This is sepia':reset
+\echo :indigo:reverse'  ':reset:indigo'This is indigo':reset
+\echo :steel:reverse'  ':reset:steel'This is steel':reset
+\echo :brown:reverse'  ':reset:brown'This is brown':reset
+\echo :olive:reverse'  ':reset:olive'This is olive':reset
+\echo :lime:reverse'  ':reset:lime'This is lime':reset
+\echo :red:reverse'  ':reset:red'This is red':reset
+\echo :crimson:reverse'  ':reset:crimson'This is crimson':reset
+\echo :plum:reverse'  ':reset:plum'This is plum':reset
+\echo :pink:reverse'  ':reset:pink'This is pink':reset
+\echo :orange:reverse'  ':reset:orange'This is orange':reset
+\echo :gold:reverse'  ':reset:gold'This is gold':reset
+\echo :tan:reverse'  ':reset:tan'This is tan':reset
+\echo :yellow:reverse'  ':reset:yellow'This is yellow':reset
+\echo :grey:reverse'  ':reset:grey'This is grey':reset
+\echo :darkgrey:reverse'  ':reset:darkgrey'This is darkgrey':reset
+\echo :white:reverse'  ':reset:white'This is white':reset

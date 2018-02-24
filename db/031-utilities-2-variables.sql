@@ -5,7 +5,6 @@
 create table U.variables of U.text_facet ( key unique not null primary key );
 
 -- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text ) cascade;
 create function ¶( ¶key text ) returns text stable language plpgsql as $$
   declare
     ¶row_count  integer;
@@ -18,7 +17,6 @@ create function ¶( ¶key text ) returns text stable language plpgsql as $$
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-drop function if exists ¶( text, anyelement ) cascade;
 create function ¶( ¶key text, ¶value anyelement ) returns void volatile language sql as $$
   insert into U.variables values ( ¶key, ¶value )
   on conflict ( key ) do update set value = ¶value; $$;

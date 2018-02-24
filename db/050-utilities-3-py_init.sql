@@ -111,7 +111,6 @@ create function U.py_init() returns void language plpython3u as $$
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
-drop function if exists log( variadic text[] ) cascade;
 create function log( value variadic text[] ) returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   value_ = [ str( e ) for e in value ]
@@ -147,16 +146,16 @@ reset role;
 set role dba;
 create function U._test_py_init() returns void language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
-  import sys
-  ctx.log( ctx.url_parser )
-  ctx.log_python_path()
-  keys = [ key for key in ctx ]
-  keys.sort()
-  for key in keys:
-    ctx.log( 'ctx.' + key )
-  for key in dir( ctx.ipc ):
-    # if key.startswith( '_' ): continue
-    ctx.log( 'ctx.ipc.' + key )
+  # import sys
+  # ctx.log( ctx.url_parser )
+  # ctx.log_python_path()
+  # keys = [ key for key in ctx ]
+  # keys.sort()
+  # for key in keys:
+  #   ctx.log( 'ctx.' + key )
+  # for key in dir( ctx.ipc ):
+  #   # if key.startswith( '_' ): continue
+  #   ctx.log( 'ctx.ipc.' + key )
   for i in range( 0, 3 ):
     ctx.log( '87321', 'RPC result:', repr( ctx.ipc.rpc( 'add', [ 42, i, ] ) ) )
   $$;

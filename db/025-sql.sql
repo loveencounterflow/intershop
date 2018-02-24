@@ -4,7 +4,6 @@
 
 
 -- ---------------------------------------------------------------------------------------------------------
-drop schema if exists SQL cascade;
 create schema SQL;
 
 /* thx to https://stackoverflow.com/a/12530727/7568091
