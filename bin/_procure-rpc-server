@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+# set -euo pipefail
+set -eo pipefail
+IFS=$'\n\t'
+
+#-----------------------------------------------------------------------------------------------------------
+cd "$(readlink -f "$0" | xargs dirname)"/..
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+
+#-----------------------------------------------------------------------------------------------------------
+if [ -z ${intershop_rpc_port+x} ]; then
+  echo "$script_path"': need variable $intershop_rpc_port'
+  exit 1
+  fi
+if [ -z ${intershop_rpc_host+x} ]; then
+  echo "$script_path"': need variable $intershop_rpc_host'
+  exit 1
+  fi
+if [ -z ${intershop_guest_modules_path+x} ]; then
+  echo "$script_path"': need variable $intershop_guest_modules_path'
+  exit 1
+  fi
+
+echo '###################################################################################'
+echo '###################################################################################'
+echo '##     SKIPPING RPC SERVER START                                                 ##'
+echo '###################################################################################'
+echo '###################################################################################'
+
+# #-----------------------------------------------------------------------------------------------------------
+# # echo "trying to restart RPC server at $intershop_rpc_path"
+# echo "trying to restart RPC server at $intershop_rpc_host:$intershop_rpc_port"
+# set +e
+# echo '["restart"]' | netcat "$intershop_rpc_host" "$intershop_rpc_port" ; status=$?
+# set -e
+# echo "status: $status"
+# if [[ $status -eq 0 ]]; then
+#   echo 'OK'
+# else
+#   echo 'failed, launching RPC server...'
+#   node "$intershop_guest_modules_path"/intershop-rpc-server-primary.js &
+#   # primary_pid=$!
+#   # echo "PID of RPC primary: $primary_pid"
+#   fi
+
+

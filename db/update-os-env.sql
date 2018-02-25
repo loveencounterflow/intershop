@@ -16,7 +16,7 @@ do $$
   declare
     ¶row record;
   begin
-    for ¶row in ( select key, value from U.variables where key ~ '^os/env/intershop_' ) loop
+    for ¶row in ( select key, value from U.variables where key ~ '^(os/env/[a-z])' ) loop
       ¶row.key :=  regexp_replace( ¶row.key, '^os/env/',  ''        );
       ¶row.key :=  regexp_replace( ¶row.key, '_',         '/', 'g'  );
       perform ¶( ¶row.key, ¶row.value );

@@ -4,13 +4,16 @@ set -e
 set -u
 set -o pipefail
 
+
 #-----------------------------------------------------------------------------------------------------------
 function show () {
   printf "$green%-50s $white%s$reset\n" "$1": "${!1}"; }
 
 #-----------------------------------------------------------------------------------------------------------
 function list () {
-  ( for name in $(printenv | grep -o -E "^[a-z][^=]*" | sort ); do show "$name"; done ) || true; }
+  declare _LIST_name
+  ( for _LIST_name in $( set | grep -o -E "^[a-z_][a-z0-9_]*=" | grep -o -E "^[^=]+" ); do
+      show "$_LIST_name"; done ) || true; }
 
 #-----------------------------------------------------------------------------------------------------------
 function on_error () {
@@ -68,37 +71,27 @@ intershop_host_sql_path="$intershop_host_path"/db                     ; export i
 # intershop_guest_sql_filepaths=$(find "$intershop_guest_sql_path" -maxdepth 1 -type f -name '[0-9][0-9][0-9]-*' | sort)
 
 #-----------------------------------------------------------------------------------------------------------
-_blank_pattern="^[ \t]*$"
-_comment_pattern="^[ \t]*#"
-_3_fields_pattern="^([^ ]+) +([^ ]+) +(.+)$"
+source "$intershop_guest_modules_path"'/ptv-reader.sh'
+update_settings_from_ptv_file "$intershop_guest_configuration_path"
+update_settings_from_ptv_file "$intershop_host_configuration_path"
 
-#-----------------------------------------------------------------------------------------------------------
-function _match_ptv_line () {
-  _ptv_key='';   export _ptv_key
-  _ptv_type='';  export _ptv_type
-  _ptv_value=''; export _ptv_value
-  if [[ $1 =~ $_3_fields_pattern ]]; then
-    _ptv_key="${BASH_REMATCH[1]}"
-    _ptv_type="${BASH_REMATCH[2]}"
-    _ptv_value="${BASH_REMATCH[3]}"
-    fi; }
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+export mojikura_extras_sawndip_path
+export mojikura_jzrds_path
+export mojikura_path
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#-----------------------------------------------------------------------------------------------------------
-function update_settings_from_host_ptv () {
-  # thx to https://stackoverflow.com/a/10929511/7568091
-  while IFS='' read -r line || [[ -n "$line" ]]; do
-    if [[ $line =~ $_blank_pattern    ]]; then continue; fi
-    if [[ $line =~ $_comment_pattern  ]]; then continue; fi
-    _match_ptv_line "$line"
-    _ptv_key=${_ptv_key//\//_}
-    export "$_ptv_key"
-    # thx to https://stackoverflow.com/a/48590164/7568091
-    eval "$_ptv_key=\$_ptv_value"
-    done < "$1"; }
-
-#-----------------------------------------------------------------------------------------------------------
-update_settings_from_host_ptv "$intershop_guest_configuration_path"
-update_settings_from_host_ptv "$intershop_host_configuration_path"
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_tmp_path='/tmp/intershop-'$intershop_db_name
@@ -162,7 +155,10 @@ function postgres_paged () {
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
-    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+    --set QUIET=on --set ON_ERROR_STOP=1                                            \
+    -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
+    "$@"
+  }
 
 #-----------------------------------------------------------------------------------------------------------
 function postgres_unpaged () {
@@ -171,7 +167,10 @@ function postgres_unpaged () {
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
-    --set QUIET=on --set ON_ERROR_STOP=1 "$@"; }
+    --set QUIET=on --set ON_ERROR_STOP=1                                            \
+    -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
+    "$@"
+  }
 
 #-----------------------------------------------------------------------------------------------------------
 function sudo_postgres_unpaged () {
@@ -180,7 +179,9 @@ function sudo_postgres_unpaged () {
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
-    --set QUIET=on --set ON_ERROR_STOP=1 "$@";
+    --set QUIET=on --set ON_ERROR_STOP=1                                            \
+    -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
+    "$@"
   if [[ $? != 0 ]]; then exit 123; fi
   }
 
