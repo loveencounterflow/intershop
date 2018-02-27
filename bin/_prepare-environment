@@ -179,19 +179,18 @@ function _sudo_postgres_unpaged_pre () {
   if [[ $? != 0 ]]; then exit 123; fi
   }
 
-
-# #-----------------------------------------------------------------------------------------------------------
-# function sudo_postgres_unpaged () {
-#   sudo -u postgres psql                                                             \
-#     -p $intershop_db_port                                                           \
-#     --set=intershop_db_user="$intershop_db_user"                                    \
-#     --set=intershop_db_name="$intershop_db_name"                                    \
-#     --set=out="$intershop_psql_output_path"                                         \
-#     --set QUIET=on --set ON_ERROR_STOP=1                                            \
-#     -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
-#     "$@"
-#   if [[ $? != 0 ]]; then exit 123; fi
-#   }
+#-----------------------------------------------------------------------------------------------------------
+function sudo_postgres_unpaged () {
+  sudo -u postgres psql                                                             \
+    -p $intershop_db_port                                                           \
+    --set=intershop_db_user="$intershop_db_user"                                    \
+    --set=intershop_db_name="$intershop_db_name"                                    \
+    --set=out="$intershop_psql_output_path"                                         \
+    --set QUIET=on --set ON_ERROR_STOP=1                                            \
+    -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
+    "$@"
+  if [[ $? != 0 ]]; then exit 123; fi
+  }
 
 
 
