@@ -36,7 +36,16 @@ IFS=$'\n\t'
 # pg_stats
 
 
+intershop_host_path=$(pwd)
+# home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+cd "$home"
 source bin/_prepare-environment
+# sudo_postgres_unpaged "$intershop_db_name" -f views/active-queries.sql
+# declare -g sudo_postgres_unpaged
+# declare -x sudo_postgres_unpaged
+# export sudo_postgres_unpaged
+
 # watch -n 0.1 -d 'sudo -u postgres bin/itsql --pset="pager=off" -f views/active-queries.sql'
 # watch -n 0.1 -d 'sudo -u postgres bin/itsql --pset="pager=off" -f views/active-queries.sql'
 # watch -n 0.1 -d 'sudo_postgres_unpaged '"$intershop_db_name"' -f views/active-queries.sql'
@@ -46,13 +55,3 @@ watch -n 0.1 -d "sudo -u postgres psql -p $intershop_db_port -d $intershop_db_na
 
 
 
-# #-----------------------------------------------------------------------------------------------------------
-# # clear
-# while [ 1 ]; do
-#   bin/bmo-psql --pset="pager=off" -c "select TIME.age_as_text( query_start ) as age, query from pg_stat_activity order by query_start;"
-#   read -t 0.25 -n 1 key
-#   if [[ $key = q ]]; then
-#     clear
-#     break
-#     fi
-#   done
