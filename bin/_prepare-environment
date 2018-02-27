@@ -17,8 +17,9 @@ function list () {
 
 #-----------------------------------------------------------------------------------------------------------
 function on_error () {
-  echo -e "$red"'An error occurred; environment at this point:'"$reset"
-  list; }
+  echo -e "$red"'An error occurred'
+  # echo -e "$red"'An error occurred; environment at this point:'"$reset" && list;
+  }
 trap 'on_error' ERR
 
 #-----------------------------------------------------------------------------------------------------------
