@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -e
-cd "$(readlink -f "$0" | xargs dirname)"/..
+set -euo pipefail
+IFS=$'\n\t'
+
 
 # pg_stat_activity
 # pg_stat_all_indexes
