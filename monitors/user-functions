@@ -37,7 +37,8 @@ cd "$(readlink -f "$0" | xargs dirname)"/..
 
 
 # watch -n 0.1 -d 'bin/bmo-psql --pset="pager=off" -f views/active-queries.sql'
-watch -n 0.01 -d 'bin/itsql -f views/user-functions.sql'
+# watch -n 0.01 -d 'bin/itsql -f views/user-functions.sql'
+watch -n 0.1 -d "PAGER= psql -d -p $intershop_db_port -U $intershop_db_user -d $intershop_db_name --set QUIET=on --set ON_ERROR_STOP=1 -f views/user-functions.sql"
 
 # #-----------------------------------------------------------------------------------------------------------
 # # clear

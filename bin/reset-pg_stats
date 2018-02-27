@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-set -e
-home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+set -euo pipefail
+IFS=$'\n\t'
+
+intershop_host_path=$(pwd)
+# home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 cd "$home"
 source bin/_prepare-environment
-set -ex
 
-sudo_postgres_unpaged -c 'select pg_stat_reset();' >> /dev/null
-
+set -x
+# _sudo_postgres_unpaged_pre -c 'select pg_stat_reset();' >> /dev/null
+sudo -u postgres psql -p $intershop_db_port -d $intershop_db_name --set QUIET=on --set ON_ERROR_STOP=1 -c 'select pg_stat_reset();' >> /dev/null

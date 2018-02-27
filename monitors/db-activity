@@ -38,7 +38,10 @@ cd "$(readlink -f "$0" | xargs dirname)"/..
 source bin/_prepare-environment
 # watch -n 0.1 -d 'sudo -u postgres bin/itsql --pset="pager=off" -f views/active-queries.sql'
 # watch -n 0.1 -d 'sudo -u postgres bin/itsql --pset="pager=off" -f views/active-queries.sql'
-watch -n 0.1 -d 'sudo_postgres_unpaged '"$intershop_db_name"' -f views/active-queries.sql'
+# watch -n 0.1 -d 'sudo_postgres_unpaged '"$intershop_db_name"' -f views/active-queries.sql'
+
+# watch -n 0.1 -d "sudo -u postgres psql -d intershop --set QUIET=on --set ON_ERROR_STOP=1 -f views/active-queries.sql"
+watch -n 0.1 -d "sudo -u postgres psql -p $intershop_db_port -d $intershop_db_name --set QUIET=on --set ON_ERROR_STOP=1 -f views/active-queries.sql"
 
 
 
