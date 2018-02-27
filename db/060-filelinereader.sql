@@ -34,7 +34,7 @@ create function FILELINEREADER.is_comment_or_blank( ¶line text ) returns boolea
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function FILELINEREADER.read_lines( path_ text ) returns setof U.line_facet
-  volatile language plpython3u as $$
+  stable language plpython3u as $$
   # plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   with open( path_, 'rb' ) as input:
     for line_idx, line in enumerate( input ):
@@ -43,18 +43,32 @@ create function FILELINEREADER.read_lines( path_ text ) returns setof U.line_fac
 reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
+set role dba;
+create function FILELINEREADER.read_lines_skip_match( path_ text, match_re_ text ) returns setof U.line_facet
+  stable language plpython3u as $$
+  # plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  import re as _RE
+  match_re = _RE.compile( match_re )
+  with open( path_, 'rb' ) as input:
+    for line_idx, line in enumerate( input ):
+      if not _RE.match( match_re, line ): continue
+      yield [ line_idx + 1, line.decode( 'utf-8' ).rstrip(), ]
+  $$;
+reset role;
+
+-- ---------------------------------------------------------------------------------------------------------
 create function FILELINEREADER.read_lines_skip( ¶path text ) returns setof U.line_facet
-  volatile language sql as $$
+  stable language sql as $$
     select * from FILELINEREADER.read_lines( ¶path ) where not FILELINEREADER.is_comment_or_blank( line ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function FILELINEREADER.read_jsonbl( ¶path text ) returns setof U.jsonbl_facet
-  volatile language sql as $$
+  stable language sql as $$
   select linenr, line::jsonb as value from FILELINEREADER.read_lines( ¶path ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function FILELINEREADER.read_jsonbl_skip( ¶path text ) returns setof U.jsonbl_facet
-  volatile language sql as $$
+  stable language sql as $$
   select linenr, line::jsonb as value from FILELINEREADER.read_lines_skip( ¶path ); $$;
 
 

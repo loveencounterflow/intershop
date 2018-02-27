@@ -52,6 +52,7 @@ function update_settings_from_ptv_file () {
       # break if no embedded variable name was found:
       if [[ "$_ptv_var_name_slashes" == '' || "$_ptv_var_name_slashes" == "$_ptv_value" ]]; then
         declare -g "$_ptv_key"="$_ptv_value"
+        export "$_ptv_key"
         break
         fi
       #.....................................................................................................
@@ -69,6 +70,7 @@ function update_settings_from_ptv_file () {
       _ptv_var_value="${!_ptv_var_name}"
       _ptv_value=${_ptv_value/\$\{$_ptv_var_name_slashes\}/$_ptv_var_value}
       declare -g "$_ptv_key"="$_ptv_value"
+      export "$_ptv_key"
       break
       done
     #.......................................................................................................

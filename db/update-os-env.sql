@@ -6,6 +6,7 @@
 /* Update OS.env to reflect current environment: */
 /* thx to https://dba.stackexchange.com/a/134538/126933 */
 \set os_environment `printenv`
+truncate U.variables;
 with
   v1 as ( select regexp_split_to_table( :'os_environment'::text, '\n' ) as setting  ),
   v2 as ( select regexp_matches( setting, '^([^=]+)=(.*)$' ) as kv_pairs from v1    )
