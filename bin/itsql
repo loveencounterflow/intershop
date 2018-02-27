@@ -3,8 +3,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-intershop_paths_app=$(pwd)
-home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+intershop_host_path=$(pwd)
+# home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 cd "$home"
 source bin/_prepare-environment
 
