@@ -3,7 +3,7 @@
 -- ---------------------------------------------------------------------------------------------------------
 \pset pager on
 \ir '../010-trm.sql'
-\echo :cyan'——————————————————————— demo-filelinereader.sql ———————————————————————':reset
+-- \echo :cyan'——————————————————————— demo-filelinereader.sql ———————————————————————':reset
 
 -- ---------------------------------------------------------------------------------------------------------
 drop schema if exists RECONSTRUCT cascade;
@@ -33,10 +33,9 @@ create function RECONSTRUCT._cast_schemaname( ¶schema text )
   returns regnamespace stable strict language plpgsql as $$
   begin
     return ¶schema::regnamespace;
-        raise notice '22982 statement: %', ¶statement;
     exception
       when /* 3F000 */ invalid_schema_name then
-        raise notice 'unknown schema %, skipping - [(%) %]', ¶schema, sqlstate, sqlerrm;
+        raise notice 'intershop RECONSTRUCT #94331 unknown schema %, skipping', ¶schema;
         return null;
     end; $$;
 
@@ -49,14 +48,14 @@ create function RECONSTRUCT.drop_schemas() returns void volatile language plpgsq
     ¶statement    text;
   begin
     for ¶row in ( select * from RECONSTRUCT.to_be_dropped ) loop
-      raise notice '22981 pattern: %', ¶row.pattern;
+      raise notice 'intershop RECONSTRUCT #94331 pattern: %', ¶row.pattern;
       case when ¶row.pattern ~ '\.\*$' then
         ¶schema     :=  trim( trailing from ¶row.pattern, '.*' );
         ¶schema_reg :=  RECONSTRUCT._cast_schemaname( ¶schema );
         if ¶schema_reg is distinct from null then
           ¶statement  := format( $x$ drop schema if exists %I cascade; $x$, ¶schema::regnamespace );
-          raise notice '22982 schema: %', ¶schema::regnamespace;
-          raise notice '22982 statement: %', ¶statement;
+          raise notice 'intershop RECONSTRUCT #94331 schema: %', ¶schema::regnamespace;
+          raise notice 'intershop RECONSTRUCT #94331 statement: %', ¶statement;
           execute ¶statement;
           end if;
       else
