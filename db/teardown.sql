@@ -1,4 +1,5 @@
 
+
 \ir './010-trm.sql'
 \pset pager off
 \pset tuples_only on
@@ -46,10 +47,6 @@ create role :intershop_db_user with
   nobypassrls
   in role dba;
 
-create database :intershop_db_name with owner = :intershop_db_user;
-\echo created db :intershop_db_name owned by :intershop_db_user
-
-
 /* Prepare: */
 set statement_timeout           = 0;
 set lock_timeout                = 0;
@@ -61,7 +58,7 @@ set row_security                = off;
 
 /* Recreate DB: */
 \connect postgres
-drop database if exists :intershop_db_name;
+-- drop database if exists :intershop_db_name;
 create database :intershop_db_name with
   template    = template0
   encoding    = 'UTF8'
@@ -74,6 +71,8 @@ create database :intershop_db_name with
 alter database :intershop_db_name owner to :intershop_db_user;
 -- grant create on database :intershop_db_name to :intershop_db_user;
 \connect :intershop_db_name
+\echo created db :intershop_db_name owned by :intershop_db_user
+
 
 /* Restate environmental settings: */
 set statement_timeout           = 0;
