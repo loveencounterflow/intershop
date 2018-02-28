@@ -14,5 +14,3 @@ postgres_paged -f ./db/update-os-env.sql
 postgres_paged "$@"
 
 
-
-
