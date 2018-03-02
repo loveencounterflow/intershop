@@ -12,7 +12,7 @@ cd "$home"
 
 #-----------------------------------------------------------------------------------------------------------
 source bin/_prepare-environment
-# bin/_restart-rpc-server
+bin/_restart-rpc-server
 
 #-----------------------------------------------------------------------------------------------------------
 _sudo_postgres_unpaged_pre  -f db/teardown.sql                    2>&1 | grep -P '^.*ERROR.*$|' --color=always
