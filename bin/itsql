@@ -9,8 +9,9 @@ home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 cd "$home"
 source bin/_prepare-environment
 
+
 #-----------------------------------------------------------------------------------------------------------
-postgres_paged -f ./db/update-os-env.sql
+# postgres_paged -f ./db/update-os-env.sql
 postgres_paged "$@"
 
 
