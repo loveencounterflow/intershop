@@ -265,6 +265,25 @@ create or replace function U.unnest_2d_1d( anyarray, out a anyarray )
 --   returns anyarray immutable language sql as $$
 --   select array_agg( x ) from unnest( ¶array ) as x where x is distinct from ¶value; $$;
 
+-- ---------------------------------------------------------------------------------------------------------
+create function U.assign( ¶a jsonb, ¶b jsonb ) returns jsonb immutable language plpgsql as $$
+  begin
+    if jsonb_typeof( ¶a ) != 'object' then raise exception 'expected a JSONb object, got %', ¶a; end if;
+    if jsonb_typeof( ¶b ) != 'object' then raise exception 'expected a JSONb object, got %', ¶b; end if;
+    return ¶a || ¶b; end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.assign( ¶a jsonb, ¶b jsonb, variadic ¶tail jsonb[] )
+  returns jsonb immutable language plpgsql as $$
+  declare
+    R         jsonb;
+    ¶element  jsonb;
+  begin
+    R := U.assign( ¶a, ¶b );
+    foreach ¶element in array ¶tail loop
+      R := U.assign( R, ¶element );
+      end loop;
+    return R; end; $$;
 
 
 \quit
