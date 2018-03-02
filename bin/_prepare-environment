@@ -73,7 +73,9 @@ intershop_host_sql_path="$intershop_host_path"/db                     ; export i
 
 #-----------------------------------------------------------------------------------------------------------
 source "$intershop_guest_modules_path"'/ptv-reader.sh'
-update_settings_from_ptv_file "$intershop_guest_configuration_path"
+if [[ $intershop_guest_configuration_path != $intershop_host_configuration_path ]]; then
+  update_settings_from_ptv_file "$intershop_guest_configuration_path"
+  fi
 update_settings_from_ptv_file "$intershop_host_configuration_path"
 
 #-----------------------------------------------------------------------------------------------------------
