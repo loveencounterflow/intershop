@@ -21,6 +21,23 @@ create function ¶( ¶key text, ¶value anyelement ) returns void volatile langu
   insert into U.variables values ( ¶key, ¶value )
   on conflict ( key ) do update set value = ¶value; $$;
 
+-- ---------------------------------------------------------------------------------------------------------
+/* Like standard `format` function, but uses *names* in `U.variables` instead of literals to perform
+  interpolation; e.g. `select ¶format( 'connecting to %s:%s', 'intershop/rpc/host', 'intershop/rpc/port' );`
+  might give you `'connecting to 127.0.0.1:23001'`. Equivalent to `format( '...%s...', ¶( 'key' ) )`. */
+create function ¶format( ¶template text, variadic ¶values text[] )
+  returns text stable strict language sql as $$
+    select format( ¶template, variadic ( select array_agg( ¶( key ) ) from unnest( ¶values ) as key ) ); $$;
+
+/*
+create function ¶format( ¶template text, variadic ¶values text[] )
+  returns text stable strict language plpgsql as $$
+  begin
+    ¶values :=  array_agg( ¶( key ) ) from unnest( ¶values ) as key;
+    return format( ¶template, variadic ¶values );
+    end; $$;
+*/
+
 
 -- =========================================================================================================
 -- NODEJS
