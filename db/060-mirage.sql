@@ -150,20 +150,22 @@ comment on view MIRAGE.modes_overview is 'overview giving MIRAGE modes, actors, 
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into MIRAGE.mode_actors
-  ( actor,          category,     value       ) values
-  ( 'hashcomment',  'skip',       '^\s*#'     ),
-  ( 'blank',        'skip',       '^\s*$'     ),
-  ( 'ws',           'split',      '\s+'       ),
-  ( 'tab',          'split',      '\t'        ),
-  ( 'trimfields',   'fieldf',     null        );
+  ( actor,          category,     value                       ) values
+  ( 'hashcomment',  'skip',       '^\s*#'                     ),
+  ( 'blank',        'skip',       '^\s*$'                     ),
+  ( 'ws',           'split',      '\s+'                       ),
+  ( 'tab',          'split',      '\t'                        ),
+  ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$' ),
+  ( 'trimfields',   'fieldf',     null                        );
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into MIRAGE.modes values
   ( 'plain',        null ),
-  ( 'tsv',          array[                         'tab', 'trimfields'  ] ),
-  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields'  ] ),
-  ( 'wsv',          array[                         'ws'                 ] ),
-  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws'                 ] );
+  ( 'tsv',          array[ 'tab', 'trimfields'  ] ),
+  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ] ),
+  ( 'wsv',          array[ 'ws' ] ),
+  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ] ),
+  ( 'ptv',          array[ 'ptv3fields', 'trimfields' ] );
 
 
 /* =========================================================================================================
@@ -202,6 +204,8 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
     ¶do_fieldfs boolean;
     ¶idx        integer;
     ¶include    boolean;
+    ¶matcher    text;
+    ¶matchers   text[];
     ¶row        U.text_line;
     ¶skipper    text;
     ¶skippers   text[];
@@ -234,12 +238,26 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
       else raise exception 'MIRAGE #00922 expected up to one splitter, got %', ¶splitters;
       end case;
     -- .....................................................................................................
+    ¶matchers := array_agg( value ) from MIRAGE.mode_actors
+      where array[ actor ] <@ ¶actors and category = 'match';
+    -- .....................................................................................................
+    case coalesce( array_length( ¶matchers, 1 ), 0 )
+      when 0 then null;
+      when 1 then ¶matcher := ¶matchers[ 1 ];
+      else raise exception 'MIRAGE #00922 expected up to one matcher, got %', ¶matchers;
+      end case;
+    -- .....................................................................................................
+    if ¶splitter is not null and ¶matcher is not null then
+      raise exception 'MIRAGE #00923 expected either splitter or matcher, got % and %', ¶splitter, ¶matcher;
+      end if;
+    -- .....................................................................................................
     for ¶row in ( select linenr, line from MIRAGE.read_lines( ¶path ) ) loop
       if ¶skipper is not null then  ¶include := regexp_match( ¶row.line, ¶skipper ) is null;
       else                          ¶include := true; end if;
       if ¶include then
-        if ¶splitter is not null then ¶fields :=  regexp_split_to_array( ¶row.line, ¶splitter );
-        else                          ¶fields :=  null; end if;
+        if    ¶splitter  is not null then ¶fields :=  regexp_split_to_array(  ¶row.line, ¶splitter  );
+        elsif ¶matcher   is not null then ¶fields :=  regexp_match(           ¶row.line, ¶matcher   );
+        else                              ¶fields :=  null; end if;
         end if;
     -- .....................................................................................................
     if ¶do_fieldfs and ¶fields is not null then
@@ -516,6 +534,11 @@ create view MIRAGE.all_pathmodes as ( select distinct path, mode from MIRAGE.dsk
 -- ---------------------------------------------------------------------------------------------------------
 create function MIRAGE.refresh() returns integer volatile language sql as $$
   select sum( MIRAGE.refresh( path, mode ) )::integer from MIRAGE.all_pathmodes; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function MIRAGE.refresh( ¶dsk text ) returns integer volatile language sql as $$
+  select sum( MIRAGE.refresh( path, mode ) )::integer
+    from MIRAGE.dsks_and_pathmodes where dsk = ¶dsk; $$;
 
 
 
