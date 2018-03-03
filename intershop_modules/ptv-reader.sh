@@ -38,7 +38,7 @@ function update_settings_from_ptv_file () {
     if [[ $line =~ $_blank_pattern    ]]; then continue; fi
     if [[ $line =~ $_comment_pattern  ]]; then continue; fi
     _match_ptv_line "$line"
-    _ptv_key=${_ptv_key//\//_}
+    _ptv_key=${_ptv_key//[-\/]/_}
     if [ -z ${!_ptv_key+x} ]; then declare -g "$_ptv_key"=UNDEFINED; fi
     #.......................................................................................................
     # Do recursive interpolations:
@@ -56,9 +56,9 @@ function update_settings_from_ptv_file () {
         break
         fi
       #.....................................................................................................
-      # find the shell varaible name by replacing slashes with underscores; exit with error if
+      # find the shell variable name by replacing slashes with underscores; exit with error if
       # that variable is unknown:
-      _ptv_var_name=$( echo "$_ptv_var_name_slashes" | sed -re 's/\//_/g' )
+      _ptv_var_name=$( echo "$_ptv_var_name_slashes" | sed -re 's/[-\/]/_/g' )
       if [ -z ${!_ptv_var_name+x} ]; then
         echo -e $red"found unknown variable '$_ptv_var_name' when trying to resolve"$reset
         echo -e $red"$line"$reset
