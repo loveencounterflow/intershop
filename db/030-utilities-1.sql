@@ -19,16 +19,18 @@ create schema U;
 create domain U.null_text             as text     check ( value is null                 );
 create domain U.null_integer          as integer  check ( value is null                 );
 create domain U.nonnegative_integer   as integer  check ( value >= 0                    );
-create domain U.positive_integer      as integer  check ( value >= 1                    );
+create domain U.natural_number        as integer  check ( value >= 1                    );
 create domain U.nonempty_text         as text     check ( value != ''                   );
 create domain U.chr                   as text     check ( character_length( value ) = 1 );
 -- .........................................................................................................
 create type U.text_facet              as ( key    text,     value text      );
 create type U.jsonb_facet             as ( key    text,     value jsonb     );
-create type U.line_facet              as ( linenr integer,  line  text      );
-create type U.jsonbl_facet            as ( linenr integer,  value jsonb     );
 create type U.integer_facet           as ( key    text,     value integer   );
 create type U.float_facet             as ( key    text,     value float     );
+-- .........................................................................................................
+create type U.text_line               as ( linenr U.natural_number, line  text  );
+create type U.fields_line             as ( linenr U.natural_number, line  text  );
+create type U.jsonb_line              as ( linenr U.natural_number, value jsonb );
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  */
