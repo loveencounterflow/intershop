@@ -109,32 +109,79 @@ insert into CATALOG2.serious_object_types values ( 'composite type',            
 
 
 -- ---------------------------------------------------------------------------------------------------------
-create view CATALOG2._dt_excerpt_010 as (
-  select distinct
-      dependency_chain[ array_length( dependency_chain, 1 ) - 1 ] as parent_objid,
-      objid,
-      objid::oid::regproc       as regproc,
-      objid::oid::regoper       as regoper,
-      objid::oid::regclass      as regclass,
-      objid::oid::regtype       as regtype,
-      objid::oid::regrole       as regrole,
-      objid::oid::regnamespace  as regnamespace,
-      objid::oid::name as xxx,
-      level,
-      lower( object_type ) as type,
-      -- array_position( dependency_chain, objid ) != array_length( dependency_chain, 1 ),
-      object_identity
-  from report.dependency
+create view CATALOG2._dt_excerpt_010 as ( select distinct
+    level                                                       as level,
+    dependency_chain[ array_length( dependency_chain, 1 ) - 1 ] as parent_oid,
+    objid                                                       as self_oid,
+    object_type                                                 as self_type_A,
+    object_identity                                             as self_identity_A,
+    dependency_chain                                            as self_dependency_chain_A
+  from report.dependency );
+    -- lower( object_type ) as type,
+    -- array_position( dependency_chain, objid ) != array_length( dependency_chain, 1 ),
   -- where object_identity ~ 'mirage'
   -- where object_identity ~ 'CATALOG2'
   -- order by
   --   object_type,
   --   object_identity
+
+-- ---------------------------------------------------------------------------------------------------------
+create function CATALOG2.get_osnt_url( ¶owner text, ¶schema text, ¶name text, ¶type text )
+  returns text immutable language sql as $$
+    select ''
+      -- || coalesce( ¶owner,  '???' )
+      -- || '@'
+      || coalesce( ¶type,   '???' )
+      || '='
+      || coalesce( ¶schema, '???' )
+      || '/'
+      || coalesce( ¶name,   '???' )
+      ; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create view CATALOG2._dt_excerpt_020 as ( select
+    dep_s.level,
+    dep_p.self_type_A as parent_type_A,
+    dep_s.self_type_A,
+
+    CATALOG2.get_osnt_url(
+      osn_p.owner_name,
+      osn_p.schema_name,
+      osn_p.self_name,
+      osn_p.isa )           as parent_osnt_url,
+
+    CATALOG2.get_osnt_url(
+      osn_s.owner_name,
+      osn_s.schema_name,
+      osn_s.self_name,
+      osn_s.isa )           as self_osnt_url,
+
+    -- osn_p.owner_name        as parent_owner_name,
+    osn_p.isa               as parent_isa,
+    osn_s.isa               as self_isa,
+    osn_p.schema_name       as parent_schema_name,
+    osn_p.self_name         as parent_name,
+    osn_s.schema_name       as self_schema_name,
+    osn_s.self_name         as self_self_name,
+
+    osn_s.owner_name        as self_owner_name,
+    dep_s.parent_oid,
+    dep_s.self_oid,
+    osn_s.owner_oid         as self_owner_oid,
+    osn_s.schema_oid        as self_schema_oid,
+    osn_p.owner_oid         as parent_owner_oid,
+    osn_p.schema_oid        as parent_schema_oid,
+    dep_s.self_identity_A,
+    dep_s.self_dependency_chain_A
+  from CATALOG2._dt_excerpt_010             as dep_s
+  left join CATALOG2._dt_excerpt_010        as dep_p on ( dep_s.parent_oid  = dep_p.self_oid )
+  left join CATALOG2.osn_catalog_with_oids  as osn_s on ( dep_s.self_oid    = osn_s.self_oid )
+  left join CATALOG2.osn_catalog_with_oids  as osn_p on ( dep_s.parent_oid  = osn_p.self_oid )
   );
 
 -- ---------------------------------------------------------------------------------------------------------
-create view CATALOG2._dt_excerpt_020 as (
-  select * from CATALOG2._dt_excerpt_010 where parent_objid is distinct from null
+create view CATALOG2.dt_excerpt as (
+  select * from CATALOG2._dt_excerpt_020
   );
 
 
@@ -144,6 +191,20 @@ create view CATALOG2._dt_excerpt_020 as (
 -- select * from CATALOG2._reference_implementation_dependencies_no_columns;
 \set ECHO queries
 select * from CATALOG2.osn_catalog_with_oids limit 15;
+
+-- select distinct on ( self_type_a, self_osnt_url ) *
+--   from CATALOG2.dt_excerpt where true
+--     and self_osnt_url = '???=???/???'
+--   order by self_osnt_url;
+
+select distinct on ( parent_type_a, self_type_a, parent_osnt_url, self_osnt_url )
+    *
+  from CATALOG2.dt_excerpt where true
+  -- and self_owner_name = 'intershop'
+  -- and ( not parent_isa = 'schema' )
+  order by self_osnt_url
+  ;
+
 \set ECHO none
 \quit
 
@@ -154,7 +215,6 @@ select * from CATALOG2._reference_implementation_dependencies_no_columns where d
 -- select report.dependency_tree('^mirage$');
 select report.dependency_tree('mirror');
 -- select report.dependency_tree('^cache$');
-select * from CATALOG2._dt_excerpt_020;
 
 
 \quit
