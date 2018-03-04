@@ -165,7 +165,7 @@ insert into MIRAGE.modes values
   ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ] ),
   ( 'wsv',          array[ 'ws' ] ),
   ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ] ),
-  ( 'ptv',          array[ 'ptv3fields', 'trimfields' ] );
+  ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ] );
 
 
 /* =========================================================================================================
