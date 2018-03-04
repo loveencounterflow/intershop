@@ -129,5 +129,57 @@ select * from _CATALOG_.dependencies                            where dependent_
 select * from _CATALOG_.dependencies_shorter_version            where dependent_schema = '_catalog_';
 select * from _CATALOG_.dependencies_shorter_version_no_columns where dependent_schema = '_catalog_';
 
-SELECT report.dependency_tree('');
+-- select report.dependency_tree('t_a_root');
+-- select report.dependency_tree('^mirage$');
+select report.dependency_tree('mirror');
+-- select report.dependency_tree('^cache$');
+
+create view _CATALOG_._dt_excerpt_010 as (
+  select distinct
+      dependency_chain[ array_length( dependency_chain, 1 ) - 1 ] as parent_objid,
+      objid,
+      level,
+      object_type,
+      -- array_position( dependency_chain, objid ) != array_length( dependency_chain, 1 ),
+      object_identity
+  from report.dependency
+  -- where object_identity ~ 'mirage'
+  order by
+    object_type,
+    object_identity
+  );
+
+create view _CATALOG_._dt_excerpt_020 as (
+  select * from _CATALOG_._dt_excerpt_010 where parent_objid is distinct from null
+  );
+
+create table _CATALOG_.serious_object_types (
+  name        text unique not null primary key,
+  is_serious  boolean not null );
+
+insert into _CATALOG_.serious_object_types values ( 'AGGREGATE',                  false );
+insert into _CATALOG_.serious_object_types values ( 'DEFAULT VALUE',              false );
+insert into _CATALOG_.serious_object_types values ( 'DOMAIN CONSTRAINT',          false );
+insert into _CATALOG_.serious_object_types values ( 'FUNCTION OF ACCESS METHOD',  false );
+insert into _CATALOG_.serious_object_types values ( 'INDEX',                      false );
+insert into _CATALOG_.serious_object_types values ( 'OPERATOR',                   false );
+insert into _CATALOG_.serious_object_types values ( 'OPERATOR CLASS',             false );
+insert into _CATALOG_.serious_object_types values ( 'OPERATOR FAMILY',            false );
+insert into _CATALOG_.serious_object_types values ( 'OPERATOR OF ACCESS METHOD',  false );
+insert into _CATALOG_.serious_object_types values ( 'RULE',                       false );
+insert into _CATALOG_.serious_object_types values ( 'SEQUENCE',                   false );
+insert into _CATALOG_.serious_object_types values ( 'TABLE CONSTRAINT',           false );
+-- .........................................................................................................
+insert into _CATALOG_.serious_object_types values ( 'SCHEMA',                     true );
+insert into _CATALOG_.serious_object_types values ( 'TABLE',                      true );
+insert into _CATALOG_.serious_object_types values ( 'TYPE',                       true );
+insert into _CATALOG_.serious_object_types values ( 'VIEW',                       true );
+insert into _CATALOG_.serious_object_types values ( 'MATERIALIZED VIEW',          true );
+insert into _CATALOG_.serious_object_types values ( 'LANGUAGE',                   true );
+insert into _CATALOG_.serious_object_types values ( 'FUNCTION',                   true );
+insert into _CATALOG_.serious_object_types values ( 'EXTENSION',                  true );
+insert into _CATALOG_.serious_object_types values ( 'COMPOSITE TYPE',             true );
+
+select distinct object_type from report.dependency order by object_type;
+-- select * from _CATALOG_._dt_excerpt_020;
 

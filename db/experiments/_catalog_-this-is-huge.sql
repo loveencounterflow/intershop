@@ -39,7 +39,8 @@ CREATE OR REPLACE VIEW report.dependency AS
 WITH RECURSIVE preference AS (
   SELECT 10 AS max_depth
     , 16384 AS min_oid -- user objects only
-    , '^(londiste|pgq|pg_toast)'::text AS schema_exclusion
+    , '^(londiste|pgq|pg_toast|pg_catalog)'::text AS schema_exclusion
+    /* ### ORIGINAL '^(londiste|pgq|pg_toast)'::text AS schema_exclusion */
     , '^pg_(conversion|language|ts_(dict|template))'::text AS class_exclusion
     , '{"SCHEMA":"00", "TABLE":"01", "TABLE CONSTRAINT":"02", "DEFAULT VALUE":"03",
         "INDEX":"05", "SEQUENCE":"06", "TRIGGER":"07", "FUNCTION":"08",
