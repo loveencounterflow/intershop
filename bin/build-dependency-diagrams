@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -ex
+
+DRIVER=~/bin/schema-spy-jars/postgresql-42.0.0.jar
+# EXECUTABLE=~/bin/schema-spy-jars/schemaSpy_5.0.0.jar
+# EXECUTABLE=~/bin/schema-spy-jars/schemaspy-6.0.0-rc1.jar
+EXECUTABLE=~/bin/schema-spy-jars/schemaspy-6.0.0-rc2.jar
+
+java -jar $EXECUTABLE -t pgsql -dp $DRIVER -hq -host localhost -port 5432 -db intershop -s mirage -u intershop -p flow -o /tmp/intershop-schema
+# java -jar $EXECUTABLE -t pgsql -dp $DRIVER -hq -host localhost -port 5432 -db intershop -s mc -u intershop -p flow -o /tmp/intershop-schema
+# java -jar $EXECUTABLE -t pgsql -dp $DRIVER -hq -host localhost -port 5432 -db mojikura -s public -u flow -p flow -o /tmp/jizura-schema
+# java -jar $EXECUTABLE -t pgsql -dp $DRIVER -hq -host localhost -port 5432 -db flow -s x -s public -u flow -p flow -o /tmp/jizura-schema
+# java -jar $EXECUTABLE -t pgsql -dp $DRIVER -hq -host localhost -port 5432 -db flow -s meta -u flow -p flow -o /tmp/jizura-schema
+# java -jar $EXECUTABLE --help
+
+
