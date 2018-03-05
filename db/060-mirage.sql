@@ -461,6 +461,10 @@ create function MIRAGE.refresh( ¶path text, ¶mode text )
     ¶affected_rows  bigint;
     ¶short_path     text;
   begin
+    -- .....................................................................................................
+    if ¶path is not distinct from null then raise exception 'MIRAGE #00931 path can not be null'; end if;
+    if ¶mode is not distinct from null then raise exception 'MIRAGE #00932 mode can not be null'; end if;
+    -- .....................................................................................................
     ¶ch :=  MIRAGE._read_ch_from_path_and_update( ¶path );
     -- .....................................................................................................
     if exists ( select 1 from MIRAGE.cache where ch = ¶ch and mode = ¶mode ) then return 0; end if;
@@ -469,6 +473,11 @@ create function MIRAGE.refresh( ¶path text, ¶mode text )
     ¶short_path     :=  regexp_replace( ¶path, '^.*?([^/]+)$', '\1' );
     ¶affected_dsks  :=  array_to_string( array_agg( distinct dsk ), ', ' )
       from MIRAGE.dsks_and_pathmodes where path = ¶path and mode = ¶mode;
+    -- .....................................................................................................
+    if ¶affected_dsks is not distinct from null then
+      raise exception 'MIRAGE #00930 unknown pathmode ( %, % )', ¶path, ¶mode;
+      end if;
+    -- .....................................................................................................
     perform log( 'MIRAGE #77384 caching:', ¶affected_dsks, format( '-> (%s)', ¶mode ), ¶short_path );
     -- .....................................................................................................
     insert into MIRAGE.cache ( ch, mode, linenr, include, line, fields )
@@ -536,9 +545,14 @@ create function MIRAGE.refresh() returns integer volatile language sql as $$
   select sum( MIRAGE.refresh( path, mode ) )::integer from MIRAGE.all_pathmodes; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function MIRAGE.refresh( ¶dsk text ) returns integer volatile language sql as $$
-  select sum( MIRAGE.refresh( path, mode ) )::integer
-    from MIRAGE.dsks_and_pathmodes where dsk = ¶dsk; $$;
+create function MIRAGE.refresh( ¶dsk text ) returns integer volatile language plpgsql as $$
+  begin
+    if ¶dsk is not distinct from null then raise exception 'MIRAGE #00941 dsk can not be null'; end if;
+    if not exists ( select 1 from MIRAGE.dsks where dsk = ¶dsk ) then
+      raise exception 'MIRAGE #00942 unknown dsk %', ¶dsk;
+      end if;
+    return sum( MIRAGE.refresh( path, mode ) )::integer
+      from MIRAGE.dsks_and_pathmodes where dsk = ¶dsk; end; $$;
 
 
 
