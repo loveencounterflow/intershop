@@ -162,7 +162,7 @@ create view CATALOG2._dt_excerpt_020 as ( select
     osn_p.schema_name       as parent_schema_name,
     osn_p.self_name         as parent_name,
     osn_s.schema_name       as self_schema_name,
-    osn_s.self_name         as self_self_name,
+    osn_s.self_name         as self_name,
 
     osn_s.owner_name        as self_owner_name,
     dep_s.parent_oid,
@@ -190,19 +190,39 @@ create view CATALOG2.dt_excerpt as (
 -- select * from CATALOG2._reference_implementation_dependencies;
 -- select * from CATALOG2._reference_implementation_dependencies_no_columns;
 \set ECHO queries
-select * from CATALOG2.osn_catalog_with_oids limit 15;
+select * from CATALOG2.osn_catalog_with_oids
+  order by schema_name, self_name, isa
+  limit 15;
+-- select * from CATALOG2._reference_implementation_dependencies;
+select distinct
+    dependent_schema,
+    dependent_view,
+    source_schema,
+    source_table
+  from CATALOG2._reference_implementation_dependencies
+  order by dependent_schema, dependent_view, source_schema, source_table;
 
 -- select distinct on ( self_type_a, self_osnt_url ) *
 --   from CATALOG2.dt_excerpt where true
 --     and self_osnt_url = '???=???/???'
 --   order by self_osnt_url;
 
-select distinct on ( parent_type_a, self_type_a, parent_osnt_url, self_osnt_url )
-    *
-  from CATALOG2.dt_excerpt where true
+\quit
+with v1 as (
+select -- distinct on ( parent_type_a, self_type_a, parent_osnt_url, self_osnt_url )
+    self_oid,
+    self_osnt_url,
+    unnest( self_dependency_chain_A ) as parent_oid
+  from CATALOG2.dt_excerpt
+  where true
+    and self_osnt_url ~ 'mirage|_demo_catalog_'
   -- and self_owner_name = 'intershop'
   -- and ( not parent_isa = 'schema' )
   order by self_osnt_url
+  )
+select c.*, v1.* from v1
+left join CATALOG2.osn_catalog_with_oids as c on ( v1.parent_oid = c.self_oid and v1.parent_oid != v1.self_oid )
+order by self_osnt_url
   ;
 
 \set ECHO none
