@@ -1,10 +1,25 @@
 
-FS = require 'fs'
+'use strict'
+
+############################################################################################################
+FS                        = require 'fs'
+PATH                      = require 'path'
+rpr                       = ( require 'util' ).inspect
 
 #-----------------------------------------------------------------------------------------------------------
 @split_line = ( line ) ->
-  [ path, type, value, ] = line.trim().split /\s+/, 3
+  ### TAINT should check that type looks like `::...=` ###
+  [ path, type, value, ]  = line.trim().split /\s+/, 3
+  type                    = type.replace /^::/, ''
+  type                    = type.replace /=$/, ''
   return { path, type, value, }
+
+#-----------------------------------------------------------------------------------------------------------
+@resolve = ( text, values ) ->
+  return text.replace /\$\{([^}]+)}/, ( $0, $1, position, input ) ->
+    return $0 if ( position > 0 ) and ( input[ position - 1 ] is '\\' )
+    throw new Error "unknown key #{rpr $1}" if ( R = values[ $1 ] ) is undefined
+    return R.value
 
 #-----------------------------------------------------------------------------------------------------------
 @hash_from_path = ( path ) ->
@@ -16,8 +31,9 @@ FS = require 'fs'
   for line in ( source.split '\n' )
     continue if ( line.match /^\s*$/ )?
     continue if ( line.match /^\s*#/ )?
-    { path, type, value, }  = split_line line
-    R[ parts.path ]         = { type, value, }
+    { path, type, value, }  = @split_line line
+    value                   = @resolve value, R
+    R[ path ]               = { type, value, }
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -30,3 +46,11 @@ FS = require 'fs'
   R[ key ] = facet.value for key, facet of x
   return JSON.stringify R
 
+
+############################################################################################################
+unless module.parent?
+  log   = console.log
+  PTVR  = @
+  log '42992', PTVR.resolve 'before\\${middle}after', {}
+  log '42992', PTVR.resolve 'before${middle}after', { middle: value: '---something---' }
+  log '42992', PTVR.hash_from_path PATH.join __dirname, '../intershop.ptv'
