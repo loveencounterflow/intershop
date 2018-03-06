@@ -69,28 +69,46 @@ select MIRAGE.add_dsk_pathmode( 'source-A', ¶( 'intershop/mirage/test1/path' ),
 select MIRAGE.add_dsk_pathmode( 'source-A', ¶( 'intershop/mirage/test2/path' ), 'cbtsv' );
 
 \echo :orange'---==( 1 )==---':reset
+select * from MIRAGE.modes_overview;
 select * from MIRAGE.dsks;
 select * from MIRAGE.dsks_and_pathmodes;
 select * from MIRAGE.all_pathmodes;
+
+\echo :orange'---==( 2 )==---':reset
 select MIRAGE.refresh();
 select * from MIRAGE.cache  order by ch, linenr;
 select * from MIRAGE.mirror order by dsk, nr, linenr;
 
-\echo :orange'---==( 2 )==---':reset
+\echo :orange'---==( 3 )==---':reset
 do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test2/path' ), e'another line that changes the content hash' );  end; $$;
 
 select MIRAGE.refresh();
 select * from MIRAGE.cache  order by ch, linenr;
 select * from MIRAGE.mirror order by dsk, nr, linenr;
 
-select MIRAGE.add_dsk_pathmode( 'source-B', ¶( 'intershop/mirage/test2/path' ), 'ws' );
+\echo :orange'---==( 4 )==---':reset
+/* The preferred method to add data source keys (DSKs) and pathmodes is to 'procure' them; this will
+  implicitly add the DSK where it is missing and associate the pathmode with the given DSK where that
+  association is missing; otheriwse, it will do nothing. The return value of `MIRAGE.procure_dsk_pathmode`
+  is `1` when a new ( DSK, pathmode ) pair has been added, and `0` otherwise: */
+select * from MIRAGE.dsks_and_pathmodes;
+select MIRAGE.procure_dsk_pathmode( 'source-B', ¶( 'intershop/mirage/test2/path' ), 'wsv' );
+select MIRAGE.procure_dsk_pathmode( 'source-B', ¶( 'intershop/mirage/test2/path' ), 'wsv' );
+select * from MIRAGE.dsks_and_pathmodes;
+/* Only when `MIRAGE.enforce_unique_dsk_paths( false )` has been used to remove the uniqueness constraint
+  on pairs ( DSK, path ) can we add the same path again to a given DSK: */
+do $$ begin perform MIRAGE.enforce_unique_dsk_paths( false ); end; $$;
+select MIRAGE.add_dsk_pathmode( 'source-B', ¶( 'intershop/mirage/test2/path' ), 'wsv' );
+select * from MIRAGE.dsks_and_pathmodes;
+select MIRAGE.refresh();
+select * from MIRAGE.mirror order by dsk, nr, linenr;
 
 \set ECHO none
 \quit
 
 /* ###################################################################################################### */
 
-\echo :orange'---==( 2 )==---':reset
+\echo :orange'---==( 4 )==---':reset
 -- ---------------------------------------------------------------------------------------------------------
 do $$ begin perform MIRAGE.thaw_cache();    end; $$;
 delete from MIRAGE.mode_actors    where actor = 'trim';
