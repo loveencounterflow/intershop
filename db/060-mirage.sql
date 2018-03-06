@@ -538,6 +538,16 @@ create function MIRAGE.add_dsk_pathmode( ¶dsk text, ¶path text, ¶mode text )
     return ¶next_nr; end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
+create function MIRAGE.procure_dsk_pathmode( ¶dsk text, ¶path text, ¶mode text )
+  returns integer volatile language plpgsql as $$
+  begin
+    if not exists ( select 1 from MIRAGE.dsks_and_pathmodes
+      where ( dsk, path, mode ) = ( ¶dsk, ¶path, ¶mode ) ) then
+      return MIRAGE.add_dsk_pathmode( ¶dsk, ¶path, ¶mode );
+      end if;
+    return 0; end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
 create view MIRAGE.all_pathmodes as ( select distinct path, mode from MIRAGE.dsks_and_pathmodes );
 
 -- ---------------------------------------------------------------------------------------------------------
