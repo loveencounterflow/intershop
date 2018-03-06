@@ -45,6 +45,25 @@ TAP.test "line splitting", ( T ) ->
   #.........................................................................................................
   T.end()
 
+#-----------------------------------------------------------------------------------------------------------
+TAP.test "matching", ( T ) ->
+  probe = {
+    'intershop/rpc/respawn/fork':  { type: 'boolean',          value: 'true',                       },
+    'intershop/path':              { type: 'text/path/folder', value: '/path/to/foobar',            },
+    'intershop/rack/path':         { type: 'text/path/folder', value: '/path/to/foobar/..',         },
+    'intershop/jzrds':             { type: 'text',             value: 'whtever1',   },
+    'foo/bar/jzrds':               { type: 'text',             value: 'whtever2',   },
+    'foo/bar/jzrds/something':     { type: 'text',             value: 'whtever3',   },
+    'intershop/jzrds/path':        { type: 'text/path/folder', value: '/path/to/foobar/../jzrds',   },
+    'intershop/testdata/path':     { type: 'text/path/folder', value: '/path/to/foobar/test-data',  }, }
+  #.........................................................................................................
+  for pattern in [ '**', '*/path', '**/path', '**/jzrds', '**/jzrds/**', ]
+    urge pattern
+    for [ path, { type, value, }, ] in PTVR.match probe, pattern
+      info ( path.padEnd 45 ), ( CND.grey type.padEnd 15 ), ( CND.white value )
+  #.........................................................................................................
+  T.end()
+
 
 
 

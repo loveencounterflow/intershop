@@ -86,6 +86,58 @@
     return T.end();
   });
 
+  //-----------------------------------------------------------------------------------------------------------
+  TAP.test("matching", function(T) {
+    var i, j, len, len1, path, pattern, probe, ref, ref1, type, value;
+    probe = {
+      'intershop/rpc/respawn/fork': {
+        type: 'boolean',
+        value: 'true'
+      },
+      'intershop/path': {
+        type: 'text/path/folder',
+        value: '/path/to/foobar'
+      },
+      'intershop/rack/path': {
+        type: 'text/path/folder',
+        value: '/path/to/foobar/..'
+      },
+      'intershop/jzrds': {
+        type: 'text',
+        value: 'whtever1'
+      },
+      'foo/bar/jzrds': {
+        type: 'text',
+        value: 'whtever2'
+      },
+      'foo/bar/jzrds/something': {
+        type: 'text',
+        value: 'whtever3'
+      },
+      'intershop/jzrds/path': {
+        type: 'text/path/folder',
+        value: '/path/to/foobar/../jzrds'
+      },
+      'intershop/testdata/path': {
+        type: 'text/path/folder',
+        value: '/path/to/foobar/test-data'
+      }
+    };
+    ref = ['**', '*/path', '**/path', '**/jzrds', '**/jzrds/**'];
+    //.........................................................................................................
+    for (i = 0, len = ref.length; i < len; i++) {
+      pattern = ref[i];
+      urge(pattern);
+      ref1 = PTVR.match(probe, pattern);
+      for (j = 0, len1 = ref1.length; j < len1; j++) {
+        [path, {type, value}] = ref1[j];
+        info(path.padEnd(45), CND.grey(type.padEnd(15)), CND.white(value));
+      }
+    }
+    //.........................................................................................................
+    return T.end();
+  });
+
 }).call(this);
 
 //# sourceMappingURL=test-ptv-reader.js.map

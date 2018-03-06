@@ -5,6 +5,8 @@
 FS                        = require 'fs'
 PATH                      = require 'path'
 rpr                       = ( require 'util' ).inspect
+minimatch                 = require 'minimatch'
+
 
 #-----------------------------------------------------------------------------------------------------------
 @split_line = ( line ) ->
@@ -51,6 +53,12 @@ rpr                       = ( require 'util' ).inspect
   R = {}
   R[ key ] = facet.value for key, facet of x
   return JSON.stringify R
+
+#-----------------------------------------------------------------------------------------------------------
+@match = ( facets, pattern, settings ) ->
+  R       = []
+  matcher = new minimatch.Minimatch pattern, settings
+  return ( [ key, value, ] for key, value of facets when matcher.match key )
 
 
 ############################################################################################################
