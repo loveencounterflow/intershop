@@ -103,6 +103,14 @@ select * from MIRAGE.dsks_and_pathmodes;
 select MIRAGE.refresh();
 select * from MIRAGE.mirror order by dsk, nr, linenr;
 
+do $$ begin perform MIRAGE.thaw_cache();    end; $$;
+truncate MIRAGE.cache;
+do $$ begin perform MIRAGE.freeze_cache();  end; $$;
+select * from MIRAGE.mirror order by dsk, nr, linenr;
+
+/* Simpler with the `MIRAGE.clear_cache()` method: */
+do $$ begin perform MIRAGE.clear_cache();  end; $$;
+
 \set ECHO none
 \quit
 

@@ -424,6 +424,14 @@ create function MIRAGE.thaw_cache() returns void volatile language sql as $$
   grant   insert, update, delete, truncate on table MIRAGE.cache to public, current_user; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
+create function MIRAGE.clear_cache() returns void volatile language plpgsql as $$
+  begin
+    perform MIRAGE.thaw_cache();
+    truncate MIRAGE.cache;
+    perform MIRAGE.freeze_cache();
+    end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
 /* ### TAINT use CH domain */
 /* ### TAINT unsure how delete, then insert behaves under concurrency */
 create function MIRAGE._read_ch_from_path_and_update( ¶path text )
