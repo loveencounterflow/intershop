@@ -12,11 +12,16 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this.split_line = function(line) {
+    var _, match, path, type, value;
     /* TAINT should check that type looks like `::...=` */
-    var path, type, value;
-    [path, type, value] = line.trim().split(/\s+/, 3);
-    type = type.replace(/^::/, '');
-    type = type.replace(/=$/, '');
+    if ((match = line.trim().match(/^(\S+)\s+::([^=]+)=\s*$/)) != null) {
+      [_, path, type] = match;
+      value = '';
+    } else if ((match = line.trim().match(/^(\S+)\s+::([^=]+)=\s+(.*)$/))) {
+      [_, path, type, value] = match;
+    } else {
+      throw new Error(`not a legal PTV line: ${rpr(line)}`);
+    }
     return {path, type, value};
   };
 
@@ -35,8 +40,14 @@
   };
 
   //-----------------------------------------------------------------------------------------------------------
-  this.hash_from_path = function(path) {
-    return this.update_hash_from_path(path, {});
+  this.hash_from_paths = function(...paths) {
+    var R, i, len, path;
+    R = {};
+    for (i = 0, len = paths.length; i < len; i++) {
+      path = paths[i];
+      this.update_hash_from_path(path, R);
+    }
+    return R;
   };
 
   //-----------------------------------------------------------------------------------------------------------

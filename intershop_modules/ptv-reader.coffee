@@ -9,9 +9,13 @@ rpr                       = ( require 'util' ).inspect
 #-----------------------------------------------------------------------------------------------------------
 @split_line = ( line ) ->
   ### TAINT should check that type looks like `::...=` ###
-  [ path, type, value, ]  = line.trim().split /\s+/, 3
-  type                    = type.replace /^::/, ''
-  type                    = type.replace /=$/, ''
+  if ( match = line.trim().match /^(\S+)\s+::([^=]+)=\s*$/ )?
+    [ _, path, type, ] = match
+    value = ''
+  else if ( match = line.trim().match /^(\S+)\s+::([^=]+)=\s+(.*)$/ )
+    [ _, path, type, value, ] = match
+  else
+    throw new Error "not a legal PTV line: #{rpr line}"
   return { path, type, value, }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -22,8 +26,10 @@ rpr                       = ( require 'util' ).inspect
     return R.value
 
 #-----------------------------------------------------------------------------------------------------------
-@hash_from_path = ( path ) ->
-  return @update_hash_from_path path, {}
+@hash_from_paths = ( paths... ) ->
+  R = {}
+  @update_hash_from_path path, R for path in paths
+  return R
 
 #-----------------------------------------------------------------------------------------------------------
 @update_hash_from_path = ( path, R ) ->
@@ -54,3 +60,8 @@ unless module.parent?
   log '42992', PTVR.resolve 'before\\${middle}after', {}
   log '42992', PTVR.resolve 'before${middle}after', { middle: value: '---something---' }
   log '42992', PTVR.hash_from_path PATH.join __dirname, '../intershop.ptv'
+
+
+
+
+

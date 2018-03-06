@@ -40,8 +40,11 @@
     "bash": "0.0.1",
     "cnd": "^4.3.1",
     "coffeescript": "^2.2.1",
+    "minimatch": "^3.0.4",
+    "pg": "^7.4.1",
     "pipestreams": "^0.4.0",
     "pkg-conf": "^2.1.0",
-    "respawn": "^2.5.0"
+    "respawn": "^2.5.0",
+    "tap": "^11.1.1"
   }
 }
