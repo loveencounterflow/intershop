@@ -417,18 +417,16 @@ ooooo     ooo                  .o8                .
 
 -- ---------------------------------------------------------------------------------------------------------
 create function MIRAGE.freeze_cache() returns void volatile language sql as $$
-  revoke  insert, update, delete, truncate on table MIRAGE.cache from public, current_user; $$;
+  revoke insert, update, delete, truncate on table MIRAGE.cache from public, current_user; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function MIRAGE.thaw_cache() returns void volatile language sql as $$
-  grant   insert, update, delete, truncate on table MIRAGE.cache to public, current_user; $$;
+  grant insert, update, delete, truncate on table MIRAGE.cache to public, current_user; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function MIRAGE.clear_cache() returns void volatile language plpgsql as $$
   begin
-    perform MIRAGE.thaw_cache();
     truncate MIRAGE.cache;
-    perform MIRAGE.freeze_cache();
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -449,11 +447,9 @@ create function MIRAGE._read_ch_from_path_and_update( ¶path text )
     delete from MIRAGE.paths_and_chs where path = ¶path;
     --......................................................................................................
     /* Delete old CH and insert new CH: */
-    perform MIRAGE.thaw_cache();
     delete from MIRAGE.chs where true
       and ( ch = ¶old_ch )
       and ( not exists ( select 1 from MIRAGE.paths_and_chs where ch = ¶old_ch ) );
-    perform MIRAGE.freeze_cache();
     insert into MIRAGE.chs ( ch ) values ( ¶new_ch ) on conflict do nothing;
     --......................................................................................................
     insert into MIRAGE.paths_and_chs ( path, ch ) values ( ¶path, ¶new_ch );
@@ -477,7 +473,6 @@ create function MIRAGE.refresh( ¶path text, ¶mode text )
     -- .....................................................................................................
     if exists ( select 1 from MIRAGE.cache where ch = ¶ch and mode = ¶mode ) then return 0; end if;
     -- .....................................................................................................
-    perform MIRAGE.thaw_cache();
     ¶short_path     :=  regexp_replace( ¶path, '^.*?([^/]+)$', '\1' );
     ¶affected_dsks  :=  array_to_string( array_agg( distinct dsk ), ', ' )
       from MIRAGE.dsks_and_pathmodes where path = ¶path and mode = ¶mode;
@@ -494,12 +489,8 @@ create function MIRAGE.refresh( ¶path text, ¶mode text )
     -- .....................................................................................................
     get diagnostics ¶affected_rows = row_count;
     perform log( format( 'MIRAGE #77384 read %s rows', to_char( ¶affected_rows, '999,999,999' ) ) );
-    perform MIRAGE.freeze_cache();
     -- .....................................................................................................
     return 1; end; $$;
-
--- ---------------------------------------------------------------------------------------------------------
-do $$ begin perform MIRAGE.freeze_cache(); end; $$;
 
 
 /* =========================================================================================================
