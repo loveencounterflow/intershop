@@ -6,10 +6,12 @@ grey='\x1b[38;05;240m'
 blue='\x1b[38;05;27m'
 lime='\x1b[38;05;118m'
 orange='\x1b[38;05;208m'
+red='\x1b[38;05;124m'
 reset='\x1b[0m'
-function info () { set +u;  printf "$grey""INTERSHOP ""$blue%s$reset\n" "$1 $2 $3 $4 $5 $6";  set -u;  }
-function help () { set +u;  printf "$grey""INTERSHOP ""$lime%s$reset\n" "$1 $2 $3 $4 $5 $6";  set -u;  }
-function urge () { set +u;  printf "$grey""INTERSHOP ""$orange%s$reset\n" "$1 $2 $3 $4 $5 $6";  set -u;  }
+function info () { set +u;  printf "$grey""INTERSHOP ""$blue%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function help () { set +u;  printf "$grey""INTERSHOP ""$lime%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function urge () { set +u;  printf "$grey""INTERSHOP ""$orange%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function warn () { set +u;  printf "$grey""INTERSHOP ""$red%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
 
 info 'intershop command '"$0" "$@"
 
@@ -23,13 +25,31 @@ info 'intershop command '"$0" "$@"
 # exit 1
 
 #-----------------------------------------------------------------------------------------------------------
-export intershop_host_path
-export intershop_host_bin_path
-export intershop_guest_path
-export intershop_guest_bin_path
-export intershop_guest_configuration_path
-export intershop_host_configuration_path
-export intershop_role
+export intershop_db_name='UNKNOWN'
+export intershop_db_port='UNKNOWN'
+export intershop_db_user='UNKNOWN'
+export intershop_guest_bin_path='UNKNOWN'
+export intershop_guest_configuration_path='UNKNOWN'
+export intershop_guest_modules_path='UNKNOWN'
+export intershop_guest_path='UNKNOWN'
+export intershop_guest_sql_path='UNKNOWN'
+export intershop_host_bin_path='UNKNOWN'
+export intershop_host_configuration_path='UNKNOWN'
+export intershop_host_modules_path='UNKNOWN'
+export intershop_host_name='UNKNOWN'
+export intershop_host_path='UNKNOWN'
+export intershop_host_sql_path='UNKNOWN'
+export intershop_modules_path='UNKNOWN'
+export intershop_psql_output_path='UNKNOWN'
+export intershop_role='UNKNOWN'
+export intershop_rpc_host='UNKNOWN'
+export intershop_rpc_port='UNKNOWN'
+export intershop_sql_buildscript_header_path='UNKNOWN'
+export intershop_sql_buildscript_path='UNKNOWN'
+export intershop_system_user='UNKNOWN'
+export intershop_tmp_path='UNKNOWN'
+# export intershop_unknown='UNKNOWN'
+
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_host_path=$(pwd)
@@ -38,7 +58,22 @@ intershop_host_configuration_path="$intershop_host_path"/intershop.ptv
 intershop_guest_path="$intershop_host_path"/intershop
 intershop_guest_bin_path="$intershop_guest_path"/bin
 intershop_guest_configuration_path="$intershop_guest_path"/intershop.ptv
-intershop_role=unknown
+intershop_system_user="$USER"
+intershop_host_name=intershop
+intershop_guest_modules_path="$intershop_guest_path"/intershop_modules
+intershop_host_modules_path="$intershop_host_path"/intershop_modules
+intershop_guest_sql_path="$intershop_guest_path"/db
+intershop_host_sql_path="$intershop_host_path"/db
+# intershop_role='UNKNOWN'
+# intershop_modules_path='UNKNOWN'
+# intershop_db_name='UNKNOWN'
+# intershop_db_user='UNKNOWN'
+# intershop_db_port='UNKNOWN'
+# intershop_rpc_port='UNKNOWN'
+# intershop_rpc_host='UNKNOWN'
+# intershop_tmp_path='UNKNOWN'
+# intershop_psql_output_path='UNKNOWN'
+
 
 #-----------------------------------------------------------------------------------------------------------
 if ! [[ -f $intershop_host_configuration_path ]]; then
@@ -54,29 +89,41 @@ if [[ -d $intershop_guest_path ]]; then
     info 'found intershop guest configuration at '"$intershop_guest_configuration_path"
     info 'intershop guest bin path at '"$intershop_guest_bin_path"
     intershop_role=guest
+    intershop_modules_path="$intershop_guest_modules_path"
   else
     info 'intershop guest configuration path not found at '"$intershop_guest_configuration_path"
     fi
   fi
 #...........................................................................................................
-if [[ $intershop_role == 'unknown' ]]; then
+if [[ $intershop_role == 'UNKNOWN' ]]; then
   info 'no intershop guest path at '"$intershop_guest_path"
   info 'intershop host bin path at '"$intershop_host_bin_path"
   intershop_role=host
+  intershop_modules_path="$intershop_host_modules_path"
+  intershop_guest_bin_path="$intershop_host_bin_path"
+  intershop_guest_configuration_path="$intershop_host_configuration_path"
+  intershop_guest_modules_path="$intershop_host_modules_path"
+  intershop_guest_path="$intershop_host_path"
+  intershop_guest_sql_path="$intershop_host_sql_path"
   fi;
 #...........................................................................................................
 info 'intershop role is '"$intershop_role"
 
 #-----------------------------------------------------------------------------------------------------------
 function find_intershop_subcommand () {
-  info 'looking for intershop subcommand '"$1"
-  for filepath in "$1"/intershop-*; do
-    help "$filepath"
-    done; }
+  local subcommand_path;
+  subcommand_path="$intershop_host_bin_path"/intershop-"$1"
+  if [[ -x "$subcommand_path" ]]; then echo "$subcommand_path"; return 0; fi
+  if [[ $intershop_role == 'guest' ]]; then
+    subcommand_path="$intershop_guest_bin_path"/intershop-"$1"
+    if [[ -x "$subcommand_path" ]]; then echo "$subcommand_path"; return 0; fi;
+    fi
+  echo 'UNKNOWN'; }
 
 #-----------------------------------------------------------------------------------------------------------
 function _list_intershop_subcommands () {
   info 'looking for intershop subcommands in '"$1"
+  ### TAINT should we check whether file is executable? ###
   for filepath in "$1"/intershop-*; do
     subcommand=$(printf '%s' "$filepath" | sed -re 's/^.*\/intershop-(.+)$/\1/')
     help intershop "$subcommand"
@@ -88,38 +135,22 @@ function list_intershop_subcommands () {
   _list_intershop_subcommands "$intershop_host_bin_path"; }
 
 #-----------------------------------------------------------------------------------------------------------
+### Locate and execute subcommand: ###
 set +u; subcommand="$1"; set -u
 if [ -z "$subcommand" ]; then
   urge 'no subcommand given; available commands:'
   list_intershop_subcommands
   exit 1
-  fi
-
-exit 1
-
-source bin/_prepare-environment
-
-#-----------------------------------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------------------------------------
-echo command is "$subcommand"
-
-sub_command_executable=./bin/intershop-"$subcommand"
-if [ -x "$sub_command_executable" ]; then
-  echo "$0: found executable $sub_command_executable for subcommand $subcommand"
 else
-  echo "$0: no executable $sub_command_executable found for subcommand $subcommand"
-  exit 1
+  subcommand_path=$(find_intershop_subcommand "$subcommand")
+  if [[ $subcommand_path == 'UNKNOWN' ]]; then
+    warn "unable to find executable for subcommand $subcommand_path"
+    exit 1
+    fi
+  help "running $subcommand_path"
+  source bin/_prepare-environment
+  "$subcommand_path"
   fi
-
-
-
-
-# thx to https://unix.stackexchange.com/a/60808
-# compgen -c | sort | grep --color=always -P '^i.*$' | less -SRN
-# compgen -c | sort | grep --color=always -P '^...$' | less -SRN
-# compgen -c | sort | less -SRN +G
-# compgen -A function -abck | sort | less -SRN +G
 
 
 
