@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # set -ex
-set -euo pipefail
-IFS=$'\n\t'
+set -euo pipefail;IFS=$'\n\t'
 
 intershop_host_path=$(pwd)
 # home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
