@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail; IFS=$'\n\t'
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+source "$intershop_guest_modules_path"/psql-functions.sh
+_sudo_postgres_unpaged_pre -c "vacuum full;" # 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+
+
+
