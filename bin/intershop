@@ -134,6 +134,91 @@ function list_intershop_subcommands () {
   if [[ $intershop_role == 'guest' ]]; then _list_intershop_subcommands "$intershop_guest_bin_path"; fi
   _list_intershop_subcommands "$intershop_host_bin_path"; }
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#-----------------------------------------------------------------------------------------------------------
+function show () {
+  printf "$green%-50s $white%s$reset\n" "$1": "${!1}"; }
+
+#-----------------------------------------------------------------------------------------------------------
+function list () {
+  declare _LIST_name
+  ( for _LIST_name in $( set | grep -o -E "^[a-z_][a-z0-9_]*=" | grep -o -E "^[^=]+" ); do
+      show "$_LIST_name"; done ) || true; }
+
+#-----------------------------------------------------------------------------------------------------------
+function on_error () {
+  echo -e "$red"'An error occurred'
+  # echo -e "$red"'An error occurred; environment at this point:'"$reset" && list;
+  }
+trap 'on_error' ERR
+
+#-----------------------------------------------------------------------------------------------------------
+if [[ $intershop_role == 'host' ]]; then
+  cd "$intershop_host_path"
+else
+  cd "$intershop_guest_path"
+  fi
+source bin/_trm
+
+#-----------------------------------------------------------------------------------------------------------
+source "$intershop_modules_path"'/ptv-reader.sh'
+if [[ $intershop_role == 'guest' ]]; then
+  update_settings_from_ptv_file "$intershop_guest_configuration_path"
+  fi
+update_settings_from_ptv_file "$intershop_host_configuration_path"
+
+#-----------------------------------------------------------------------------------------------------------
+intershop_tmp_path='/tmp/intershop-'$intershop_db_name
+intershop_psql_output_path=$intershop_tmp_path'/psql-output'
+intershop_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql
+intershop_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql
+
+
+#===========================================================================================================
+# PREPARE PSQL OUTPUT FILE
+#-----------------------------------------------------------------------------------------------------------
+# # I'd simply use a pipe here but that invalidates the `$!` (last PID) invocation:
+# tail -f /tmp/psql-output | sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' &
+# # Thx to https://stackoverflow.com/a/8048493/7568091
+# # for the idea to redirect to a subshell to preserve the PID of the first command:
+# ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+# make sure output file exists with the correct rights:
+mkdir -p $intershop_tmp_path
+chmod 0777 $intershop_tmp_path
+touch $intershop_psql_output_path
+chmod 0666 $intershop_psql_output_path
+truncate -s 0 $intershop_psql_output_path
+( tail -f $intershop_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+psql_tailer_pid=$!
+
+# # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
+trap 'kill $psql_tailer_pid' EXIT
+# echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 #-----------------------------------------------------------------------------------------------------------
 ### Locate and execute subcommand: ###
 set +u; subcommand="$1"; set -u
@@ -149,7 +234,6 @@ else
     fi
   set +u
   help "running $subcommand_path" "$2 $3 $4 $5 $6 $7 $8 $9"
-  source bin/_prepare-environment
   set +u
   "$subcommand_path" "$2 $3 $4 $5 $6 $7 $8 $9"
   set -u
