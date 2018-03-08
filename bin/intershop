@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail;IFS=$'\n\t'
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+echo '44902' "$0" "$@"
+
+#-----------------------------------------------------------------------------------------------------------
+export intershop_host_path
+export intershop_guest_path_exists
+export intershop_guest_configuration_path
+export intershop_host_configuration_path
+export intershop_role
+
+#-----------------------------------------------------------------------------------------------------------
+intershop_host_path=$(pwd)
+intershop_host_configuration_path="$intershop_host_path"/intershop.ptv
+intershop_guest_path="$intershop_host_path"/intershop
+intershop_guest_configuration_path="$intershop_guest_path"/intershop.ptv
+intershop_role=unknown
+
+#-----------------------------------------------------------------------------------------------------------
+if ! [[ -f $intershop_host_configuration_path ]]; then
+  echo 'ISHOP#39081-1: unable to find '"$intershop_host_configuration_path"
+  echo 'ISHOP#39081-2: not an intershop module: '"$intershop_host_path"
+  exit 1
+  fi
+echo 'ISHOP#39081-3: found intershop host configuration at '"$intershop_host_configuration_path"
+#...........................................................................................................
+if [[ -d $intershop_guest_path ]]; then
+  echo 'ISHOP#39081-4: found intershop guest path at '"$intershop_guest_path"
+  if [[ -f $intershop_guest_configuration_path ]]; then
+    echo 'ISHOP#39081-5: found intershop guest configuration at '"$intershop_guest_configuration_path"
+    intershop_role=guest
+  else
+    echo 'ISHOP#39081-6: intershop guest configuration path not found at '"$intershop_guest_configuration_path"
+    fi
+  fi
+#...........................................................................................................
+if [[ $intershop_role == 'unknown' ]]; then
+  echo 'ISHOP#39081-7: no intershop guest path at '"$intershop_guest_path"
+  intershop_role=host
+  fi;
+#...........................................................................................................
+echo 'ISHOP#39081-8: intershop role is '"$intershop_role"
+exit 1
+
+source bin/_prepare-environment
+
+#-----------------------------------------------------------------------------------------------------------
+set +u; sub_command="$1"; set -u
+if [ -z "$sub_command" ]; then
+  echo "$0: need sub-command"
+  exit 1
+  fi
+
+#-----------------------------------------------------------------------------------------------------------
+echo command is "$sub_command"
+
+sub_command_executable=./bin/intershop-"$sub_command"
+if [ -x "$sub_command_executable" ]; then
+  echo "$0: found executable $sub_command_executable for sub-command $sub_command"
+else
+  echo "$0: no executable $sub_command_executable found for sub-command $sub_command"
+  exit 1
+  fi
+
+
+
+
+# thx to https://unix.stackexchange.com/a/60808
+# compgen -c | sort | grep --color=always -P '^i.*$' | less -SRN
+# compgen -c | sort | grep --color=always -P '^...$' | less -SRN
+# compgen -c | sort | less -SRN +G
+# compgen -A function -abck | sort | less -SRN +G
+
+
+
+
+
