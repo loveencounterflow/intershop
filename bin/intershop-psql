@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
-# set -ex
-set -euo pipefail
-IFS=$'\n\t'
+set -euo pipefail; IFS=$'\n\t'
 
-intershop_host_path=$(pwd)
-# home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
+
+set | sort | grep -P '^intershop'
+
+# intershop_host_path=$(pwd)
+# # home=$(realpath "$(readlink -f "$0" | xargs dirname)"/..)
 home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 cd "$home"
-source bin/_prepare-environment
 
+source bin/_prepare-environment
+# echo '***'
+# declare -f
+# echo '***'
 
 #-----------------------------------------------------------------------------------------------------------
 # postgres_paged -f ./db/update-os-env.sql
+echo "$0" "$@"
 postgres_paged "$@"
 
 
