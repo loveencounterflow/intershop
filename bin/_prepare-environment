@@ -1,8 +1,6 @@
-#!/usr/bin/env bash
-# set -ex
-set -e
-set -u
-set -o pipefail
+#!/bin/bash
+set -euo pipefail
+
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -24,56 +22,27 @@ trap 'on_error' ERR
 
 #-----------------------------------------------------------------------------------------------------------
 # thx to https://stackoverflow.com/a/20579006/7568091
-script_path="$(realpath "${BASH_SOURCE[0]}")"
-intershop_bin_path="$(dirname "$script_path")"                ; export intershop_bin_path
-intershop_guest_path="$(realpath "$intershop_bin_path"/..)"   ; export intershop_guest_path
+# script_path="$(realpath "${BASH_SOURCE[0]}")"
+
+# #-----------------------------------------------------------------------------------------------------------
+# if [ -z ${intershop_host_path+x} ]; then
+#   echo "$script_path"': need variable $intershop_host_path'
+#   echo "terminating"
+#   exit 1
+#   fi
+# export intershop_host_path
 
 #-----------------------------------------------------------------------------------------------------------
-if [ -z ${intershop_host_path+x} ]; then
-  echo "$script_path"': need variable $intershop_host_path'
-  echo "terminating"
-  exit 1
+if [[ $intershop_role == 'host' ]]; then
+  cd "$intershop_host_path"
+else
+  cd "$intershop_guest_path"
   fi
-export intershop_host_path
-
-#-----------------------------------------------------------------------------------------------------------
-intershop_guest_configuration_path="$home"/intershop.ptv ; export intershop_guest_configuration_path
-if ! [[ -f $intershop_guest_configuration_path ]]; then
-  echo "unable to find configuration file in $intershop_guest_configuration_path; terminating"
-  exit 1
-  fi
-
-#-----------------------------------------------------------------------------------------------------------
-intershop_host_configuration_path="$intershop_host_path"/intershop.ptv ; export intershop_host_configuration_path
-if ! [[ -f $intershop_host_configuration_path ]]; then
-  echo "unable to find configuration file in $intershop_host_configuration_path; terminating"
-  exit 1
-  fi
-
-#-----------------------------------------------------------------------------------------------------------
-cd "$intershop_guest_path"
 source bin/_trm
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_db_name=UNKNOWN                                             ; export intershop_db_name
-intershop_db_user=UNKNOWN                                             ; export intershop_db_user
-intershop_db_port=UNKNOWN                                             ; export intershop_db_port
-intershop_rpc_port=UNKNOWN                                            ; export intershop_rpc_port
-intershop_rpc_host=UNKNOWN                                            ; export intershop_rpc_host
-intershop_tmp_path=UNKNOWN                                            ; export intershop_tmp_path
-intershop_psql_output_path=UNKNOWN                                    ; export intershop_psql_output_path
-#...........................................................................................................
-intershop_system_user="$USER"                                         ; export intershop_system_user
-intershop_host_name=intershop                                         ; export intershop_host_name
-intershop_guest_modules_path="$home"/intershop_modules                ; export intershop_guest_modules_path
-intershop_host_modules_path="$intershop_host_path"/intershop_modules  ; export intershop_host_modules_path
-intershop_guest_sql_path="$home"/db                                   ; export intershop_guest_sql_path
-intershop_host_sql_path="$intershop_host_path"/db                     ; export intershop_host_sql_path
-# intershop_guest_sql_filepaths=$(find "$intershop_guest_sql_path" -maxdepth 1 -type f -name '[0-9][0-9][0-9]-*' | sort)
-
-#-----------------------------------------------------------------------------------------------------------
-source "$intershop_guest_modules_path"'/ptv-reader.sh'
-if [[ $intershop_guest_configuration_path != $intershop_host_configuration_path ]]; then
+source "$intershop_modules_path"'/ptv-reader.sh'
+if [[ $intershop_role == 'guest' ]]; then
   update_settings_from_ptv_file "$intershop_guest_configuration_path"
   fi
 update_settings_from_ptv_file "$intershop_host_configuration_path"
@@ -83,10 +52,6 @@ intershop_tmp_path='/tmp/intershop-'$intershop_db_name
 intershop_psql_output_path=$intershop_tmp_path'/psql-output'
 intershop_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql
 intershop_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql
-export intershop_tmp_path
-export intershop_psql_output_path
-export intershop_sql_buildscript_header_path
-export intershop_sql_buildscript_path
 
 
 #===========================================================================================================
@@ -110,27 +75,6 @@ psql_tailer_pid=$!
 trap 'kill $psql_tailer_pid' EXIT
 # echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
 
-
-#===========================================================================================================
-# GENERATE GUEST SQL BUILDSCRIPT
-#-----------------------------------------------------------------------------------------------------------
-touch "$intershop_sql_buildscript_path"
-cat "$intershop_sql_buildscript_header_path" > "$intershop_sql_buildscript_path"
-shopt -s extglob
-if [[ $intershop_guest_sql_path != $intershop_host_sql_path ]]; then
-  echo "adding guest SQL files from $intershop_guest_sql_path"
-  for sql_filepath in $( ls "$intershop_guest_sql_path"/@([0-9][0-9][0-9])-*.sql | sort ); do
-    echo '\echo :_intershop_trm_title'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_sql_buildscript_path"
-    done
-  fi
-
-#===========================================================================================================
-# ADD HOST SQL BUILDSCRIPT LINES
-#-----------------------------------------------------------------------------------------------------------
-echo "adding host SQL files from $intershop_host_sql_path"
-for sql_filepath in $( ls "$intershop_host_sql_path"/@([0-9][0-9][0-9])-*.sql | sort ); do
-  echo '\echo :_intershop_trm_title2'"'""$sql_filepath""'"':_intershop_trm_reset \i '"'""$sql_filepath""'" >> "$intershop_sql_buildscript_path"
-  done
 
 #===========================================================================================================
 # DEFINE UTILITY FUNCTIONS FOR CALLING PSQL
