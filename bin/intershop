@@ -229,7 +229,7 @@ if [ -z "$subcommand" ]; then
 else
   subcommand_path=$(find_intershop_subcommand "$subcommand")
   if [[ $subcommand_path == 'UNKNOWN' ]]; then
-    warn "unable to find executable for subcommand $subcommand_path"
+    warn "unable to find executable for subcommand $subcommand"
     exit 1
     fi
   set +u
