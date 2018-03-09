@@ -163,25 +163,18 @@ function on_error () {
 trap 'on_error' ERR
 
 #-----------------------------------------------------------------------------------------------------------
-if [[ $intershop_role == 'host' ]]; then
-  cd "$intershop_host_path"
-else
-  cd "$intershop_guest_path"
-  fi
-source bin/_trm
-
-#-----------------------------------------------------------------------------------------------------------
-source "$intershop_modules_path"'/ptv-reader.sh'
+source "$intershop_guest_bin_path/_trm"
+source "$intershop_modules_path/ptv-reader.sh"
 if [[ $intershop_role == 'guest' ]]; then
   update_settings_from_ptv_file "$intershop_guest_configuration_path"
   fi
 update_settings_from_ptv_file "$intershop_host_configuration_path"
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_tmp_path='/tmp/intershop-'$intershop_db_name
-intershop_psql_output_path=$intershop_tmp_path'/psql-output'
-intershop_sql_buildscript_header_path="$intershop_guest_sql_path"/_buildscript-header.sql
-intershop_sql_buildscript_path="$intershop_tmp_path"/build-intershop-db.sql
+intershop_tmp_path="/tmp/intershop-$intershop_db_name"
+intershop_psql_output_path="$intershop_tmp_path/psql-output"
+intershop_sql_buildscript_header_path="$intershop_guest_sql_path/_buildscript-header.sql"
+intershop_sql_buildscript_path="$intershop_tmp_path/build-intershop-db.sql"
 
 
 #===========================================================================================================
