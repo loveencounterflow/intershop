@@ -186,12 +186,12 @@ intershop_sql_buildscript_path="$intershop_tmp_path/build-intershop-db.sql"
 # # for the idea to redirect to a subshell to preserve the PID of the first command:
 # ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 # make sure output file exists with the correct rights:
-mkdir -p $intershop_tmp_path
-chmod 0777 $intershop_tmp_path
-touch $intershop_psql_output_path
-chmod 0666 $intershop_psql_output_path
-truncate -s 0 $intershop_psql_output_path
-( tail -f $intershop_psql_output_path 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
+mkdir -p "$intershop_tmp_path"
+chmod 0777 "$intershop_tmp_path"
+touch "$intershop_psql_output_path"
+chmod 0666 "$intershop_psql_output_path"
+truncate -s 0 "$intershop_psql_output_path"
+( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
