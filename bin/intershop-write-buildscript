@@ -19,17 +19,21 @@ function get_type_of_buildfile () {
 function append_buildfiles_from_path () {
   for sql_buildfile_path in $( ls "$1"/@([0-9][0-9][0-9])-* | sort ); do
     sql_buildfile_type=$(get_type_of_buildfile "$sql_buildfile_path")
+    echo 'echo -e $yellow$reverse'  '$reset$yellow '"$sql_buildfile_path"'$reset' >> "$intershop_sql_buildscript_path"
     #.......................................................................................................
     case $sql_buildfile_type in
       #.....................................................................................................
-      'sql' )
-        echo "echo XXX $sql_buildfile_path"               >> "$intershop_sql_buildscript_path"
-        echo "postgres_unpaged -f $sql_buildfile_path"    >> "$intershop_sql_buildscript_path"
-        ;;
-      #.....................................................................................................
       'executable' )
-        echo "echo XXX $sql_buildfile_path"               >> "$intershop_sql_buildscript_path"
-        echo "source $sql_buildfile_path"                 >> "$intershop_sql_buildscript_path"
+        echo "$sql_buildfile_path"                        >> "$intershop_sql_buildscript_path"
+        ;;
+      # #.....................................................................................................
+      # 'sh' )
+      #   echo "echo XXX $sql_buildfile_path"               >> "$intershop_sql_buildscript_path"
+      #   echo "source $sql_buildfile_path"                 >> "$intershop_sql_buildscript_path"
+      #   ;;
+      #.....................................................................................................
+      'sql' )
+        echo "postgres_unpaged -f $sql_buildfile_path"    >> "$intershop_sql_buildscript_path"
         ;;
       #.....................................................................................................
       * )
@@ -47,7 +51,7 @@ touch "$intershop_sql_buildscript_path"
 chmod 0744 "$intershop_sql_buildscript_path"
 ls -AlF "$intershop_sql_buildscript_path"
 cat "$intershop_sql_buildscript_header_path" > "$intershop_sql_buildscript_path"
-echo source "$intershop_guest_modules_path/psql-functions.sh" >> "$intershop_sql_buildscript_path"
+echo source "$intershop_guest_modules_path/utilities.sh" >> "$intershop_sql_buildscript_path"
 shopt -s extglob
 if [[ $intershop_role == 'guest' ]]; then
   echo "adding guest SQL files from $intershop_guest_sql_path"

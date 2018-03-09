@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+source "$intershop_guest_bin_path/_trm"
 
 # /* turn off pager, to avoid accidental paging */
 # \pset pager off

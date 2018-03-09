@@ -6,7 +6,7 @@ set -euo pipefail; IFS=$'\n\t'
 # cd "$home"
 
 #-----------------------------------------------------------------------------------------------------------
-source "$intershop_guest_modules_path"/psql-functions.sh
+source "$intershop_guest_modules_path/utilities.sh"
 postgres_paged "$@"
 
 

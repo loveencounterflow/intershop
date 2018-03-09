@@ -6,7 +6,7 @@ set -euo pipefail; IFS=$'\n\t'
 # cd "$home"
 
 #-----------------------------------------------------------------------------------------------------------
-source "$intershop_guest_modules_path"/psql-functions.sh
+source "$intershop_guest_modules_path/utilities.sh"
 _sudo_postgres_unpaged_pre -c "vacuum full;" # 2>&1 | grep -P '^.*ERROR.*$|' --color=always
 
 
