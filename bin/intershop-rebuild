@@ -7,12 +7,12 @@ set -euo pipefail; IFS=$'\n\t'
 
 #-----------------------------------------------------------------------------------------------------------
 sudo printf '' # make sure password prompt won't pop up later, be perhaps hard to detect
-source "$intershop_guest_modules_path"/psql-functions.sh
-bin/_restart-rpc-server
+source "$intershop_guest_modules_path/psql-functions.sh"
+"$intershop_guest_bin_path/_restart-rpc-server"
 
 #-----------------------------------------------------------------------------------------------------------
-_sudo_postgres_unpaged_pre  -f db/teardown.sql                    2>&1 | grep -P '^.*ERROR.*$|' --color=always
-_postgres_unpaged_pre       -f "$intershop_sql_buildscript_path"  2>&1 | grep -P '^.*ERROR.*$|' --color=always
+_sudo_postgres_unpaged_pre  -f "$intershop_guest_sql_path/teardown.sql" 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+_postgres_unpaged_pre       -f "$intershop_sql_buildscript_path"        2>&1 | grep -P '^.*ERROR.*$|' --color=always
 
 
 
