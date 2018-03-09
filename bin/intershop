@@ -173,8 +173,8 @@ update_settings_from_ptv_file "$intershop_host_configuration_path"
 #-----------------------------------------------------------------------------------------------------------
 intershop_tmp_path="/tmp/intershop-$intershop_db_name"
 intershop_psql_output_path="$intershop_tmp_path/psql-output"
-intershop_sql_buildscript_header_path="$intershop_guest_sql_path/_buildscript-header.sql"
-intershop_sql_buildscript_path="$intershop_tmp_path/build-intershop-db.sql"
+intershop_sql_buildscript_header_path="$intershop_guest_modules_path/buildscript-header.sh"
+intershop_sql_buildscript_path="$intershop_tmp_path/build-intershop-db"
 
 
 #===========================================================================================================
