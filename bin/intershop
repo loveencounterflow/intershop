@@ -123,7 +123,6 @@ function find_intershop_subcommand () {
 #-----------------------------------------------------------------------------------------------------------
 function _list_intershop_subcommands () {
   info 'looking for intershop subcommands in '"$1"
-  ### TAINT should we check whether file is executable? ###
   for filepath in "$1"/intershop-*; do
     subcommand=$(printf '%s' "$filepath" | sed -re 's/^.*\/intershop-(.+)$/\1/')
     help intershop "$subcommand"
