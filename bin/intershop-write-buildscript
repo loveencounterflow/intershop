@@ -1,19 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-
-#-----------------------------------------------------------------------------------------------------------
-function extension_from_path () {
-  local base
-  base="$(basename "$1")"
-  echo ${base##*.}; }
-
-#-----------------------------------------------------------------------------------------------------------
-function get_type_of_buildfile () {
-  if [[ -x "$1" ]]; then
-    echo 'executable'
-  else
-    extension_from_path "$1";
-  fi; }
+source "$intershop_guest_modules_path/utilities.sh"
 
 #-----------------------------------------------------------------------------------------------------------
 function append_buildfiles_from_path () {
@@ -45,13 +32,18 @@ function append_buildfiles_from_path () {
 
 
 #===========================================================================================================
-# GENERATE GUEST SQL BUILDSCRIPT
+# PROCURE BUILDSCRIPT FILE
 #-----------------------------------------------------------------------------------------------------------
 touch "$intershop_sql_buildscript_path"
 chmod 0744 "$intershop_sql_buildscript_path"
 ls -AlF "$intershop_sql_buildscript_path"
 cat "$intershop_sql_buildscript_header_path" > "$intershop_sql_buildscript_path"
 echo source "$intershop_guest_modules_path/utilities.sh" >> "$intershop_sql_buildscript_path"
+
+
+#===========================================================================================================
+# ADD GUEST SQL BUILDSCRIPT LINES
+#-----------------------------------------------------------------------------------------------------------
 shopt -s extglob
 if [[ $intershop_role == 'guest' ]]; then
   echo "adding guest SQL files from $intershop_guest_sql_path"
@@ -63,4 +55,7 @@ if [[ $intershop_role == 'guest' ]]; then
 #-----------------------------------------------------------------------------------------------------------
 echo "adding host SQL files from $intershop_host_sql_path"
 append_buildfiles_from_path "$intershop_host_sql_path"
+
+
+
 

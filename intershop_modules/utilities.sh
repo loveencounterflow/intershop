@@ -1,8 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+
 #===========================================================================================================
-# DEFINE UTILITY FUNCTIONS FOR CALLING PSQL
+# CALLING PSQL
 #-----------------------------------------------------------------------------------------------------------
 function postgres_paged () {
   PAGER="postgres-pager -s 6 --less-status-bar" psql                                \
@@ -63,4 +64,20 @@ function sudo_postgres_unpaged () {
   if [[ $? != 0 ]]; then exit 123; fi
   }
 
+
+#===========================================================================================================
+# BUILDSCRIPT UTILITIES
+#-----------------------------------------------------------------------------------------------------------
+function extension_from_path () {
+  local base
+  base="$(basename "$1")"
+  echo ${base##*.}; }
+
+#-----------------------------------------------------------------------------------------------------------
+function get_type_of_buildfile () {
+  if [[ -x "$1" ]]; then
+    echo 'executable'
+  else
+    extension_from_path "$1";
+  fi; }
 
