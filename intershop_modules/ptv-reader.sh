@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-cd "$( realpath "${BASH_SOURCE[0]}" | xargs dirname )"/..
-source bin/_trm
+# do not change CWD here, this script is sourced
+# cd "$( realpath "${BASH_SOURCE[0]}" | xargs dirname )"/..
+source "$intershop_guest_bin_path/_trm"
 
 
 #-----------------------------------------------------------------------------------------------------------
