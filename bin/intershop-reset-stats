@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail; IFS=$'\n\t'
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+source "$intershop_guest_modules_path/utilities.sh"
+# postgres_paged "$@"
+sudo_postgres_unpaged_hostdb -c 'select pg_stat_reset();' >> /dev/null
+
+
