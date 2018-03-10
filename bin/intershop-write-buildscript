@@ -4,6 +4,7 @@ source "$intershop_guest_modules_path/utilities.sh"
 
 #-----------------------------------------------------------------------------------------------------------
 function append_buildfiles_from_path () {
+  shopt -s extglob
   for sql_buildfile_path in $( ls "$1"/@([0-9][0-9][0-9])-* | sort ); do
     sql_buildfile_type=$(get_type_of_buildfile "$sql_buildfile_path")
     echo 'echo -e $yellow$reverse'  '$reset$yellow '"$sql_buildfile_path"'$reset' >> "$intershop_sql_buildscript_path"
