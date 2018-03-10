@@ -26,23 +26,12 @@ function postgres_unpaged () {
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
     "$@"
   }
-    # -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
 
 #-----------------------------------------------------------------------------------------------------------
-function _postgres_unpaged_pre () {
-  psql                                                                              \
-    -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
-    --set=intershop_db_user="$intershop_db_user"                                    \
-    --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
-    --set QUIET=on --set ON_ERROR_STOP=1                                            \
-    "$@"
-  }
-
-#-----------------------------------------------------------------------------------------------------------
-function _sudo_postgres_unpaged_pre () {
+# like sudo_postgres_unpaged, but using host database
+function sudo_postgres_unpaged_hostdb () {
   sudo -u postgres psql                                                             \
-    -p $intershop_db_port                                                           \
+    -d $intershop_db_name -p $intershop_db_port                                     \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
@@ -59,7 +48,6 @@ function sudo_postgres_unpaged () {
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
-    -f "$intershop_guest_path"'/db/update-os-env.sql'                               \
     "$@"
   if [[ $? != 0 ]]; then exit 123; fi
   }
