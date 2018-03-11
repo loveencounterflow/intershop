@@ -59,14 +59,20 @@ reset role;
 \set ECHO queries
 do $$ begin perform ¶( 'intershop/mirage/test1/path', ¶format( '%s/mirage-test-1', 'intershop/tmp/path' ) ); end; $$;
 do $$ begin perform ¶( 'intershop/mirage/test2/path', ¶format( '%s/mirage-test-2', 'intershop/tmp/path' ) ); end; $$;
+do $$ begin perform ¶( 'intershop/mirage/test3/path', ¶format( '%s/mirage-test-3', 'intershop/tmp/path' ) ); end; $$;
 
 do $$ begin perform _DEMO_MIRAGE_.truncate_file( ¶( 'intershop/mirage/test1/path' ) );  end; $$;
 do $$ begin perform _DEMO_MIRAGE_.truncate_file( ¶( 'intershop/mirage/test2/path' ) );  end; $$;
+do $$ begin perform _DEMO_MIRAGE_.truncate_file( ¶( 'intershop/mirage/test3/path' ) );  end; $$;
 do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test1/path' ), e'helo\t42', e'world', e'', e'# comment', e'a-key\tsome-value' );  end; $$;
 do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test2/path' ), e'helo\t42', e'world', e'', e'# comment', e'a-key\tsome-value' );  end; $$;
+do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test3/path' ), e'first-field\tsubsequent fields' );  end; $$;
+do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test3/path' ), e'first-field\tsubsequent fields # with comment' );  end; $$;
 
 select MIRAGE.add_dsk_pathmode( 'source-A', ¶( 'intershop/mirage/test1/path' ), 'cbtsv' );
 select MIRAGE.add_dsk_pathmode( 'source-A', ¶( 'intershop/mirage/test2/path' ), 'cbtsv' );
+select MIRAGE.add_dsk_pathmode( 'source-C', ¶( 'intershop/mirage/test3/path' ), 'cbwsv1' );
+select MIRAGE.add_dsk_pathmode( 'source-C', ¶( 'intershop/mirage/test2/path' ), 'cbwsv1' );
 
 \echo :orange'---==( 1 )==---':reset
 select * from MIRAGE.modes_overview;
@@ -103,6 +109,9 @@ select * from MIRAGE.dsks_and_pathmodes;
 select MIRAGE.refresh();
 select * from MIRAGE.mirror order by dsk, nr, linenr;
 
+\set ECHO none
+\quit
+
 do $$ begin perform MIRAGE.thaw_cache();    end; $$;
 truncate MIRAGE.cache;
 do $$ begin perform MIRAGE.freeze_cache();  end; $$;
@@ -110,9 +119,6 @@ select * from MIRAGE.mirror order by dsk, nr, linenr;
 
 /* Simpler with the `MIRAGE.clear_cache()` method: */
 do $$ begin perform MIRAGE.clear_cache();  end; $$;
-
-\set ECHO none
-\quit
 
 /* ###################################################################################################### */
 

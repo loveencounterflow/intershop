@@ -150,22 +150,26 @@ comment on view MIRAGE.modes_overview is 'overview giving MIRAGE modes, actors, 
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into MIRAGE.mode_actors
-  ( actor,          category,     value                       ) values
-  ( 'hashcomment',  'skip',       '^\s*#'                     ),
-  ( 'blank',        'skip',       '^\s*$'                     ),
-  ( 'ws',           'split',      '\s+'                       ),
-  ( 'tab',          'split',      '\t'                        ),
-  ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$' ),
-  ( 'trimfields',   'fieldf',     null                        );
+  ( actor,          category,     value                                               ) values
+  ( 'hashcomment',  'skip',       '^\s*#'                                             ),
+  ( 'blank',        'skip',       '^\s*$'                                             ),
+  ( 'ws',           'split',      '\s+'                                               ),
+  ( 'tab',          'split',      '\t'                                                ),
+  ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$'                         ),
+  ( 'ws1',          'match',      '^(?:(\S+)\s+(.*)\s(#.*)|(\S+)\s+(.*))$'            ),
+  ( 'nonulls',      'filter',     null                                                ),
+  ( 'trimfields',   'fieldf',     null                                                );
 
 -- ---------------------------------------------------------------------------------------------------------
-insert into MIRAGE.modes values
-  ( 'plain',        null ),
-  ( 'tsv',          array[ 'tab', 'trimfields'  ] ),
-  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ] ),
-  ( 'wsv',          array[ 'ws' ] ),
-  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ] ),
-  ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ] );
+insert into MIRAGE.modes
+  ( mode,           actors                                                        ) values
+  ( 'plain',        null                                                          ),
+  ( 'tsv',          array[ 'tab', 'trimfields'  ]                                 ),
+  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ]          ),
+  ( 'wsv',          array[ 'ws' ]                                                 ),
+  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ]                         ),
+  ( 'cbwsv1',       array[ 'blank', 'hashcomment', 'ws1', 'nonulls' ]             ),
+  ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ]   );
 
 
 /* =========================================================================================================
@@ -199,6 +203,8 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
   declare
     ¶actors     text[]        :=  actors from MIRAGE.modes where mode = ¶mode;
     ¶fields     text[];
+    ¶filter      text;
+    ¶filters     text[];
     ¶fieldf     text;
     ¶fieldfs    text[];
     ¶do_fieldfs boolean;
@@ -228,6 +234,9 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
     ¶fieldfs := array_agg( actor ) from MIRAGE.mode_actors
       where array[ actor ] <@ ¶actors and category = 'fieldf';
     ¶do_fieldfs := coalesce( array_length( ¶fieldfs, 1 ), 0 ) > 0;
+    -- .....................................................................................................
+    ¶filters := array_agg( actor ) from MIRAGE.mode_actors
+      where array[ actor ] <@ ¶actors and category = 'filter';
     -- .....................................................................................................
     ¶splitters := array_agg( value ) from MIRAGE.mode_actors
       where array[ actor ] <@ ¶actors and category = 'split';
@@ -259,20 +268,31 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
         elsif ¶matcher   is not null then ¶fields :=  regexp_match(           ¶row.line, ¶matcher   );
         else                              ¶fields :=  null; end if;
         end if;
-    -- .....................................................................................................
-    if ¶do_fieldfs and ¶fields is not null then
-      -- thx to https://stackoverflow.com/a/8586492/7568091
-      -- ¶fields := array( select trim( both from unnest( ¶fields ) ) );
-      -- the below solution takes 55.7s vs 64.5s for 285,699 lines (dt = 30s for 1e6 lines)
-      for ¶idx in array_lower( ¶fields, 1 ) .. array_upper( ¶fields, 1 ) loop
-        foreach ¶fieldf in array ¶fieldfs loop
-          case ¶fieldf
-            when 'trimfields' then ¶fields[ ¶idx ] := trim( both from ¶fields[ ¶idx ] );
+      -- ...................................................................................................
+      if ¶do_fieldfs and ¶fields is not null then
+        -- thx to https://stackoverflow.com/a/8586492/7568091
+        -- ¶fields := array( select trim( both from unnest( ¶fields ) ) );
+        -- the below solution takes 55.7s vs 64.5s for 285,699 lines (dt = 30s for 1e6 lines)
+        for ¶idx in array_lower( ¶fields, 1 ) .. array_upper( ¶fields, 1 ) loop
+          foreach ¶fieldf in array ¶fieldfs loop
+            case ¶fieldf
+              when 'trimfields' then ¶fields[ ¶idx ] := trim( both from ¶fields[ ¶idx ] );
+              else raise exception 'MIRAGE #00924 unknown fieldf term %', ¶fieldf;
+              end case;
+            end loop;
+          end loop;
+        end if;
+      -- ...................................................................................................
+      if ( ¶fields is not null ) and ( ¶filters is not null ) then
+        foreach ¶filter in array ¶filters loop
+          case ¶filter
+            when 'nonulls' then
+              ¶fields := array_agg( field ) from unnest( ¶fields ) as field where field is not null;
+            else raise exception 'MIRAGE #00925 unknown filter term %', ¶filter;
             end case;
           end loop;
-        end loop;
-      end if;
-    -- .....................................................................................................
+        end if;
+      -- ...................................................................................................
       return next ( ¶row.linenr, ¶include, ¶row.line, ¶fields )::MIRAGE._cachelinekernel;
       end loop;
     -- .....................................................................................................
