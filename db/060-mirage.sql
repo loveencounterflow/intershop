@@ -273,6 +273,7 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
       end if;
     -- .....................................................................................................
     for ¶row in ( select linenr, line from MIRAGE.read_lines( ¶path ) ) loop
+      ¶fields := null;
       if ¶skipper is not null then  ¶include := regexp_match( ¶row.line, ¶skipper ) is null;
       else                          ¶include := true; end if;
       if ¶include then
