@@ -6,6 +6,7 @@
 intershop/host/name                   ::text=            intershop
 
 #-----------------------------------------------------------------------------------------------------------
+# intershop/db/host                     ::text=            localhost
 intershop/db/port                     ::integer=         5432
 intershop/db/name                     ::text=            ${intershop/host/name}
 intershop/db/user                     ::text=            ${intershop/db/name}
