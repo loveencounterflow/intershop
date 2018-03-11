@@ -150,26 +150,32 @@ comment on view MIRAGE.modes_overview is 'overview giving MIRAGE modes, actors, 
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into MIRAGE.mode_actors
-  ( actor,          category,     value                                               ) values
-  ( 'hashcomment',  'skip',       '^\s*#'                                             ),
-  ( 'blank',        'skip',       '^\s*$'                                             ),
-  ( 'ws',           'split',      '\s+'                                               ),
-  ( 'tab',          'split',      '\t'                                                ),
-  ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$'                         ),
-  ( 'ws1',          'match',      '^(?:(\S+)\s+(.*)\s(#.*)|(\S+)\s+(.*))$'            ),
-  ( 'nonulls',      'filter',     null                                                ),
-  ( 'trimfields',   'fieldf',     null                                                );
+  ( actor,          category,     value                                                           ) values
+  ( 'hashcomment',  'skip',       '^\s*#'                                                         ),
+  ( 'blank',        'skip',       '^\s*$'                                                         ),
+  ( 'ws',           'split',      '\s+'                                                           ),
+  ( 'tab',          'split',      '\t'                                                            ),
+  ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$'                                     ),
+  ( 'ws1',          'match',      '^(?:(\S+)\s+(.*)\s(#.*)|(\S+)\s+(.*))$'                        ),
+  ( 'ws2',          'match',      '^(?:(\S+)\s+(\S+)\s+(.*)\s(#.*)|(\S+)\s+(\S+)\s+(.*))$'        ),
+  ( 'nonulls',      'filter',     null                                                            ),
+  ( 'nocomments',   'filter',     null                                                            ),
+  ( 'trimfields',   'fieldf',     null                                                            );
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into MIRAGE.modes
-  ( mode,           actors                                                        ) values
-  ( 'plain',        null                                                          ),
-  ( 'tsv',          array[ 'tab', 'trimfields'  ]                                 ),
-  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ]          ),
-  ( 'wsv',          array[ 'ws' ]                                                 ),
-  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ]                         ),
-  ( 'cbwsv1',       array[ 'blank', 'hashcomment', 'ws1', 'nonulls' ]             ),
-  ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ]   );
+  ( mode,           actors                                                                        ) values
+  ( 'plain',        null                                                                          ),
+  ( 'tsv',          array[ 'tab', 'trimfields'  ]                                                 ),
+  ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ]                          ),
+  ( 'wsv',          array[ 'ws' ]                                                                 ),
+  ( 'cbwsv',        array[ 'blank', 'hashcomment', 'ws' ]                                         ),
+  ( 'cbwsv1',       array[ 'blank', 'hashcomment', 'ws1', 'nonulls' ]                             ),
+  ( 'cbwsv2',       array[ 'blank', 'hashcomment', 'ws2', 'nonulls' ]                             ),
+  ( 'cbwsv-c',      array[ 'blank', 'hashcomment', 'ws', 'nocomments' ]                           ),
+  ( 'cbwsv1-c',     array[ 'blank', 'hashcomment', 'ws1', 'nonulls', 'nocomments' ]               ),
+  ( 'cbwsv2-c',     array[ 'blank', 'hashcomment', 'ws2', 'nonulls', 'nocomments' ]               ),
+  ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ]                   );
 
 
 /* =========================================================================================================
@@ -201,23 +207,24 @@ reset role;
 create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
   returns setof MIRAGE._cachelinekernel stable language plpgsql as $$
   declare
-    ¶actors     text[]        :=  actors from MIRAGE.modes where mode = ¶mode;
-    ¶fields     text[];
-    ¶filter      text;
-    ¶filters     text[];
-    ¶fieldf     text;
-    ¶fieldfs    text[];
-    ¶do_fieldfs boolean;
-    ¶idx        integer;
-    ¶include    boolean;
-    ¶matcher    text;
-    ¶matchers   text[];
-    ¶row        U.text_line;
-    ¶skipper    text;
-    ¶skippers   text[];
-    ¶splitter   text;
-    ¶splitters  text[];
-    ¶unknown    text[];
+    ¶actors           text[]        :=  actors from MIRAGE.modes where mode = ¶mode;
+    ¶fields           text[];
+    ¶filters          text[];
+    ¶filter_nulls     boolean;
+    ¶filter_comments  boolean;
+    ¶fieldf           text;
+    ¶fieldfs          text[];
+    ¶do_fieldfs       boolean;
+    ¶idx              integer;
+    ¶include          boolean;
+    ¶matcher          text;
+    ¶matchers         text[];
+    ¶row              U.text_line;
+    ¶skipper          text;
+    ¶skippers         text[];
+    ¶splitter         text;
+    ¶splitters        text[];
+    ¶unknown          text[];
   begin
     -- .....................................................................................................
     ¶unknown  := array_agg( given.actor ) from unnest( ¶actors ) as given( actor )
@@ -237,6 +244,11 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
     -- .....................................................................................................
     ¶filters := array_agg( actor ) from MIRAGE.mode_actors
       where array[ actor ] <@ ¶actors and category = 'filter';
+    if not ¶filters <@ array[ 'nonulls', 'nocomments' ]::text[] then
+      raise exception 'MIRAGE #00925 unknown filter term in %', ¶filters;
+      end if;
+    ¶filter_nulls     :=  ¶filters @> array[ 'nonulls'    ]::text[];
+    ¶filter_comments  :=  ¶filters @> array[ 'nocomments' ]::text[];
     -- .....................................................................................................
     ¶splitters := array_agg( value ) from MIRAGE.mode_actors
       where array[ actor ] <@ ¶actors and category = 'split';
@@ -283,14 +295,16 @@ create function MIRAGE._read_cachelinekernels( ¶path text, ¶mode text )
           end loop;
         end if;
       -- ...................................................................................................
-      if ( ¶fields is not null ) and ( ¶filters is not null ) then
-        foreach ¶filter in array ¶filters loop
-          case ¶filter
-            when 'nonulls' then
-              ¶fields := array_agg( field ) from unnest( ¶fields ) as field where field is not null;
-            else raise exception 'MIRAGE #00925 unknown filter term %', ¶filter;
-            end case;
-          end loop;
+      if ( ¶fields is not null ) then
+        if ¶filter_nulls then
+          ¶fields := array_agg( field ) from unnest( ¶fields ) as field where field is not null;
+          end if;
+        if ¶filter_comments then
+          ¶idx    := array_position( ¶fields, '#' );
+          if ¶idx is not null then
+            ¶fields := ¶fields[ : ¶idx - 1 ];
+            end if;
+          end if;
         end if;
       -- ...................................................................................................
       return next ( ¶row.linenr, ¶include, ¶row.line, ¶fields )::MIRAGE._cachelinekernel;
