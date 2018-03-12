@@ -155,6 +155,7 @@ insert into MIRAGE.mode_actors
   ( 'blank',        'skip',       '^\s*$'                                                         ),
   ( 'ws',           'split',      '\s+'                                                           ),
   ( 'tab',          'split',      '\t'                                                            ),
+  ( 'colonws',      'split',      '\s*;\s*'                                                       ),
   ( 'ptv3fields',   'match',      '^(\S+)\s+::(\S+)=\s+(.*)$'                                     ),
   ( 'ws1',          'match',      '^(?:(\S+)\s+(.*)\s(#.*)|(\S+)\s+(.*))$'                        ),
   ( 'ws2',          'match',      '^(?:(\S+)\s+(\S+)\s+(.*)\s(#.*)|(\S+)\s+(\S+)\s+(.*))$'        ),
@@ -175,6 +176,7 @@ insert into MIRAGE.modes
   ( 'cbwsv-c',      array[ 'blank', 'hashcomment', 'ws', 'nocomments' ]                           ),
   ( 'cbwsv1-c',     array[ 'blank', 'hashcomment', 'ws1', 'nonulls', 'nocomments' ]               ),
   ( 'cbwsv2-c',     array[ 'blank', 'hashcomment', 'ws2', 'nonulls', 'nocomments' ]               ),
+  ( 'cbcolsv',      array[ 'blank', 'hashcomment', 'colonws', 'nonulls', 'nocomments' ]           ),
   ( 'ptv',          array[ 'blank', 'hashcomment', 'ptv3fields', 'trimfields' ]                   );
 
 
