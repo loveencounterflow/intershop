@@ -16,12 +16,13 @@ Y88b. .d88P
 create schema U;
 
 -- .........................................................................................................
-create domain U.null_text             as text     check ( value is null                 );
-create domain U.null_integer          as integer  check ( value is null                 );
-create domain U.nonnegative_integer   as integer  check ( value >= 0                    );
-create domain U.natural_number        as integer  check ( value >= 1                    );
-create domain U.nonempty_text         as text     check ( value != ''                   );
-create domain U.chr                   as text     check ( character_length( value ) = 1 );
+create domain U.null_text                   as text     check ( value is null                 );
+create domain U.null_integer                as integer  check ( value is null                 );
+create domain U.nonnegative_integer         as integer  check ( value >= 0                    );
+create domain U.natural_number              as integer  check ( value >= 1                    );
+create domain U.nonempty_text               as text     check ( value != ''                   );
+create domain U.chr                         as text     check ( character_length( value ) = 1 );
+create domain U.unsigned_integer_literal    as text     check ( value ~ '^[0-9]+$'            );
 -- .........................................................................................................
 create type U.text_facet              as ( key    text,     value text      );
 create type U.jsonb_facet             as ( key    text,     value jsonb     );
