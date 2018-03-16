@@ -83,14 +83,14 @@ select * from MIRAGE.all_pathmodes;
 \echo :orange'---==( 2 )==---':reset
 select MIRAGE.refresh();
 select * from MIRAGE.cache  order by ch, linenr;
-select * from MIRAGE.mirror order by dsk, nr, linenr;
+select * from MIRAGE.mirror order by dsk, dsnr, linenr;
 
 \echo :orange'---==( 3 )==---':reset
 do $$ begin perform _DEMO_MIRAGE_.write( ¶( 'intershop/mirage/test2/path' ), e'another line that changes the content hash' );  end; $$;
 
 select MIRAGE.refresh();
 select * from MIRAGE.cache  order by ch, linenr;
-select * from MIRAGE.mirror order by dsk, nr, linenr;
+select * from MIRAGE.mirror order by dsk, dsnr, linenr;
 
 \echo :orange'---==( 4 )==---':reset
 /* The preferred method to add data source keys (DSKs) and pathmodes is to 'procure' them; this will
@@ -107,7 +107,7 @@ do $$ begin perform MIRAGE.enforce_unique_dsk_paths( false ); end; $$;
 select MIRAGE.add_dsk_pathmode( 'source-B', ¶( 'intershop/mirage/test2/path' ), 'wsv' );
 select * from MIRAGE.dsks_and_pathmodes;
 select MIRAGE.refresh();
-select * from MIRAGE.mirror order by dsk, nr, linenr;
+select * from MIRAGE.mirror order by dsk, dsnr, linenr;
 
 \set ECHO none
 \quit
@@ -115,7 +115,7 @@ select * from MIRAGE.mirror order by dsk, nr, linenr;
 do $$ begin perform MIRAGE.thaw_cache();    end; $$;
 truncate MIRAGE.cache;
 do $$ begin perform MIRAGE.freeze_cache();  end; $$;
-select * from MIRAGE.mirror order by dsk, nr, linenr;
+select * from MIRAGE.mirror order by dsk, dsnr, linenr;
 
 /* Simpler with the `MIRAGE.clear_cache()` method: */
 do $$ begin perform MIRAGE.clear_cache();  end; $$;

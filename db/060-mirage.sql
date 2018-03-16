@@ -341,10 +341,10 @@ comment on table MIRAGE.paths_and_chs is 'registry of all file paths and the CHs
 -- ---------------------------------------------------------------------------------------------------------
 create table MIRAGE.dsks_and_pathmodes (
   dsk         text        not null references MIRAGE.dsks   ( dsk   ) on delete cascade,
-  nr          integer     not null,
+  dsnr        integer     not null,
   path        text        not null references MIRAGE.paths  ( path  ),
   mode        text        not null references MIRAGE.modes  ( mode  ) on delete cascade,
-  primary key ( dsk, nr ) );
+  primary key ( dsk, dsnr ) );
 
 comment on table MIRAGE.dsks_and_pathmodes is 'connects each DSK to a list of path/mode pairs';
 
@@ -556,8 +556,8 @@ create function MIRAGE._max_dsk_pathmode_nr_from_dsk( ¶dsk text )
     ¶row MIRAGE.dsks_and_pathmodes%rowtype;
   begin
     for ¶row in select * from MIRAGE.dsks_and_pathmodes as s
-      where s.dsk = ¶dsk order by s.nr desc limit 1 for update skip locked loop
-        return next ¶row.nr;
+      where s.dsk = ¶dsk order by s.dsnr desc limit 1 for update skip locked loop
+        return next ¶row.dsnr;
         end loop;
     end; $$;
 
@@ -565,13 +565,13 @@ create function MIRAGE._max_dsk_pathmode_nr_from_dsk( ¶dsk text )
 create function MIRAGE.add_dsk_pathmode( ¶dsk text, ¶path text, ¶mode text )
   returns integer volatile language plpgsql as $$
   declare
-    ¶next_nr  integer :=  MIRAGE._max_dsk_pathmode_nr_from_dsk( ¶dsk );
+    ¶next_dsnr  integer :=  MIRAGE._max_dsk_pathmode_nr_from_dsk( ¶dsk );
   begin
-    ¶next_nr  :=  coalesce( ¶next_nr, 0 ) + 1;
+    ¶next_dsnr  :=  coalesce( ¶next_dsnr, 0 ) + 1;
     insert into MIRAGE.dsks  ( dsk  ) values ( ¶dsk  ) on conflict do nothing;
     insert into MIRAGE.paths ( path ) values ( ¶path ) on conflict do nothing;
-    insert into MIRAGE.dsks_and_pathmodes ( dsk, nr, path, mode ) values ( ¶dsk, ¶next_nr, ¶path, ¶mode );
-    return ¶next_nr; end; $$;
+    insert into MIRAGE.dsks_and_pathmodes ( dsk, dsnr, path, mode ) values ( ¶dsk, ¶next_dsnr, ¶path, ¶mode );
+    return ¶next_dsnr; end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function MIRAGE.procure_dsk_pathmode( ¶dsk text, ¶path text, ¶mode text )
@@ -617,7 +617,7 @@ o8o        o888o o888o d888b    d888b    `Y8bod8P' d888b
 -- ---------------------------------------------------------------------------------------------------------
 create view MIRAGE.mirror as ( select
     d.dsk       as dsk,
-    d.nr        as nr,
+    d.dsnr      as dsnr,
     -- d.path      as path,
     -- c.ch        as ch,
     c.linenr    as linenr,
@@ -628,7 +628,7 @@ create view MIRAGE.mirror as ( select
   from MIRAGE.dsks_and_pathmodes  as d
   join MIRAGE.paths_and_chs         as p using ( path )
   join MIRAGE.cache                 as c using ( ch, mode )
-  order by dsk, nr, linenr );
+  order by dsk, dsnr, linenr );
 
 
 
