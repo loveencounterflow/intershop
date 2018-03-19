@@ -288,6 +288,20 @@ create function U.assign( ¶a jsonb, ¶b jsonb, variadic ¶tail jsonb[] )
       end loop;
     return R; end; $$;
 
+-- ---------------------------------------------------------------------------------------------------------
+/* thx to https://stackoverflow.com/a/12870458/7568091 */
+create function U.array_sort( anyarray ) returns anyarray immutable strict language sql as $$
+  select array( select unnest( $1 ) order by 1 ); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.array_unique( anyarray ) returns anyarray immutable strict language sql as $$
+  select array( select distinct unnest( $1 ) ); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.array_sort_unique( anyarray ) returns anyarray immutable strict language sql as $$
+  select array( select distinct unnest( $1 ) order by 1 ); $$;
+
+
 
 \quit
 
