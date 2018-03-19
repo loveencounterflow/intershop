@@ -255,7 +255,7 @@ reset role;
 -- ---------------------------------------------------------------------------------------------------------
 /* thx to https://stackoverflow.com/a/8142998/7568091
   https://stackoverflow.com/a/41405177/7568091 */
-create or replace function U.unnest_2d_1d( anyarray, out a anyarray )
+create function U.unnest_2d_1d( anyarray, out a anyarray )
   returns setof anyarray immutable strict language plpgsql as $$
   begin
     foreach a slice 1 in array $1 loop
@@ -264,7 +264,7 @@ create or replace function U.unnest_2d_1d( anyarray, out a anyarray )
     end $$;
 
 -- -- ---------------------------------------------------------------------------------------------------------
--- create or replace function U.filter_array( ¶array anyarray, ¶value anyelement )
+-- create function U.filter_array( ¶array anyarray, ¶value anyelement )
 --   returns anyarray immutable language sql as $$
 --   select array_agg( x ) from unnest( ¶array ) as x where x is distinct from ¶value; $$;
 
