@@ -18,7 +18,7 @@ function postgres_paged () {
 
 #-----------------------------------------------------------------------------------------------------------
 function postgres_unpaged () {
-  psql                                                                              \
+  PAGER='' psql                                                                     \
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
