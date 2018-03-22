@@ -15,6 +15,14 @@ Y88b. .d88P
 -- ---------------------------------------------------------------------------------------------------------
 create schema U;
 
+-- ---------------------------------------------------------------------------------------------------------
+create or replace function echo( text, anyelement ) returns anyelement volatile language plpgsql as $$
+  begin raise notice '(%) %', $1, $2; return $2; end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function echo( text, anyelement ) is 'Diagnostic function that simplifies issuing notices; it
+  returns its second argument so it can be inserted into queries to ''peek inside'', as it were.'
+
 -- .........................................................................................................
 create domain U.null_text                   as text     check ( value is null                 );
 create domain U.null_integer                as integer  check ( value is null                 );
