@@ -21,7 +21,7 @@ create or replace function echo( text, anyelement ) returns anyelement volatile 
 
 -- ---------------------------------------------------------------------------------------------------------
 comment on function echo( text, anyelement ) is 'Diagnostic function that simplifies issuing notices; it
-  returns its second argument so it can be inserted into queries to ''peek inside'', as it were.'
+  returns its second argument so it can be inserted into queries to ''peek inside'', as it were.';
 
 -- .........................................................................................................
 create domain U.null_text                   as text     check ( value is null                 );
