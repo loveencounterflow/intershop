@@ -336,6 +336,7 @@ create table MIRAGE.paths_and_chs (
   ch          text not null         references MIRAGE.chs   ( ch    ) on delete cascade,
   primary key ( path, ch ) );
 
+create index on MIRAGE.paths_and_chs ( ch );
 comment on table MIRAGE.paths_and_chs is 'registry of all file paths and the CHs of the current file contents';
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -625,7 +626,7 @@ create view MIRAGE.mirror as ( select
     c.include   as include,
     c.line      as line,
     c.fields    as fields
-  from MIRAGE.dsks_and_pathmodes  as d
+  from MIRAGE.dsks_and_pathmodes    as d
   join MIRAGE.paths_and_chs         as p using ( path )
   join MIRAGE.cache                 as c using ( ch, mode )
   order by dsk, dsnr, linenr );
