@@ -277,6 +277,25 @@
     return a + b;
   };
 
+  //-----------------------------------------------------------------------------------------------------------
+  this.rpc_add_integers_only = function(S, P) {
+    var a, b;
+    if (!((CND.isa_list(P)) && (P.length === 2))) {
+      throw new Error(`expected a list with two numbers, got ${rpr(P)}`);
+    }
+    [a, b] = P;
+    if (!((CND.isa_number(a)) && (CND.isa_number(b)))) {
+      throw new Error(`expected a list with two numbers, got ${rpr(P)}`);
+    }
+    if (!(a === Math.floor(a))) {
+      throw new Error(`expected an integer, got ${rpr(a)}`);
+    }
+    if (!(b === Math.floor(b))) {
+      throw new Error(`expected an integer, got ${rpr(b)}`);
+    }
+    return a + b;
+  };
+
   // #-----------------------------------------------------------------------------------------------------------
   // @rpc_normalize_formula = ( S, P ) ->
   //   unless ( CND.isa_list P ) and ( P.length is 2 )
