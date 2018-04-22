@@ -15,6 +15,7 @@ info                      = CND.get_logger 'info',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
 FS                        = require 'fs'
+PATH                      = require 'path'
 NET                       = require 'net'
 #...........................................................................................................
 PS                        = require 'pipestreams'
@@ -23,6 +24,28 @@ PS                        = require 'pipestreams'
 #...........................................................................................................
 O                         = require './options'
 
+# debug '84874', '⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖'
+# for key, value of process.env
+#   continue unless ( key.match /mojikura|intershop/ )?
+#   debug key, value
+
+#-----------------------------------------------------------------------------------------------------------
+@_acquire_host_rpc_routines = ->
+  intershop_host_modules_path = process.env[ 'intershop_host_modules_path' ]
+  if ( intershop_host_modules_path )?
+    host_rpc_module_path  = PATH.join intershop_host_modules_path, 'rpc.js'
+    host_rpc              = null
+    try
+      host_rpc = require host_rpc_module_path
+    catch error
+      throw error unless error.code is 'MODULE_NOT_FOUND'
+      warn "no host RPC code at #{rpr host_rpc_module_path}"
+    if host_rpc?
+      # Object.assign @, host_rpc
+      for key, value of host_rpc
+        info '33829', "add host RPC attribute #{rpr key}"
+        @[ key ] = value
+  return null
 
 #-----------------------------------------------------------------------------------------------------------
 @_socket_listen_on_all = ( socket ) ->
@@ -216,6 +239,7 @@ O                         = require './options'
 ############################################################################################################
 unless module.parent?
   RPCS = @
+  @_acquire_host_rpc_routines()
   RPCS.listen()
 
 
