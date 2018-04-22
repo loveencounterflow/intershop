@@ -49,7 +49,9 @@ def rpc( method, parameters ):
     data      = R[ 1 ]
   except Exception:
     raise
-  return R
+  if command == 'error':
+    raise RuntimeError( repr( R ) )
+  return R[ 1 ]
 
 
 

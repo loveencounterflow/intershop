@@ -177,6 +177,19 @@ O                         = require './options'
     throw new Error "expected a list with two numbers, got #{rpr P}"
   return a + b
 
+#-----------------------------------------------------------------------------------------------------------
+@rpc_add_integers_only = ( S, P ) ->
+  unless ( CND.isa_list P ) and ( P.length is 2 )
+    throw new Error "expected a list with two numbers, got #{rpr P}"
+  [ a, b, ] = P
+  unless ( CND.isa_number a ) and ( CND.isa_number b )
+    throw new Error "expected a list with two numbers, got #{rpr P}"
+  unless ( a == Math.floor a )
+    throw new Error "expected an integer, got #{rpr a}"
+  unless ( b == Math.floor b )
+    throw new Error "expected an integer, got #{rpr b}"
+  return a + b
+
 # #-----------------------------------------------------------------------------------------------------------
 # @rpc_normalize_formula = ( S, P ) ->
 #   unless ( CND.isa_list P ) and ( P.length is 2 )
