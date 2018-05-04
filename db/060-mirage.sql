@@ -390,6 +390,13 @@ create table MIRAGE.cache of MIRAGE.cacheline (
   line        not null,
   primary key ( ch, mode, linenr ) );
 
+-- ---------------------------------------------------------------------------------------------------------
+create index on MIRAGE.cache ( mode     );
+create index on MIRAGE.cache ( linenr   );
+create index on MIRAGE.cache ( include  );
+/* do not index as it would hit indexed size limitation sooner or later:
+ -- create index on MIRAGE.cache ( line     );
+*/
 
 /* =========================================================================================================
 
@@ -629,7 +636,8 @@ create view MIRAGE.mirror as ( select
   from MIRAGE.dsks_and_pathmodes    as d
   join MIRAGE.paths_and_chs         as p using ( path )
   join MIRAGE.cache                 as c using ( ch, mode )
-  order by dsk, dsnr, linenr );
+  -- order by dsk, dsnr, linenr
+  );
 
 
 
