@@ -309,7 +309,34 @@ create function U.array_unique( anyarray ) returns anyarray immutable strict lan
 create function U.array_sort_unique( anyarray ) returns anyarray immutable strict language sql as $$
   select array( select distinct unnest( $1 ) order by 1 ); $$;
 
+-- ---------------------------------------------------------------------------------------------------------
+create function U.is_strict_subarray( anyarray, anyarray )
+  returns boolean immutable strict parallel safe language sql as $$
+  select true
+    and array_length( $2, 1 ) > array_length( $1, 1 )
+    and $2[ 1 : array_length( $1, 1 ) ] = $1; $$;
 
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.is_strict_subarray( anyarray, anyarray ) is 'Returns whether second
+  array given is both longer than the first and starts with the same elements as the first.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.sets_are_equal( anyarray, anyarray )
+  returns boolean immutable strict parallel safe language sql as $$
+  select $1 <@ $2 and $1 @> $2; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.sets_are_equal( anyarray, anyarray ) is 'Test whether two arrays contain the
+  same set of elements; return true even if some elements are reduplicated.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.sets_are_strictly_equal( anyarray, anyarray )
+  returns boolean immutable strict parallel safe language sql as $$
+  select array_length( $1, 1 ) = array_length( $2, 1 ) and $1 <@ $2 and $1 @> $2; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.sets_are_strictly_equal( anyarray, anyarray ) is 'Test whether two arrays contain
+  the same set of elements; return false when the arrays differ in length.';
 
 \quit
 
