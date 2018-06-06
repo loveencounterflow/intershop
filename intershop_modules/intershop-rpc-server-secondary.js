@@ -226,7 +226,7 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this.do_rpc = function(S, method_name, parameters) {
-    var error, method, result;
+    var error, error_2, message, method, result;
     S.counts.rpcs += +1;
     method = this[`rpc_${method_name}`];
     if (method == null) {
@@ -238,6 +238,15 @@
     } catch (error1) {
       error = error1;
       S.counts.errors += +1;
+      try {
+        ({message} = error);
+      } catch (error1) {
+        error_2 = error1;
+        null;
+      }
+      if (message == null) {
+        message = '(UNKNOWN ERROR MESSAGE)';
+      }
       return this.send_error(S, error.message);
     }
     return this._write(S, method_name, result);

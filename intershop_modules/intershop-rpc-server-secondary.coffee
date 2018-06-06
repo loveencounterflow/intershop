@@ -146,6 +146,11 @@ O                         = require './options'
     result = method.call @, S, parameters
   catch error
     S.counts.errors += +1
+    try
+      { message, } = error
+    catch error_2
+      null
+    message ?= '(UNKNOWN ERROR MESSAGE)'
     return @send_error S, error.message
   @_write S, method_name, result
 
