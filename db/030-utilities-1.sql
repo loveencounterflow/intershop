@@ -310,6 +310,15 @@ create function U.array_sort_unique( anyarray ) returns anyarray immutable stric
   select array( select distinct unnest( $1 ) order by 1 ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
+/* thx to https://dba.stackexchange.com/a/211502/126933, https://stackoverflow.com/a/42399297/7568091 */
+create function U.array_unique_stable( anyarray )
+  returns anyarray immutable strict parallel safe language sql as $$
+  select array_agg( value order by nr )
+  from ( select distinct on ( value ) value, nr
+    from unnest( $1 ) with ordinality as x ( value, nr )
+    order by value, nr ) as v1; $$
+
+-- ---------------------------------------------------------------------------------------------------------
 create function U.is_strict_subarray( anyarray, anyarray )
   returns boolean immutable strict parallel safe language sql as $$
   select true
