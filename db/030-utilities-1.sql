@@ -316,7 +316,7 @@ create function U.array_unique_stable( anyarray )
   select array_agg( value order by nr )
   from ( select distinct on ( value ) value, nr
     from unnest( $1 ) with ordinality as x ( value, nr )
-    order by value, nr ) as v1; $$
+    order by value, nr ) as v1; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function U.is_strict_subarray( anyarray, anyarray )
