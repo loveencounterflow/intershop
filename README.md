@@ -1,6 +1,6 @@
 
 
-![](https://github.com/loveencounterflow/intershop/raw/master/artwork/intershop-logo.svg)
+<!-- ![](https://github.com/loveencounterflow/intershop/raw/master/artwork/intershop-logo.svg) -->
 
 # InterShop
 
