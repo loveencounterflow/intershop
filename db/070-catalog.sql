@@ -160,11 +160,12 @@ create view CATALOG._tables_and_views_all as (
 -- ---------------------------------------------------------------------------------------------------------
 create view CATALOG._tables_and_views as (
   select
-      t,
-      schema,
-      name,
-      CATALOG.count_tuples_dsp( schema, name ) as size,
-      remarks
+      t                                           as t,
+      schema                                      as schema,
+      name                                        as name,
+      null                                        as size,
+      -- CATALOG.count_tuples_dsp( schema, name )   as size,
+      remarks                                     as remarks
     from CATALOG._tables_and_views_all
     where true
       -- and t = 'rt'
@@ -185,11 +186,12 @@ create view CATALOG._materialized_views as (
       from pg_matviews
     )
     select
-        t,
-        schema,
-        name,
-        CATALOG.count_tuples_dsp( schema, name ) as size,
-        remarks
+        t                                         as t,
+        schema                                    as schema,
+        name                                      as name,
+        null                                      as size,
+        -- CATALOG.count_tuples_dsp( schema, name ) as size,
+        remarks                                   as remarks
       from v1
     );
 
@@ -203,6 +205,8 @@ create view CATALOG.catalog as (
     select * from v1 order by t, schema, name
   );
 
+/* # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### ##  */
+\quit
 
 
 /* # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### # ## # ### ##  */
