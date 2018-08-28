@@ -1,5 +1,7 @@
 
 
+![](https://github.com/loveencounterflow/intershop/raw/master/artwork/intershop-logo.svg)
+
 # InterShop
 
 An incipient application basework built with SQL in PostGreSQL.
