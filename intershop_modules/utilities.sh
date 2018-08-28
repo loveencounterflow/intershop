@@ -3,6 +3,21 @@ set -euo pipefail
 
 
 #===========================================================================================================
+# ECHOING FUNCTIONS
+#-----------------------------------------------------------------------------------------------------------
+grey='\x1b[38;05;240m'
+blue='\x1b[38;05;27m'
+lime='\x1b[38;05;118m'
+orange='\x1b[38;05;208m'
+red='\x1b[38;05;124m'
+reset='\x1b[0m'
+function info () { set +u;  printf "$grey""INTERSHOP ""$blue%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function help () { set +u;  printf "$grey""INTERSHOP ""$lime%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function urge () { set +u;  printf "$grey""INTERSHOP ""$orange%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+function warn () { set +u;  printf "$grey""INTERSHOP ""$red%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
+
+
+#===========================================================================================================
 # CALLING PSQL
 #-----------------------------------------------------------------------------------------------------------
 function postgres_paged () {
