@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#-----------------------------------------------------------------------------------------------------------
+source "$intershop_guest_modules_path/utilities.sh"
+
+#-----------------------------------------------------------------------------------------------------------
+# intershop psql -f "$intershop_guest_sql_path/update-os-env.sql"
+help 'executing intershop psql -f '"$intershop_guest_sql_path/update-os-env.sql"
+postgres_unpaged -f "$intershop_guest_sql_path/update-os-env.sql"
+info "values in DB $intershop_db_name table U.variables have been updated"
+
