@@ -118,7 +118,7 @@
         value: '---something---'
       }
     }));
-    log('42992', PTVR.hash_from_path(PATH.join(__dirname, '../intershop.ptv')));
+    log('42992', PTVR.hash_from_paths(PATH.join(__dirname, '../intershop.ptv')));
   }
 
 }).call(this);

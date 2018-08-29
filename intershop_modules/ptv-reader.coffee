@@ -67,7 +67,7 @@ unless module.parent?
   PTVR  = @
   log '42992', PTVR.resolve 'before\\${middle}after', {}
   log '42992', PTVR.resolve 'before${middle}after', { middle: value: '---something---' }
-  log '42992', PTVR.hash_from_path PATH.join __dirname, '../intershop.ptv'
+  log '42992', PTVR.hash_from_paths PATH.join __dirname, '../intershop.ptv'
 
 
 
