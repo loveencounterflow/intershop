@@ -32,10 +32,11 @@ create domain U.nonempty_text               as text     check ( value != ''     
 create domain U.chr                         as text     check ( character_length( value ) = 1 );
 create domain U.unsigned_integer_literal    as text     check ( value ~ '^[0-9]+$'            );
 -- .........................................................................................................
-create type U.text_facet              as ( key    text,     value text      );
-create type U.jsonb_facet             as ( key    text,     value jsonb     );
-create type U.integer_facet           as ( key    text,     value integer   );
-create type U.float_facet             as ( key    text,     value float     );
+create type U.triple_facet            as ( key text,  type text,  value text      );
+create type U.text_facet              as ( key text,              value text      );
+create type U.jsonb_facet             as ( key text,              value jsonb     );
+create type U.integer_facet           as ( key text,              value integer   );
+create type U.float_facet             as ( key text,              value float     );
 -- .........................................................................................................
 create type U.text_line               as ( linenr U.natural_number, line  text  );
 create type U.fields_line             as ( linenr U.natural_number, line  text  );
