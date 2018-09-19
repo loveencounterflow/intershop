@@ -167,6 +167,7 @@ insert into MIRAGE.mode_actors
 insert into MIRAGE.modes
   ( mode,           actors                                                                        ) values
   ( 'plain',        null                                                                          ),
+  ( 'cbplain',      array[ 'blank', 'hashcomment' ]                                               ),
   ( 'tsv',          array[ 'tab', 'trimfields'  ]                                                 ),
   ( 'cbtsv',        array[ 'blank', 'hashcomment', 'tab', 'trimfields' ]                          ),
   ( 'wsv',          array[ 'ws' ]                                                                 ),
