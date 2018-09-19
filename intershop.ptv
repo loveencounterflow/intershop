@@ -32,5 +32,10 @@ intershop/rpc/respawn/kill            ::unit=            30 s
 # fork instead of spawn
 intershop/rpc/respawn/fork            ::boolean=         true
 
+#-----------------------------------------------------------------------------------------------------------
+intershop/invariants/autovalidate     ::boolean=         true
+
+
+
 
 
