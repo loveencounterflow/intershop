@@ -348,5 +348,54 @@ create function U.sets_are_strictly_equal( anyarray, anyarray )
 comment on function U.sets_are_strictly_equal( anyarray, anyarray ) is 'Test whether two arrays contain
   the same set of elements; return false when the arrays differ in length.';
 
+-- ---------------------------------------------------------------------------------------------------------
+create function U.length_of( anyarray )
+  returns integer immutable strict parallel safe language sql as $$
+  select coalesce( array_length( $1, 1 ), 0 ); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.length_of( text )
+  returns integer immutable strict parallel safe language sql as $$
+  select character_length( $1 ); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.length_of( anyarray ) is 'Equivalent to `array_length( x, 1 )`
+  but returns zero, not SQL `null` when array is empty; returns `null` on `null` input.';
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.length_of( text ) is 'Equivalent to `character_length( x )`.
+  Returns zero, not SQL `null` when string is empty; returns `null` on `null` input.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.choose_coalescent( anyarray, text[] )
+  returns text immutable strict parallel safe language plpgsql as $$
+  begin
+    for i in 1 .. U.length_of( $1 ) loop
+      if ( $1[ i ] is not null ) or ( $1[ i ] is distinct from null ) then
+        return $2[ i ];
+        end if;
+      end loop;
+    return null;
+    end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.choose_coalescent( anyarray, text[] ) is 'Try to find the first non-null element in
+  the first array and return the value with the same index from the second one. The first array may be of
+  any type; the result will be a text.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function U.choose_coalescent( anyarray, integer[] )
+  returns integer immutable strict parallel safe language sql as $$
+  select ( U.choose_coalescent( $1, $2::text[] ) )::integer; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.choose_coalescent( anyarray, integer[] ) is 'Try to find the first non-null element in
+  the first array and return the value with the same index from the second one. The first array may be of
+  any type; the result will be an integer.';
+
+-- select U.choose_coalescent( array[ 1, null, 2, 3 ]::integer[], '{a,b,c,d}'::text[] );
+-- select U.choose_coalescent( array[ null, 1, 2, 3 ]::integer[], '{a,b,c,d}'::text[] );
+-- select U.choose_coalescent( array[ null, 'a', 'b', 'c' ]::text[], '{1,2,3,4}'::integer[] );
+
 \quit
 
