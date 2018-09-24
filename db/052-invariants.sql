@@ -93,7 +93,7 @@ create function INVARIANTS.validate()
     if has_errors then
       raise sqlstate 'INV01' using message = '#INV01-1 Violations Detected', hint = 'see above';
     else
-      perform log( 'INVARIANTS 44645', 'INVARIANTS ok' );
+      perform log( 'INVARIANTS 44645', 'invariants ok' );
       end if;
     end; $$;
 
