@@ -44,7 +44,9 @@
     "pg": "^7.4.3",
     "pipestreams": "^0.4.1",
     "pkg-conf": "^2.1.0",
-    "respawn": "^2.5.0",
+    "respawn": "^2.5.0"
+  },
+  "devDependencies": {
     "tap": "^12.0.1"
   }
 }
