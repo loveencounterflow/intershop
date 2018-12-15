@@ -117,3 +117,12 @@ see [documentation/flowmatic-fa.md](documentation/no-more-fdws-ftw.md)
 
 see [documentation/no-more-fdws-ftw.md](documentation/no-more-fdws-ftw.md)
 
+# The MIRAGE File Mirror Module
+
+The [*Mirage*
+module](https://github.com/loveencounterflow/intershop/blob/master/db/035-mirage.sql)
+is responsible for handling all read-only linewise file access. Have a look at
+[the
+docs](https://github.com/loveencounterflow/intershop/blob/master/documentation/mirage.md)
+and [the
+demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-files-with-mirage.sql).
