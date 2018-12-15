@@ -53,23 +53,26 @@ I then remebered Multicorn—a framework to implement PG FDWs in Python—and
 realized, again, that while it comes nicely bundled and is readily available as
 `sudo apt install postgresql-10-python3-multicorn`, the website does look sort
 of unfinished and when you look at what has been implemented using that tool,
-it's relatively little. Overall. the project makes a somewhat abandoned project.
-I for one became soon tired when reading up on how to write an extension within
-that framework.
+it's relatively little. Overall, the project makes for a somewhat abandoned
+impression.
 
-Lastly, and this is where the story ends for the time being, I sat down and
-implemented my own solution in Python (`plpgpython3u`, that is). I had beaten
-around this particular bush because I was afraid that a Python solution was to
-mean that each file had to be swallowed in one gulp no matter what size. Turns
-out I was wrong. Turns out the solution is so simple you could just jot it down
-each time you wanted to access a particular file from within the DB. It goes
-like this:
+Worse, when you take a gander at [how to implement an FDW in
+Multicorn](https://multicorn.readthedocs.io/en/latest/implementing-tutorial.html)
+you will not fail to realize that there's quite a bit of ceremony going on, and
+on top of that you'll still have to do the [PostGreSQL FDW Server
+Dance](https://www.postgresql.org/docs/current/postgres-fdw.html). That's a lot
+if all you want is have line-by-line read-only access to a local text file.
+
+I then sat down and implemented my own solution in Python (`plpython3u`, that
+is). I had beaten around this particular bush because I was afraid that a Python
+solution was to mean that each file had to be swallowed in one gulp no matter
+what size. Turns out I was wrong; in Python3, you get a nice syntax to access
+file lines in a piecemeal fashion, out of the box:
 
 ```
 set role dba;
 create function FLR.read_file_lines( path_ text )
-  returns table ( linenr integer, line text )
-  volatile language plpython3u as $$
+  returns table ( linenr integer, line text ) volatile language plpython3u as $$
     with open( path_, 'rb' ) as input:
       for linenr, line in enumerate( input ):
         yield [ linenr, line.decode( 'utf-8' ).rstrip(), ]
@@ -77,12 +80,14 @@ create function FLR.read_file_lines( path_ text )
 reset role;
 ```
 
-And that's it! A simple `create view x as ( select linenr, line from read_file_lines( 'path' );`
-and all ready you are already.
+And that's it! A simple `create view x as ( select linenr, line from
+read_file_lines( 'path' );` and you are good to go.
 
-The best of this is what the above straight-forward 9 LOC, 0.3k chrs
-replace—it's these rather convoluted and annoyingly complex ~60 lines, > 2k
-chrs:
+The best of the `plpython3u` solution is the reduction in perceived complexity:
+the above straightforward 9 LOC can functionally replace the below annoyingly
+complex 60 LOC, where I struggle to write dynamic SQL, have to run in circles to
+satisfy PostGreSQL's auth/privileges system, and do lots and lots of stuff to
+avoid tripping up SQL identifier syntax rules:
 
 ```
 drop function if exists _create_file_fdw( text ) cascade;
@@ -166,6 +171,8 @@ sure) and let them formulate their solutions than to introduce yet another
 highly complex, yet ultimately also highly specific framework-ish interface-y
 whatchamaycallit. Nothing keeps you from drawing from a wide range of existing
 Python solutions to connect to other databases, web pages, local services,
-whatever, and then just `yield` that data into the DB. No more FDWs.
+whatever, and then just `yield` that data into the DB.
+
+No more FDWs FTW.
 
 
