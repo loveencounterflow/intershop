@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+source "$intershop_guest_modules_path/utilities.sh"
+# sudo_postgres_unpaged_hostdb -c "vacuum full;" # 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+# ( sudo -u postgres psql -c "select name, setting, reset_val from pg_settings where category = 'File Locations' order by name;" ) | ~/bin/pspg -s17
+# sudo_postgres_unpaged_hostdb -c "select * from pg_settings where category = 'File Locations' order by name;" # 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+sudo -u postgres psql -c "                                                \
+  select                                                                  \
+      name                                                    as key,     \
+      setting                                                 as value,   \
+      case setting when reset_val then '' else reset_val end  as changed  \
+    from pg_settings                                                      \
+    where true                                                            \
+      and ( category = 'File Locations' )                                 \
+      order by name;"
+
+
