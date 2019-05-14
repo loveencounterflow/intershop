@@ -21,7 +21,7 @@ function warn () { set +u;  printf "$grey""INTERSHOP ""$red%s$reset\n" "$1 $2 $3
 # CALLING PSQL
 #-----------------------------------------------------------------------------------------------------------
 function postgres_paged () {
-  PAGER="pspg -s 17 --less-status-bar" psql                                \
+  PAGER="pspg -s17" psql                                                            \
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
