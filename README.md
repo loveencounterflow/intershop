@@ -23,19 +23,6 @@ sudo apt update
 ```
 
 ```sh
-sudo apt install postgresql-10
-sudo apt install postgresql-server-dev-10
-sudo apt install postgresql-plpython3-10
-sudo apt install postgresql-contrib-10
-sudo apt install postgresql-10-plsh
-sudo apt install postgresql-10-unit
-# sudo apt install postgresql-10-pgtap
-# sudo apt install postgresql-10-pldebugger
-# sudo apt install postgresql-9.6-plv8
-# sudo apt install postgresql-plperl-9.6
-```
-
-```sh
 # sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main 11" >> /etc/apt/sources.list.d/pgdg.list'
 sudo apt install postgresql-11
 sudo apt install postgresql-server-dev-11
@@ -48,18 +35,6 @@ sudo apt install postgresql-11-unit
 # sudo apt install postgresql-9.6-plv8
 # sudo apt install postgresql-plperl-9.6
 ```
-
-#### pgsql-fio
-
-```bash
-sudo apt install postgresql-server-dev-10
-git clone https://github.com/csimsek/pgsql-fio/
-cd pgsql-fio
-sudo make install
-```
-
-(May want to use `which pg_config` and enter the result in `Makefile` under `PG_CONFIG`)
-
 
 ##### Statement-Level Statistics
 
@@ -93,8 +68,6 @@ sudo add-apt-repository ppa:buildinspace/peru
 sudo apt update
 sudo apt install peru
 ```
-
-
 
 #### Python
 
