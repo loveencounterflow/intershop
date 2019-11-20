@@ -22,7 +22,7 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-
 sudo apt update
 ```
 
-```sh
+```bash
 # sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main 11" >> /etc/apt/sources.list.d/pgdg.list'
 sudo apt install postgresql-11
 sudo apt install postgresql-server-dev-11
@@ -63,7 +63,7 @@ I've yet found to compose one application by drawing together from various
 sources crossing languages and access methods. It can be conveniently installed
 via the [Peru PPA](https://launchpad.net/%7Ebuildinspace/+archive/ubuntu/peru):
 
-```sh
+```bash
 sudo add-apt-repository ppa:buildinspace/peru
 sudo apt update
 sudo apt install peru
@@ -71,7 +71,7 @@ sudo apt install peru
 
 ### Python
 
-```sh
+```bash
 sudo pip install pipenv
 pipenv install tap.py pytest
 ```
@@ -82,7 +82,7 @@ pipenv install tap.py pytest
 To get started with your app, create a directory for it and `cd` into it; then, copy the three essential
 configuration files using `wget` (`curl` works similar):
 
-```sh
+```bash
 mkdir myapp
 cd myapp
 wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/copy-to-host-app/rakefile
@@ -94,7 +94,7 @@ If you don't already have a `.gitignore` file, you may want to copy (or merge) t
 is to make sure your git repo won't version a gazillion dependencies under `node_modules` (although for some
 use cases this is actually the recommended way):
 
-```sh
+```bash
 wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/.gitignore
 ```
 
@@ -115,7 +115,7 @@ intershop_npm_install` will run `npm install` inside the newly established `inte
 `intershop rebuild` will create a Postgres DB (named `myapp` or whatever name you chose) and a user by the
 same name and run all the `*.sql` files in `intershop/db`:
 
-```sh
+```bash
 peru sync
 rake intershop_npm_install
 intershop rebuild
@@ -123,7 +123,7 @@ intershop rebuild
 
 To get an idea what we have by now, take a gander at the catalog:
 
-```sh
+```bash
 intershop psql -c "select * from CATALOG.catalog order by schema, name;"
 ```
 
@@ -132,14 +132,14 @@ The `intershop psql` invocation is essentially nothing but `psql -U $intershop_d
 
 It's probably a good idea to add your configuration to git:
 
-```sh
+```bash
 git add intershop.ptv && git commit -m'add intershop.ptv'
 git add peru.yaml && git commit -m'update by peru'
 ```
 
 Whether or not to add the `intershop` submodule to git is a matter of taste:
 
-```sh
+```bash
 git add intershop && git commit -m'updates from upstream'
 ```
 
@@ -182,7 +182,7 @@ do $$ begin
 
 ## Running Tests
 
-```sh
+```bash
 py.test --tap-files
 ```
 
