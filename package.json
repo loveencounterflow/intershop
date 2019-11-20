@@ -38,15 +38,15 @@
   "license": "MIT",
   "dependencies": {
     "bash": "0.0.1",
-    "cnd": "^4.3.1",
-    "coffeescript": "^2.3.2",
+    "cnd": "^4.6.0",
+    "coffeescript": "^2.4.1",
     "minimatch": "^3.0.4",
-    "pg": "^7.4.3",
+    "pg": "^7.13.0",
     "pipestreams": "^0.4.1",
     "pkg-conf": "^2.1.0",
-    "respawn": "^2.5.0"
+    "respawn": "^2.6.0"
   },
   "devDependencies": {
-    "tap": "^12.0.1"
+    "tap": "^14.9.2"
   }
 }
