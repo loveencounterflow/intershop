@@ -9,17 +9,15 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [InterShop](#intershop)
 - [Installation](#installation)
   - [Dependencies](#dependencies)
     - [Postgres](#postgres)
       - [Statement-Level Statistics](#statement-level-statistics)
     - [Peru](#peru)
     - [Python](#python)
-    - [InterShop](#intershop-1)
-      - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
-  - [Running Tests](#running-tests)
-- [The FlowMatic Finite Automaton](#the-flowmatic-finite-automaton)
+  - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
+    - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
+    - [Running Tests](#running-tests)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
 
@@ -98,7 +96,7 @@ pipenv install tap.py pytest
 ```
 
 
-### InterShop
+## InterShop Initialization and (Re-) Building
 
 To get started with your app, create a directory for it and `cd` into it; then, copy the three essential
 configuration files using `wget` (`curl` works similar):
@@ -165,7 +163,7 @@ git add intershop && git commit -m'updates from upstream'
 ```
 
 
-#### Using PTV Configuration Variables in SQL
+### Using PTV Configuration Variables in SQL
 
 Later on, you may want to add your own options into `intershop.ptv` so you can access those configuration
 settings from SQL; it's customary to prefix those options with the name of your app (but anything will work
@@ -201,15 +199,12 @@ do $$ begin
 
 
 
-## Running Tests
+### Running Tests
 
 ```bash
 py.test --tap-files
 ```
 
-# The FlowMatic Finite Automaton
-
-see [documentation/flowmatic-fa.md](documentation/no-more-fdws-ftw.md)
 
 # No More FDWs FTW
 
