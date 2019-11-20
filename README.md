@@ -5,7 +5,7 @@
 
 # InterShop
 
-An incipient application foundation built with SQL in Postgres.
+An incipient application foundation built on Postgres, with sprinkles of JavaScript and plPython3u
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
