@@ -4,13 +4,13 @@
 
 # InterShop
 
-An incipient application basework built with SQL in PostGreSQL.
+An incipient application basework built with SQL in Postgres.
 
-## Installation
+# Installation
 
-### Dependencies
+## Dependencies
 
-#### PostGreSQL
+### Postgres
 
 
 https://wiki.postgresql.org/wiki/Apt
@@ -36,7 +36,7 @@ sudo apt install postgresql-11-unit
 # sudo apt install postgresql-plperl-9.6
 ```
 
-##### Statement-Level Statistics
+#### Statement-Level Statistics
 
 In `postgresql.conf`:
 
@@ -55,7 +55,7 @@ create extension if not exists pg_stat_statements;
 
 Also see [here](https://pganalyze.com/docs/install/01_enabling_pg_stat_statements).
 
-#### Peru
+### Peru
 
 [Peru](https://github.com/buildinspace/peru) is "a tool for including other
 people's code in your projects"; it is the most convenient and promising way
@@ -69,14 +69,118 @@ sudo apt update
 sudo apt install peru
 ```
 
-#### Python
+### Python
 
 ```sh
 sudo pip install pipenv
 pipenv install tap.py pytest
 ```
 
-### Running Tests
+
+### InterShop
+
+To get started with your app, create a directory for it and `cd` into it; then, copy the three essential
+configuration files using `wget` (`curl` works similar):
+
+```sh
+mkdir myapp
+cd myapp
+wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/copy-to-host-app/rakefile
+wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/copy-to-host-app/peru.yaml
+wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/intershop.ptv
+```
+
+If you don't already have a `.gitignore` file, you may want to copy (or merge) the one from InterShop; this
+is to make sure your git repo won't version a gazillion dependencies under `node_modules` (although for some
+use cases this is actually the recommended way):
+
+```sh
+wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/.gitignore
+```
+
+Edit `intershop.ptv` so the line `intershop/host/name` spells out the name of your app (let's call it
+`myapp` here), which will also become the name of the database and the Postgres user:
+
+```ptv
+intershop/host/name                             ::text=               myapp
+intershop/db/port                               ::integer=            5432
+intershop/db/name                               ::text=               ${intershop/host/name}
+intershop/db/user                               ::text=               ${intershop/host/name}
+intershop/rpc/port                              ::integer=            23001
+intershop/rpc/host                              ::text/ip-address=    127.0.0.1
+```
+
+You are now ready to start installation: `peru sync` will pull the latest InterShop sources; `rake
+intershop_npm_install` will run `npm install` inside the newly established `intershop` folder, and
+`intershop rebuild` will create a Postgres DB (named `myapp` or whatever name you chose) and a user by the
+same name and run all the `*.sql` files in `intershop/db`:
+
+```sh
+peru sync
+rake intershop_npm_install
+intershop rebuild
+```
+
+To get an idea what we have by now, take a gander at the catalog:
+
+```sh
+intershop psql -c "select * from CATALOG.catalog order by schema, name;"
+```
+
+The `intershop psql` invocation is essentially nothing but `psql -U $intershop_db_user -d $intershop_db_name
+-p $intershop_db_port ... "@$"` where `...` denotes a bunch of configuration values.
+
+It's probably a good idea to add your configuration to git:
+
+```sh
+git add intershop.ptv && git commit -m'add intershop.ptv'
+git add peru.yaml && git commit -m'update by peru'
+```
+
+Whether or not to add the `intershop` submodule to git is a matter of taste:
+
+```sh
+git add intershop && git commit -m'updates from upstream'
+```
+
+
+#### Using PTV Configuration Variables in SQL
+
+Later on, you may want to add your own options into `intershop.ptv` so you can access those configuration
+settings from SQL; it's customary to prefix those options with the name of your app (but anything will work
+so long as names don't start with `intershop`):
+
+```ptv
+myapp/fudge/use                                 ::boolean=          true
+myapp/fudge/factor                              ::float=            3.14
+myapp/fudge/delta                               ::integer=          12
+```
+
+The type annotations are currently not documented and not used programmatically; they serve at present
+merely as a handy reference for the type casting one has to perform explicitly when retrieving values; so,
+in your SQL you might want to do this:
+
+```sql
+select ¶( 'myapp/fudge/use'    )::boolean;
+select ¶( 'myapp/fudge/factor' )::float;
+select ¶( 'myapp/fudge/delta'  )::integer;
+```
+
+Variables can be used as compilation parameters:
+
+```sql
+do $$ begin
+  if ¶( 'myapp/fudge/use' )::boolean then
+    create function ...;
+  else
+    create function ...;
+    end if;
+  $$
+```
+
+
+
+## Running Tests
 
 ```sh
 py.test --tap-files
