@@ -1,8 +1,29 @@
 
 
+
 <!-- ![](https://github.com/loveencounterflow/intershop/raw/master/artwork/intershop-logo.svg) -->
 
 # InterShop
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [InterShop](#intershop)
+- [Installation](#installation)
+  - [Dependencies](#dependencies)
+    - [Postgres](#postgres)
+      - [Statement-Level Statistics](#statement-level-statistics)
+    - [Peru](#peru)
+    - [Python](#python)
+    - [InterShop](#intershop-1)
+      - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
+  - [Running Tests](#running-tests)
+- [The FlowMatic Finite Automaton](#the-flowmatic-finite-automaton)
+- [No More FDWs FTW](#no-more-fdws-ftw)
+- [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 An incipient application basework built with SQL in Postgres.
 
