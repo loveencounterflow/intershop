@@ -136,7 +136,7 @@ intershop_npm_install` will run `npm install` inside the newly established `inte
 same name and run all the `*.sql` files in `intershop/db`:
 
 ```bash
-peru sync
+peru reup && peru sync
 rake intershop_npm_install
 intershop rebuild
 ```
