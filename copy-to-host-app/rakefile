@@ -1,19 +1,20 @@
 
-# puts Gem.available? /-?rcov$/
-if Gem::Specification::find_all_by_name( 'gemname' ).any?
-  puts 'available'
-else
-  puts 'not available'
-  end
 
-require_relative './intershop/ruby_modules/ptv_reader'
+
+require_relative './intershop/intershop_modules/ptv_reader'
+require_relative './intershop/intershop_modules/rake_extensions'
+require_relative './intershop/intershop_modules/trm'
+
+# log gem_available? 'rake'
+# log gem_available? 'foobar'
+
+# puts "#{TRM.red}helo"
 
 # puts split_ptv_line 'respawn/sleep               unit            1 s'
-options = ptv_hash_from_path './intershop.ptv'
+options = PTV.hash_from_path './intershop.ptv'
 
-puts options_as_facet_json    options
-puts options_as_untyped_json  options
-exit
+log TRM.green  PTV.options_as_facet_json    options
+log TRM.orange PTV.options_as_untyped_json  options
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -24,14 +25,14 @@ task :update  => :peru_update
 task :peru_sync do
   sh 'peru sync'
   Rake::Task[ 'intershop_npm_install' ].invoke
-  Rake::Task[ 'intershop_copy_configuration_if_missing' ].invoke
+  Rake::Task[ 'intershop_configuration_where_missing' ].invoke
   end
 
 #-----------------------------------------------------------------------------------------------------------
 task :peru_update do
   sh 'peru reup'
   Rake::Task[ 'intershop_npm_install' ].invoke
-  Rake::Task[ 'intershop_copy_configuration_if_missing' ].invoke
+  Rake::Task[ 'intershop_configuration_where_missing' ].invoke
   end
 
 #-----------------------------------------------------------------------------------------------------------
@@ -40,13 +41,10 @@ task :intershop_npm_install do
   end
 
 #-----------------------------------------------------------------------------------------------------------
-task :intershop_copy_configuration_if_missing do
-  target_path = './intershop.json'
-  if File.exist? target_path
-    puts "file #{target_path} exists; skipping"
-  else
-    cp 'intershop/intershop.json', target_path, :verbose => true
-    end
+task :intershop_configuration_where_missing do
+  copy_if_new './intershop/intershop.ptv',                './intershop.ptv'
+  copy_if_new './intershop/copy-to-host-app/peru.yaml',   './peru.yaml'
+  copy_if_new './intershop/copy-to-host-app/rakefile',    './rakefile'
   end
 
 
