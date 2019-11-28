@@ -3,7 +3,12 @@ set -euo pipefail
 # do not change CWD here, this script is sourced
 # cd "$( realpath "${BASH_SOURCE[0]}" | xargs dirname )"/..
 source "$intershop_guest_bin_path/_trm"
-
+_ptv_line_nr=0
+if [[ $intershop_role == 'guest' ]]; then
+  _ptv_path="$intershop_guest_configuration_path"
+else
+  _ptv_path="$intershop_host_configuration_path"
+  fi
 
 #-----------------------------------------------------------------------------------------------------------
 function show () {
@@ -25,6 +30,12 @@ function _match_ptv_line () {
   _ptv_key='';   export _ptv_key
   _ptv_type='';  export _ptv_type
   _ptv_value=''; export _ptv_value
+  # [[ "$1" =~ \t ]] && echo "yes"
+  if [[ "$1" =~ $(printf "\t") ]]; then
+    echo "line #$_ptv_line_nr in file $_ptv_path contains tabs"
+    echo "replace all tabs in that file with space characters and try again"
+    exit 1
+    fi;
   if [[ $1 =~ $_3_fields_pattern ]]; then
     _ptv_key="${BASH_REMATCH[1]}"
     _ptv_type="${BASH_REMATCH[2]}"
@@ -34,8 +45,10 @@ function _match_ptv_line () {
 #-----------------------------------------------------------------------------------------------------------
 function update_settings_from_ptv_file () {
   echo -e $orange"reading settings from $1"$reset
+  _ptv_line_nr=0
   #.........................................................................................................
   while IFS='' read -r line || [[ -n "$line" ]]; do
+    _ptv_line_nr=$((_ptv_line_nr + 1))
     if [[ $line =~ $_blank_pattern    ]]; then continue; fi
     if [[ $line =~ $_comment_pattern  ]]; then continue; fi
     _match_ptv_line "$line"
