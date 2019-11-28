@@ -1,3 +1,4 @@
+#!/bin/bash
 #!/usr/bin/env bash
 set -euo pipefail;IFS=$'\n\t'
 # home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
