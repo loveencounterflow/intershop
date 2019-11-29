@@ -1,0 +1,1 @@
+../tests/stop.test.sql
