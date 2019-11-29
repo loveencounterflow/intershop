@@ -33,7 +33,10 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
 ### Postgres
 
 
-https://wiki.postgresql.org/wiki/Apt
+* https://wiki.postgresql.org/wiki/Apt
+* https://askubuntu.com/questions/445487/what-debian-version-are-the-different-ubuntu-versions-based-on
+* https://www.linuxmint.com/download_all.php
+
 
 ```bash
 sudo apt install wget ca-certificates psmisc
@@ -43,17 +46,102 @@ sudo apt update
 ```
 
 ```bash
-# sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main 11" >> /etc/apt/sources.list.d/pgdg.list'
-sudo apt install postgresql-11
-sudo apt install postgresql-server-dev-11
-sudo apt install postgresql-plpython3-11
-sudo apt install postgresql-contrib-11
-sudo apt install postgresql-11-plsh
-sudo apt install postgresql-11-unit
-# sudo apt install postgresql-11-pgtap
-# sudo apt install postgresql-11-pldebugger
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+```
+
+```bash
+sudo apt install postgresql-12
+sudo apt install postgresql-server-dev-12
+sudo apt install postgresql-plpython3-12
+sudo apt install postgresql-contrib-12
+sudo apt install postgresql-12-unit
+sudo apt install postgresql-12-plsh
+# sudo apt install postgresql-12-pgtap
+# sudo apt install postgresql-12-pldebugger
 # sudo apt install postgresql-9.6-plv8
 # sudo apt install postgresql-plperl-9.6
+```
+
+<!--
+
+mkdir etc.postgresql.12.main && cd etc.postgresql.12.main
+sudo ln /etc/postgresql/12/main/postgresql.conf
+sudo ln /etc/postgresql/12/main/pg_ident.conf
+sudo ln /etc/postgresql/12/main/pg_hba.conf
+
+ -->
+
+#### Configure Postgres
+
+#### Find Configuration File Locations
+
+In the below, adjust port; the first Postgres installation will likely listen on port 5432, the next one on
+port 5433 and so on; this, of course, will vary depending on whether one installed a newer PG version along
+an older one and so.
+
+```bash
+sudo -u postgres psql --port 5433 -c "                                                \
+  select                                                                  \
+      name                                                    as key,     \
+      setting                                                 as value,   \
+      case setting when reset_val then '' else reset_val end  as changed  \
+    from pg_settings                                                      \
+    where true                                                            \
+      and ( category = 'File Locations' )                                 \
+      order by name;"
+```
+
+This will output a table similar to this one:
+
+```
+        key        |                  value                  | changed
+-------------------+-----------------------------------------+---------
+ config_file       | /etc/postgresql/12/main/postgresql.conf |
+ data_directory    | /var/lib/postgresql/12/main             |
+ external_pid_file | /var/run/postgresql/12-main.pid         |
+ hba_file          | /etc/postgresql/12/main/pg_hba.conf     |
+ ident_file        | /etc/postgresql/12/main/pg_ident.conf   |
+```
+
+Personally, I prefer to create a `git`-versioned project so I can track (and, when necessary, undo) my
+changes to the PG configuration. Inside that project, I create one directory for each version and use
+*hard*links (not symlinks) so I get mirrored local versions of the pertinent files that will always be
+identical to the configurations as seen by Postgres.
+
+In `pg_hba.conf`, add these lines below the one that reads
+
+```
+# Database administrative login by Unix domain socket
+local   all             postgres                                peer
+```
+
+Do **not** change the above, just add these lines to indicate that connections from localhost should always
+be trusted:
+
+```
+### in pg_hba.conf ###
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   all             all                                     trust
+host    all             all             localhost               trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+```
+<!--
+```
+### in pg_ident.conf ###
+# MAPNAME       SYSTEM-USERNAME         PG-USERNAME
+omicron         myusername              myusername
+omicron         myusername              myprojectname1
+omicron         myusername              somedb
+omicron         myusername              foobar
+```
+ -->
+
+**You must restart Postgres after changing the configuration**, for example with one of these lines:
+
+```bash
+sudo /etc/init.d/postgresql restart ; echo $?
+sudo /etc/init.d/postgresql restart 12 ; echo $?
 ```
 
 #### Statement-Level Statistics
