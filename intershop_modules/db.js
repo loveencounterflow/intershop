@@ -37,7 +37,7 @@
   // prv_path                  = process.cwd()
   // process.chdir PATH.join __dirname, '../..'
   // whisper '33622', "working directory temporarily changed to #{process.cwd()}"
-  INTERSHOP = require('../..');
+  INTERSHOP = require('..');
 
   O = INTERSHOP.settings;
 
