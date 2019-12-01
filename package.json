@@ -38,15 +38,17 @@
   "license": "MIT",
   "dependencies": {
     "bash": "0.0.1",
-    "cnd": "^4.6.0",
+    "cnd": "^4.7.0",
     "coffeescript": "^2.4.1",
+    "datom": "^2.3.0",
     "minimatch": "^3.0.4",
-    "pg": "^7.13.0",
+    "pg": "^7.14.0",
+    "pg-cursor": "^2.0.1",
     "pipestreams": "^0.4.1",
-    "pkg-conf": "^2.1.0",
-    "respawn": "^2.6.0"
+    "respawn": "^2.6.0",
+    "steampipes": "^3.2.0"
   },
   "devDependencies": {
-    "tap": "^14.9.2"
+    "tap": "^14.10.2"
   }
 }
