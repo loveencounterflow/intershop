@@ -35,8 +35,28 @@ intershop_guest_configuration_path  = resolve join intershop_guest_path, 'inters
 @settings[ 'intershop/host/configuration/path'  ] = { type: 'text/path/folder', value: intershop_host_configuration_path, }
 @settings[ 'intershop/guest/configuration/path' ] = { type: 'text/path/folder', value: intershop_guest_configuration_path, }
 #...........................................................................................................
-@PTV_READER.update_hash_from_path intershop_guest_configuration_path, @settings
-@PTV_READER.update_hash_from_path intershop_host_configuration_path,  @settings
+try
+  @PTV_READER.update_hash_from_path intershop_guest_configuration_path, @settings
+catch error
+  warn """
+    '^intershop@334-1^'
+    when trying to read guest configuration from
+      #{intershop_guest_configuration_path}
+    an error occurred:
+      #{error.message}"""
+  # process.exit 1
+  # throw error
+try
+  @PTV_READER.update_hash_from_path intershop_host_configuration_path,  @settings
+catch error
+  warn """
+    '^intershop@334-2^'
+    when trying to read host configuration from
+      #{intershop_host_configuration_path}
+    an error occurred:
+      #{error.message}"""
+  process.exit 1
+  throw error
 
 
 ############################################################################################################
