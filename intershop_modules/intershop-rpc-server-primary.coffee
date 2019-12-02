@@ -18,6 +18,7 @@ echo                      = CND.echo.bind CND
 ### https://github.com/mafintosh/respawn ###
 respawn                   = require 'respawn'
 #...........................................................................................................
+require 'cnd/lib/exception-handler'
 O                         = require './options'
 
 monitor = respawn O.respawn
