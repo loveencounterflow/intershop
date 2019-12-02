@@ -194,9 +194,17 @@ chmod 0666 "$intershop_psql_output_path"
 truncate -s 0 "$intershop_psql_output_path"
 ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
+echo '^3334^ psql_tailer_pid:' "$psql_tailer_pid"
+
+function terminate_if_running() {
+  if ps -p "$1" > /dev/null; then
+     kill "$1"
+  # else
+  #   echo "processs PID $1 is NOT running"
+    fi; }
 
 # # according to https://stackoverflow.com/a/8366378/7568091 we can also use trap "kill 0" SIGINT
-trap 'kill $psql_tailer_pid' EXIT
+trap 'terminate_if_running $psql_tailer_pid' EXIT
 # echo 'helo world' >> $intershop_psql_output_path; ls -AlF /tmp/intershop*; exit 1
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
