@@ -194,7 +194,7 @@ chmod 0666 "$intershop_psql_output_path"
 truncate -s 0 "$intershop_psql_output_path"
 ( tail -f "$intershop_psql_output_path" 2> /dev/null ) > >( sed 's/^.*$/\x1b[38;05;214m\0\x1b[0m/g' ) &
 psql_tailer_pid=$!
-echo '^3334^ psql_tailer_pid:' "$psql_tailer_pid"
+# echo '^3334^ psql_tailer_pid:' "$psql_tailer_pid"
 
 function terminate_if_running() {
   if ps -p "$1" > /dev/null; then
