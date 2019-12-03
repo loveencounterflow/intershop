@@ -77,11 +77,12 @@ O                         = require './options'
   #.........................................................................................................
   server = NET.createServer ( socket ) =>
     #.......................................................................................................
+    # @_socket_listen_on_all socket
     source    = SP.new_push_source()
-    socket.on 'data',   ( data  ) => source.send data
-    # socket.on 'error',  ( error ) => warn "socket error: #{error.message}"
-    socket.on 'error',  ( error ) => throw error
-    socket.on 'end',              => source.end()
+    socket.on 'data',   ( data  ) => source.send data unless data is ''
+    socket.on 'error',  ( error ) => warn "socket error: #{error.message}"
+    # socket.on 'error',  ( error ) => throw error
+    # socket.on 'end',              => source.end()
     counts    = { requests: 0, rpcs: 0, hits: 0, fails: 0, errors: 0, }
     S         = { socket, counts, }
     pipeline  = []
