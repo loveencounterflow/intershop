@@ -1,4 +1,6 @@
 
+
+
 'use strict'
 
 ############################################################################################################
@@ -18,7 +20,9 @@ FS                        = require 'fs'
 PATH                      = require 'path'
 NET                       = require 'net'
 #...........................................................................................................
-PS                        = require 'pipestreams'
+PS_path = '/home/flow/jzr/intershop/node_modules/pipestreams'
+warn "using #{PS_path}"
+PS                        = require PS_path
 { $
   $async }                = PS
 #...........................................................................................................
@@ -32,19 +36,19 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_acquire_host_rpc_routines = ->
   intershop_host_modules_path = process.env[ 'intershop_host_modules_path' ]
+  help '^3334^', "trying to acquire RPC routines from #{rpr intershop_host_modules_path}"
   if ( intershop_host_modules_path )?
     host_rpc_module_path  = PATH.join intershop_host_modules_path, 'rpc.js'
     host_rpc              = null
-    try
-      host_rpc = require host_rpc_module_path
-    catch error
+    ### Make sure to accept missing `rpc.js` module without swallowing errors occurring during import: ###
+    try require.resolve host_rpc_module_path catch error
       throw error unless error.code is 'MODULE_NOT_FOUND'
-      warn "no host RPC code at #{rpr host_rpc_module_path}"
-    if host_rpc?
-      # Object.assign @, host_rpc
-      for key, value of host_rpc
-        info '33829', "add host RPC attribute #{rpr key}"
-        @[ key ] = value
+      warn "no such module: #{rpr host_rpc_module_path}"
+      return null
+    host_rpc = require host_rpc_module_path
+    for key, value of host_rpc
+      info '33829', "add host RPC attribute #{rpr key}"
+      @[ key ] = value
   return null
 
 #-----------------------------------------------------------------------------------------------------------
@@ -99,6 +103,9 @@ O                         = require './options'
   # server.listen O.rpc.path, handler
   # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
   server.listen O.rpc.port, O.rpc.host, handler
+  process.on 'uncaughtException',   -> warn "^8876^ uncaughtException";   server.close -> whisper "RPC server closed"
+  process.on 'unhandledRejection',  -> warn "^8876^ unhandledRejection";  server.close -> whisper "RPC server closed"
+  process.on 'exit',                -> warn "^8876^ exit";                server.close -> whisper "RPC server closed"
   return null
 
 #-----------------------------------------------------------------------------------------------------------
