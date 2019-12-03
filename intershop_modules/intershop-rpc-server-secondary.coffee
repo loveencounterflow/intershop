@@ -99,16 +99,18 @@ O                         = require './options'
   #.........................................................................................................
   handler ?= =>
     { address: host, port, family, } = server.address()
-    help "#{O.app.name} RPC server listening on #{family} #{host}:#{port}"
+    app_name = O.app.name ? process.env[ 'intershop_db_name' ] ? 'intershop'
+    help "RPC server for #{app_name} listening on #{family} #{host}:#{port}"
   #.........................................................................................................
   # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
   # try FS.unlinkSync O.rpc.path catch error then warn error
   # server.listen O.rpc.path, handler
   # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+  # @_server_listen_on_all server
   server.listen O.rpc.port, O.rpc.host, handler
-  process.on 'uncaughtException',   -> warn "^8876^ uncaughtException";   server.close -> whisper "RPC server closed"
-  process.on 'unhandledRejection',  -> warn "^8876^ unhandledRejection";  server.close -> whisper "RPC server closed"
-  process.on 'exit',                -> warn "^8876^ exit";                server.close -> whisper "RPC server closed"
+  # process.on 'uncaughtException',   -> warn "^8876^ uncaughtException";   server.close -> whisper "RPC server closed"
+  # process.on 'unhandledRejection',  -> warn "^8876^ unhandledRejection";  server.close -> whisper "RPC server closed"
+  # process.on 'exit',                -> warn "^8876^ exit";                server.close -> whisper "RPC server closed"
   return null
 
 #-----------------------------------------------------------------------------------------------------------
