@@ -122,5 +122,3 @@
   }
 
 }).call(this);
-
-//# sourceMappingURL=ptv-reader.js.map

@@ -98,5 +98,3 @@
   monitor.start();
 
 }).call(this);
-
-//# sourceMappingURL=intershop-rpc-server-primary.js.map
