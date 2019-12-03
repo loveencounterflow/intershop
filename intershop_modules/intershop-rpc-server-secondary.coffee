@@ -20,9 +20,7 @@ FS                        = require 'fs'
 PATH                      = require 'path'
 NET                       = require 'net'
 #...........................................................................................................
-PS_path = '/home/flow/jzr/intershop/node_modules/pipestreams'
-warn "using #{PS_path}"
-PS                        = require PS_path
+PS                        = require 'pipestreams'
 { $
   $async }                = PS
 #...........................................................................................................
