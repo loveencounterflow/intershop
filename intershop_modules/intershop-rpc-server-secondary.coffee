@@ -20,9 +20,11 @@ FS                        = require 'fs'
 PATH                      = require 'path'
 NET                       = require 'net'
 #...........................................................................................................
-PS                        = require 'pipestreams'
+SP                        = require 'steampipes'
 { $
-  $async }                = PS
+  $async
+  $watch
+  $drain }                = SP.export()
 #...........................................................................................................
 O                         = require './options'
 
@@ -74,22 +76,24 @@ O                         = require './options'
   @_acquire_host_rpc_routines()
   #.........................................................................................................
   server = NET.createServer ( socket ) =>
-    socket.on 'error', ( error ) => warn "socket error: #{error.message}"
     #.......................................................................................................
-    source    = PS._nodejs_input_to_pull_source socket
+    source    = SP.new_push_source()
+    socket.on 'data',   ( data  ) => source.send data
+    # socket.on 'error',  ( error ) => warn "socket error: #{error.message}"
+    socket.on 'error',  ( error ) => throw error
+    socket.on 'end',              => source.end()
     counts    = { requests: 0, rpcs: 0, hits: 0, fails: 0, errors: 0, }
     S         = { socket, counts, }
     pipeline  = []
-    on_stop   = PS.new_event_collector 'stop', => socket.end()
     #.......................................................................................................
     pipeline.push source
-    pipeline.push PS.$split()
-    # pipeline.push PS.$show()
+    pipeline.push SP.$split()
+    # pipeline.push SP.$show()
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
-    pipeline.push on_stop.add PS.$drain()
+    pipeline.push $drain()
     #.......................................................................................................
-    PS.pull pipeline...
+    SP.pull pipeline...
     return null
   #.........................................................................................................
   handler ?= =>
@@ -108,7 +112,7 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @$show_counts = ( S ) ->
-  return PS.$watch ( event ) ->
+  return $watch ( event ) ->
     S.counts.requests += +1
     if ( S.counts.requests % 1000 ) is 0
       urge JSON.stringify S.counts
@@ -117,6 +121,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @$dispatch = ( S ) ->
   return $ ( line, send ) =>
+    debug '^7776^', rpr line
     try
       event                   = JSON.parse line
       [ method, parameters, ] = event
