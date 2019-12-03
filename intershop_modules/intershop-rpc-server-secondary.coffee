@@ -124,7 +124,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @$dispatch = ( S ) ->
   return $ ( line, send ) =>
-    debug '^7776^', rpr line
+    return null if line is ''
     try
       event                   = JSON.parse line
       [ method, parameters, ] = event
@@ -154,10 +154,15 @@ O                         = require './options'
 @do_rpc = ( S, method_name, parameters ) ->
   S.counts.rpcs  += +1
   method          = @[ "rpc_#{method_name}" ]
+  method_type     = type_of method
+  debug '^5554^', method_type
   return @send_error S, "no such method: #{rpr method_name}" unless method?
   #.........................................................................................................
   try
-    result = method.call @, S, parameters
+    switch method_type
+      when 'function'       then  result =        method.call @, S, parameters
+      when 'asyncfunction'  then  result = await  method.call @, S, parameters
+      else throw new Error "unknown method type #{rpr method_type}"
   catch error
     S.counts.errors += +1
     try
@@ -166,7 +171,11 @@ O                         = require './options'
       null
     message ?= '(UNKNOWN ERROR MESSAGE)'
     return @send_error S, error.message
-  @_write S, method_name, result
+  if isa.promise result
+    result.then ( result ) => @_write S, method_name, result
+  else
+    @_write S, method_name, result
+  return null
 
 #-----------------------------------------------------------------------------------------------------------
 @send_error = ( S, message ) ->
