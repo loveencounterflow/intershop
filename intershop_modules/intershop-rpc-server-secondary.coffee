@@ -60,22 +60,22 @@ process_is_managed        = module is require.main
 
 #-----------------------------------------------------------------------------------------------------------
 @_socket_listen_on_all = ( socket ) ->
-  socket.on 'close',      -> help 'socket', 'close'
-  socket.on 'connect',    -> help 'socket', 'connect'
-  socket.on 'data',       -> help 'socket', 'data'
-  socket.on 'drain',      -> help 'socket', 'drain'
-  socket.on 'end',        -> help 'socket', 'end'
-  socket.on 'error',      -> help 'socket', 'error'
-  socket.on 'lookup',     -> help 'socket', 'lookup'
-  socket.on 'timeout',    -> help 'socket', 'timeout'
+  socket.on 'close',      -> whisper '^rpc-4432-1^', 'socket', 'close'
+  socket.on 'connect',    -> whisper '^rpc-4432-2^', 'socket', 'connect'
+  socket.on 'data',       -> whisper '^rpc-4432-3^', 'socket', 'data'
+  socket.on 'drain',      -> whisper '^rpc-4432-4^', 'socket', 'drain'
+  socket.on 'end',        -> whisper '^rpc-4432-5^', 'socket', 'end'
+  socket.on 'error',      -> whisper '^rpc-4432-6^', 'socket', 'error'
+  socket.on 'lookup',     -> whisper '^rpc-4432-7^', 'socket', 'lookup'
+  socket.on 'timeout',    -> whisper '^rpc-4432-8^', 'socket', 'timeout'
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 @_server_listen_on_all = ( server ) ->
-  server.on 'close',      -> help 'server', 'close'
-  server.on 'connection', -> help 'server', 'connection'
-  server.on 'error',      -> help 'server', 'error'
-  server.on 'listening',  -> help 'server', 'listening'
+  server.on 'close',      -> whisper '^rpc-4432-9^', 'server', 'close'
+  server.on 'connection', -> whisper '^rpc-4432-10^', 'server', 'connection'
+  server.on 'error',      -> whisper '^rpc-4432-11^', 'server', 'error'
+  server.on 'listening',  -> whisper '^rpc-4432-12^', 'server', 'listening'
   return null
 
 #-----------------------------------------------------------------------------------------------------------
@@ -141,16 +141,20 @@ process_is_managed        = module is require.main
     # debug '27211', ( rpr method ), ( rpr parameters )
     #.......................................................................................................
     switch method
-      when 'error'    then @send_error S, parameters
+      when 'error'
+        @send_error S, parameters
       #.....................................................................................................
       ### Send `stop` signal to primary and exit secondary: ###
       when 'stop'
-        process.send 'stop'
+        process.send 'stop' if process_is_managed
         process.exit()
       #.....................................................................................................
       ### exit and have primary restart secondary: ###
       when 'restart'
-        process.exit()
+        unless process_is_managed
+          warn "received restart signal but standalone process can't restart"
+        else
+          process.exit()
       #.....................................................................................................
       else
         @do_rpc S, method, parameters
@@ -190,6 +194,7 @@ process_is_managed        = module is require.main
 
 #-----------------------------------------------------------------------------------------------------------
 @_write = ( S, method, parameters ) ->
+  # debug '^intershop-rpc-server-secondary.coffee@3332^', ( rpr method ), ( rpr parameters )
   S.socket.write ( JSON.stringify [ method, parameters, ] ) + '\n'
   return null
 
@@ -285,8 +290,16 @@ process_is_managed        = module is require.main
 
 
 ############################################################################################################
-unless module.parent?
+if module is require.main then do =>
   RPCS = @
   RPCS.listen()
+
+
+# curl --silent --show-error localhost:23001/
+# curl --silent --show-error localhost:23001
+# curl --show-error localhost:23001
+# grep -r --color=always -P '23001' db src bin tex-inputs | sort | less -SRN
+# grep -r --color=always -P '23001' . | sort | less -SRN
+# grep -r --color=always -P '23001|8910|rpc' . | sort | less -SRN
 
 
