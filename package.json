@@ -40,11 +40,11 @@
     "bash": "0.0.1",
     "cnd": "^4.7.0",
     "coffeescript": "^2.4.1",
-    "datom": "^2.3.0",
+    "datom": "^2.3.1",
+    "intertype": "^2.7.0",
     "minimatch": "^3.0.4",
     "pg": "^7.14.0",
     "pg-cursor": "^2.0.1",
-    "pipestreams": "^0.4.1",
     "respawn": "^2.6.0",
     "steampipes": "^3.2.0"
   },
