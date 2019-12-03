@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 """
 
@@ -26,8 +28,6 @@ def _prepare():
   client_socket_rfile                 = _OS.fdopen( client_socket.fileno(), 'r', encoding = 'utf-8' )
   _cache[ 'SIGNALS.client_socket'       ] = client_socket
   _cache[ 'SIGNALS.client_socket_rfile' ] = client_socket_rfile
-  # _write_line( '{"data":"helo","role":"q","channel":"all","command":"helo"}' )
-  rpc( 'helo', [ 'some', 'data', ] )
 
 #-----------------------------------------------------------------------------------------------------------
 def _write_line( line ):
