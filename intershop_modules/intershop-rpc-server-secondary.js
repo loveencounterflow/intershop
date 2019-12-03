@@ -172,6 +172,24 @@
     // server.listen O.rpc.path, handler
     // ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
     server.listen(O.rpc.port, O.rpc.host, handler);
+    process.on('uncaughtException', function() {
+      warn("^8876^ uncaughtException");
+      return server.close(function() {
+        return whisper("RPC server closed");
+      });
+    });
+    process.on('unhandledRejection', function() {
+      warn("^8876^ unhandledRejection");
+      return server.close(function() {
+        return whisper("RPC server closed");
+      });
+    });
+    process.on('exit', function() {
+      warn("^8876^ exit");
+      return server.close(function() {
+        return whisper("RPC server closed");
+      });
+    });
     return null;
   };
 
