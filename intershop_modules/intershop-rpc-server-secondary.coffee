@@ -69,6 +69,7 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @listen = ( handler = null ) ->
+  @_acquire_host_rpc_routines()
   #.........................................................................................................
   server = NET.createServer ( socket ) =>
     socket.on 'error', ( error ) => warn "socket error: #{error.message}"
@@ -257,7 +258,6 @@ O                         = require './options'
 ############################################################################################################
 unless module.parent?
   RPCS = @
-  @_acquire_host_rpc_routines()
   RPCS.listen()
 
 
