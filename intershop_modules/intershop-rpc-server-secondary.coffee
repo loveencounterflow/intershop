@@ -26,7 +26,14 @@ SP                        = require 'steampipes'
   $watch
   $drain }                = SP.export()
 #...........................................................................................................
+@types                    = require './types'
+{ isa
+  validate
+  cast
+  type_of }               = @types
+#...........................................................................................................
 O                         = require './options'
+process_is_managed        = module is require.main
 
 # debug '84874', '⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖'
 # for key, value of process.env
