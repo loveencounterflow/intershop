@@ -352,63 +352,6 @@
     return a + b;
   };
 
-  // #-----------------------------------------------------------------------------------------------------------
-  // @rpc_normalize_formula = ( S, P ) ->
-  //   unless ( CND.isa_list P ) and ( P.length is 2 )
-  //     throw new Error "expected a list with two texts, got #{rpr P}"
-  //   [ glyph, original_formula, ] = P
-  //   unless ( CND.isa_text glyph ) and ( CND.isa_text original_formula )
-  //     throw new Error "expected a list with two texts, got #{rpr P}"
-  //   #.........................................................................................................
-  //   normalized_formula  = IDLX.minimize_formula original_formula
-  //   if normalized_formula is original_formula then  S.counts.fails += +1
-  //   else                                            S.counts.hits  += +1
-  //   # debug '44432', rpr normalized_formula
-  //   # if normalized_formula? and normalized_formula isnt original_formula
-  //   #   debug '66672', glyph, original_formula, '->', normalized_formula if ( original_formula.match /∅/ )?
-  //   #   event.data.row.formula = MKNCR.chrs_from_text normalized_formula
-  //   return [ glyph, normalized_formula, ]
-
-  // #-----------------------------------------------------------------------------------------------------------
-  // @rpc_get_relational_bigrams = ( S, P ) ->
-  //   unless ( CND.isa_list P ) and ( P.length is 1 )
-  //     throw new Error "expected a list with one text, got #{rpr P}"
-  //   [ formula, ] = P
-  //   return null if formula is null
-  //   unless ( CND.isa_text formula )
-  //     throw new Error "expected a list with one text, got #{rpr P}"
-  //   #.........................................................................................................
-  //   return IDLX.get_relational_bigrams formula
-
-  // #-----------------------------------------------------------------------------------------------------------
-  // @rpc_get_relational_bigrams_as_indices = ( S, P ) ->
-  //   unless ( CND.isa_list P ) and ( P.length is 1 )
-  //     throw new Error "expected a list with one text, got #{rpr P}"
-  //   [ formula, ] = P
-  //   return null if formula is null
-  //   unless ( CND.isa_text formula )
-  //     throw new Error "expected a list with one text, got #{rpr P}"
-  //   #.........................................................................................................
-  //   return IDLX.get_relational_bigrams_as_indices formula
-
-  // #-----------------------------------------------------------------------------------------------------------
-  // @rpc_XCTO_demo = ( S, P ) ->
-  //   debug '33344', P
-  //   # unless ( CND.isa_list P ) and ( P.length is 1 )
-  //   #   throw new Error "expected a list with one text, got #{rpr P}"
-  //   # [ formula, ] = P
-  //   # return null if formula is null
-  //   # unless ( CND.isa_text formula )
-  //   #   throw new Error "expected a list with one text, got #{rpr P}"
-  //   #.........................................................................................................
-  //   return rpr P
-
-  // ############################################################################################################
-  // do ( L = @ ) ->
-  //   for name, method of L
-  //     continue unless name.startsWith 'rpc_'
-  //     L[ name ] = method.bind L
-
   //###########################################################################################################
   if (module === require.main) {
     (() => {
