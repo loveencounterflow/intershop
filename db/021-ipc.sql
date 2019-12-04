@@ -1,4 +1,5 @@
 
+
 /*
 
 8888888 8888888b.   .d8888b.
@@ -45,6 +46,10 @@ create function IPC.send( channel text,               data anyelement ) returns 
 -- create function IPC.send( channel text, command text, data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data::text  ); end; $$;
 create function IPC.send( channel text, command text, data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
 create function IPC.send( channel text, command text, data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
+
+
+-- current_database()
+-- select current_setting('application_name');
 
 -- ---------------------------------------------------------------------------------------------------------
 /* ### TAINT this function should be written in Python and call IPC._send from the ipc module;
