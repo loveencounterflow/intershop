@@ -34,6 +34,9 @@ SP                        = require 'steampipes'
 #...........................................................................................................
 O                         = require './options'
 process_is_managed        = module is require.main
+{ jr }                    = CND
+
+
 
 # debug '84874', '⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖⬖'
 # for key, value of process.env
@@ -96,7 +99,7 @@ process_is_managed        = module is require.main
     #.......................................................................................................
     pipeline.push source
     pipeline.push SP.$split()
-    # pipeline.push SP.$show()
+    pipeline.push $watch ( d ) => urge '^3398^', jr d
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
     pipeline.push $drain()
@@ -132,34 +135,55 @@ process_is_managed        = module is require.main
 @$dispatch = ( S ) ->
   return $ ( line, send ) =>
     return null if line is ''
-    try
-      event                   = JSON.parse line
-      [ method, parameters, ] = event
-    catch error
-      method      = 'error'
-      parameters  = "An error occurred while trying to parse #{rpr event}:\n#{error.message}"
-    # debug '27211', ( rpr method ), ( rpr parameters )
+    event       = null
+    method      = null
+    parameters  = null
+    $rsvp       = false
     #.......................................................................................................
-    switch method
-      when 'error'
-        @send_error S, parameters
+    loop
+      try event = JSON.parse line catch error
+        @send_error S, """^rpc-secondary/$dispatch@5564^
+          An error occurred while trying to parse #{rpr line}:
+          #{error.message}"""
+        break
       #.....................................................................................................
-      ### Send `stop` signal to primary and exit secondary: ###
-      when 'stop'
-        process.send 'stop' if process_is_managed
-        process.exit()
-      #.....................................................................................................
-      ### exit and have primary restart secondary: ###
-      when 'restart'
-        unless process_is_managed
-          warn "received restart signal but standalone process can't restart"
+      switch type = type_of event
+        when 'list'
+          warn "^rpc-secondary/$dispatch@5564^ using list instead of object in RPC calls is deprecated"
+          [ method, parameters, ] = event
+          $rsvp                   = true
+        when 'object'
+          { $key: method, $value: parameters, $rsvp, }  = event
+          $rsvp                                        ?= false
         else
-          process.exit()
+          @send_error S, "^rpc-secondary/$dispatch@5565^ expected (list or) object, got a #{type}"
+          break
       #.....................................................................................................
-      else
-        @do_rpc S, method, parameters
+      switch method
+        when 'error'
+          @send_error S, parameters
+        #...................................................................................................
+        ### Send `stop` signal to primary and exit secondary: ###
+        when 'stop'
+          process.send 'stop' if process_is_managed
+          process.exit()
+        #...................................................................................................
+        ### exit and have primary restart secondary: ###
+        when 'restart'
+          unless process_is_managed
+            warn "received restart signal but standalone process can't restart"
+          else
+            process.exit()
+        #...................................................................................................
+        else
+          if $rsvp is true
+            @do_rpc S, method, parameters
+      #.....................................................................................................
+      break
     #.......................................................................................................
-    send event
+    ### TAINT sending on failed lines w/out marking them as such? ###
+    send event ? line
+    return null
 
 #-----------------------------------------------------------------------------------------------------------
 @do_rpc = ( S, method_name, parameters ) ->
