@@ -38,7 +38,7 @@
   "license": "MIT",
   "dependencies": {
     "bash": "0.0.1",
-    "cnd": "^4.7.0",
+    "cnd": "^4.7.3",
     "coffeescript": "^2.4.1",
     "datom": "^2.3.1",
     "intertype": "^2.7.0",
