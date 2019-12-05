@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+# sudo printf '' # make sure password prompt won't pop up later, be perhaps hard to detect
+source "$intershop_guest_modules_path/utilities.sh"
+"$intershop_guest_bin_path/_stop-rpc-server"

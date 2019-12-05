@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
-# set -euo pipefail
-set -eo pipefail
+set -euo pipefail
 
 #-----------------------------------------------------------------------------------------------------------
 cd "$(readlink -f "$0" | xargs dirname)"/..
@@ -23,18 +22,16 @@ if [ -z ${intershop_guest_modules_path+x} ]; then
 
 #-----------------------------------------------------------------------------------------------------------
 # echo "trying to restart RPC server at $intershop_rpc_path"
-echo "trying to restart RPC server at $intershop_rpc_host:$intershop_rpc_port"
+echo "trying to stop RPC server at $intershop_rpc_host:$intershop_rpc_port"
 set +e
-echo '["restart"]' | netcat "$intershop_rpc_host" "$intershop_rpc_port" ; status=$?
+echo '["stop"]' | netcat "$intershop_rpc_host" "$intershop_rpc_port" ; status=$?
 set -e
-echo "status: $status"
+# echo "status: $status"
 if [[ $status -eq 0 ]]; then
   echo 'OK'
 else
-  echo 'failed, launching RPC server...'
-  node "$intershop_guest_modules_path"/intershop-rpc-server-primary.js &
-  # primary_pid=$!
-  # echo "PID of RPC primary: $primary_pid"
+  echo 'RPC server not running'
   fi
+
 
 
