@@ -60,37 +60,17 @@ create function IPC._write_line( line text ) returns void volatile language plpy
   $$;
 reset role;
 
-
-/*
-
-8888888b.  8888888b.   .d8888b.
-888   Y88b 888   Y88b d88P  Y88b
-888    888 888    888 888    888
-888   d88P 888   d88P 888
-8888888P"  8888888P"  888
-888 T88b   888        888    888
-888  T88b  888        Y88b  d88P
-888   T88b 888         "Y8888P"
-
-*/
+-- ---------------------------------------------------------------------------------------------------------
+create function IPC.send( ¶key text, ¶value jsonb, ¶rsvp boolean ) returns void volatile language sql as $$
+  select IPC._write_line( jsonb_build_object( '$key', ¶key, '$value', ¶value, '$rsvp', ¶rsvp )::text ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function IPC.rpc( method text, parameters jsonb ) returns jsonb volatile language plpgsql as $$
-  begin
-    return IPC._rpc( method, parameters );
-    end; $$;
+create function IPC.send( ¶key text, ¶value jsonb ) returns void volatile language sql as $$
+  select IPC.send( ¶key, ¶value, false ); $$;
 
--- ---------------------------------------------------------------------------------------------------------
-create function IPC._rpc( method text, parameters jsonb )
-  returns text volatile language plpgsql as $$
-    declare
-      R text;
-    begin
-      perform IPC._send( channel, 'rpc', jsonb_build_object( 'method', method, 'parameters', parameters ) );
-      R := IPC._read_line();
-      return R;
-      end; $$;
 
+-- =========================================================================================================
+-- RPC
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function IPC._read_line() returns text volatile language plpython3u as $$
@@ -98,4 +78,19 @@ create function IPC._read_line() returns text volatile language plpython3u as $$
   return ctx.ipc._read_line()
   $$;
 reset role;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function IPC._rpc( method text, parameters jsonb )
+  returns jsonb volatile language plpgsql as $$
+    declare
+      R text;
+    begin
+      perform IPC.send( method, parameters, true );
+      R := IPC._read_line()::jsonb;
+      return R;
+      end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function IPC.rpc( method text, parameters jsonb ) returns jsonb volatile language sql as $$
+  select IPC._rpc( method, parameters ); $$;
 
