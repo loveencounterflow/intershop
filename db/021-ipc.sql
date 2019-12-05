@@ -66,8 +66,7 @@ create function IPC._read_line() returns text volatile language plpython3u as $$
 reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function IPC._rpc( method text, parameters jsonb )
-  returns jsonb volatile language plpgsql as $$
+create function IPC.rpc( method text, parameters jsonb ) returns jsonb volatile language plpgsql as $$
     declare
       R jsonb;
     begin
@@ -76,7 +75,5 @@ create function IPC._rpc( method text, parameters jsonb )
       return R->'$value';
       end; $$;
 
--- ---------------------------------------------------------------------------------------------------------
-create function IPC.rpc( method text, parameters jsonb ) returns jsonb volatile language sql as $$
-  select IPC._rpc( method, parameters ); $$;
+
 
