@@ -37,33 +37,19 @@ create schema IPC;
 
 */
 
--- ---------------------------------------------------------------------------------------------------------
--- create function IPC.send(                             data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data::text  ); end; $$;
-create function IPC.send(                             data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data        ); end; $$;
--- create function IPC.send( channel text,               data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data::text  ); end; $$;
-create function IPC.send( channel text,               data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
-create function IPC.send( channel text,               data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
--- create function IPC.send( channel text, command text, data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data::text  ); end; $$;
-create function IPC.send( channel text, command text, data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
-create function IPC.send( channel text, command text, data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- -- create function IPC.send(                             data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data::text  ); end; $$;
+-- create function IPC.send(                             data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data        ); end; $$;
+-- -- create function IPC.send( channel text,               data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data::text  ); end; $$;
+-- create function IPC.send( channel text,               data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
+-- create function IPC.send( channel text,               data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
+-- -- create function IPC.send( channel text, command text, data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data::text  ); end; $$;
+-- create function IPC.send( channel text, command text, data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
+-- create function IPC.send( channel text, command text, data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
 
 
 -- current_database()
 -- select current_setting('application_name');
-
--- ---------------------------------------------------------------------------------------------------------
-/* ### TAINT this function should be written in Python and call IPC._send from the ipc module;
-  we only have it here b/c type `anyelement` is not an allowed plpython3u function parameter type. */
-create function IPC._send( channel text, command text, role text, data anyelement )
-  returns void volatile language plpgsql as $$
-    begin
-      perform IPC._write_line( jsonb_build_object(
-        'channel',  channel,
-        'command',  command,
-        'role',     role,
-        'data',     data
-        )::text );
-      end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 /* ### TAINT this function should only exist in Python module */
