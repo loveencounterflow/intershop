@@ -40,17 +40,17 @@ def _read_line():
   return _cache[ 'SIGNALS.client_socket_rfile' ].readline().strip()
 
 #-----------------------------------------------------------------------------------------------------------
-### TAINT must implement RPC result buffer ###
 def rpc( method, parameters ):
   _write_line( _JSON.dumps( { '$key': method, '$value': parameters, '$rsvp': True, } ) )
-  try:
-    rsp       = _JSON.loads( _read_line() )
-    command   = rsp[ '$method' ]
-    R         = rsp[ '$value' ]
-  except Exception:
-    raise
+  rsp       = _JSON.loads( _read_line() )
+  command   = rsp[ '$method' ]
+  R         = rsp[ '$value' ]
   if command == 'error':
-    raise RuntimeError( repr( rsp ) )
+    ctx.log( '^ipc.py/rpc@7776^', "when doing an RPC call to " + repr( method ) )
+    ctx.log( '^ipc.py/rpc@7776^', "with parameters " + repr( parameters ) )
+    ctx.log( '^ipc.py/rpc@7776^', "an error occurred: " )
+    ctx.log( rsp[ '$value' ] )
+    raise RuntimeError( rsp[ '$value' ] )
   return R
 
 

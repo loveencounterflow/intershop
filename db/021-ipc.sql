@@ -69,11 +69,11 @@ reset role;
 create function IPC._rpc( method text, parameters jsonb )
   returns jsonb volatile language plpgsql as $$
     declare
-      R text;
+      R jsonb;
     begin
       perform IPC.send( method, parameters, true );
-      R := IPC._read_line()::jsonb;
-      return R;
+      R := ( IPC._read_line() )::jsonb;
+      return R->'$value';
       end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
