@@ -26,6 +26,10 @@ SP                        = require 'steampipes'
   $watch
   $drain }                = SP.export()
 #...........................................................................................................
+DATOM                     = require 'datom'
+{ new_datom
+  select }                = DATOM.export()
+#...........................................................................................................
 @types                    = require './types'
 { isa
   validate
@@ -118,6 +122,8 @@ process_is_managed        = module is require.main
   # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
   # @_server_listen_on_all server
   server.listen O.rpc.port, O.rpc.host, handler
+  @stop = -> server.close()
+  # debug '^899555^', ( k for k of server)
   # process.on 'uncaughtException',   -> warn "^8876^ uncaughtException";   server.close -> whisper "RPC server closed"
   # process.on 'unhandledRejection',  -> warn "^8876^ unhandledRejection";  server.close -> whisper "RPC server closed"
   # process.on 'exit',                -> warn "^8876^ exit";                server.close -> whisper "RPC server closed"
@@ -148,15 +154,15 @@ process_is_managed        = module is require.main
         break
       #.....................................................................................................
       switch type = type_of event
-        when 'list'
-          warn "^rpc-secondary/$dispatch@5564^ using list instead of object in RPC calls is deprecated"
-          [ method, parameters, ] = event
-          $rsvp                   = true
+        # when 'list'
+        #   warn "^rpc-secondary/$dispatch@5564^ using list instead of object in RPC calls is deprecated"
+        #   [ method, parameters, ] = event
+        #   $rsvp                   = true
         when 'object'
           { $key: method, $value: parameters, $rsvp, }  = event
           $rsvp                                        ?= false
         else
-          @send_error S, "^rpc-secondary/$dispatch@5565^ expected (list or) object, got a #{type}"
+          @send_error S, "^rpc-secondary/$dispatch@5565^ expected object, got a #{type}: #{rpr event}"
           break
       #.....................................................................................................
       switch method
@@ -190,7 +196,6 @@ process_is_managed        = module is require.main
   S.counts.rpcs  += +1
   method          = @[ "rpc_#{method_name}" ]
   method_type     = type_of method
-  debug '^5554^', method_type
   return @send_error S, "no such method: #{rpr method_name}" unless method?
   #.........................................................................................................
   try
@@ -217,9 +222,12 @@ process_is_managed        = module is require.main
   @_write S, 'error', message
 
 #-----------------------------------------------------------------------------------------------------------
-@_write = ( S, method, parameters ) ->
-  # debug '^intershop-rpc-server-secondary.coffee@3332^', ( rpr method ), ( rpr parameters )
-  S.socket.write ( JSON.stringify [ method, parameters, ] ) + '\n'
+@_write = ( S, $method, parameters ) ->
+  # debug '^intershop-rpc-server-secondary.coffee@3332^', ( rpr method_name ), ( rpr parameters )
+  # if isa.object parameters  then  d = new_datom '^rpc-result', { $method, parameters..., }
+  # else                            d = new_datom '^rpc-result', { $method, $value: parameters, }
+  d = new_datom '^rpc-result', { $method, $value: parameters, }
+  S.socket.write ( JSON.stringify d ) + '\n'
   return null
 
 

@@ -42,16 +42,16 @@ def _read_line():
 #-----------------------------------------------------------------------------------------------------------
 ### TAINT must implement RPC result buffer ###
 def rpc( method, parameters ):
-  _write_line( _JSON.dumps( [ method, parameters, ] ) )
+  _write_line( _JSON.dumps( { '$key': method, '$value': parameters, '$rsvp': True, } ) )
   try:
-    R = _JSON.loads( _read_line() )
-    command   = R[ 0 ]
-    data      = R[ 1 ]
+    rsp       = _JSON.loads( _read_line() )
+    command   = rsp[ '$method' ]
+    R         = rsp[ '$value' ]
   except Exception:
     raise
   if command == 'error':
-    raise RuntimeError( repr( R ) )
-  return R[ 1 ]
+    raise RuntimeError( repr( rsp ) )
+  return R
 
 
 

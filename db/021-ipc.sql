@@ -37,32 +37,18 @@ create schema IPC;
 
 */
 
--- -- ---------------------------------------------------------------------------------------------------------
--- -- create function IPC.send(                             data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data::text  ); end; $$;
--- create function IPC.send(                             data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( 'all',    'data',  'q', data        ); end; $$;
--- -- create function IPC.send( channel text,               data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data::text  ); end; $$;
--- create function IPC.send( channel text,               data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
--- create function IPC.send( channel text,               data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  'data',  'q', data        ); end; $$;
--- -- create function IPC.send( channel text, command text, data unknown    ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data::text  ); end; $$;
--- create function IPC.send( channel text, command text, data text       ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
--- create function IPC.send( channel text, command text, data anyelement ) returns void volatile language plpgsql as $$ begin perform IPC._send( channel,  command, 'q', data        ); end; $$;
-
-
 -- current_database()
 -- select current_setting('application_name');
 
 -- ---------------------------------------------------------------------------------------------------------
-/* ### TAINT this function should only exist in Python module */
 set role dba;
-create function IPC._write_line( line text ) returns void volatile language plpython3u as $$
+create function IPC.send( key text, value jsonb, rsvp boolean )
+  returns void volatile language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
-  return ctx.ipc._write_line( line )
+  import json
+  ctx.ipc._write_line( json.dumps( { '$key': key, '$value': json.loads( value ), '$rsvp': rsvp, } ) )
   $$;
 reset role;
-
--- ---------------------------------------------------------------------------------------------------------
-create function IPC.send( ¶key text, ¶value jsonb, ¶rsvp boolean ) returns void volatile language sql as $$
-  select IPC._write_line( jsonb_build_object( '$key', ¶key, '$value', ¶value, '$rsvp', ¶rsvp )::text ); $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 create function IPC.send( ¶key text, ¶value jsonb ) returns void volatile language sql as $$
