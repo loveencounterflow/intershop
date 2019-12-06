@@ -41,6 +41,24 @@ create function IPC.server_is_online() returns boolean volatile language plpytho
 
 comment on function IPC.server_is_online() is 'Return `true` iff RPC server is reachable, `false`
 otherwise.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function IPC.has_rpc_method( key text ) returns boolean volatile language plpython3u as $$
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  if not ctx.ipc.server_is_online(): return None
+  try:
+    return ctx.ipc.rpc( 'has_rpc_method', key )
+  except ConnectionRefusedError as e:
+    return False
+  $$;
+
+comment on function IPC.has_rpc_method( text ) is 'When RPC server is not online, always return `null`
+(indicating no definite answer, but RPC not possible either way); otherwise, return whether method is found
+on RPC server. Note that since methods can be added while the server is running, return values may be
+subject to change at any time; also observe that there''s a race condition between testing for the server
+being online, testing for the server having a given method, and actually calling that method, an RPC call
+may still fail even if this method indicates it should succeed.';
+
 reset role;
 
 
@@ -68,10 +86,6 @@ create function IPC.rpc( key text, value jsonb ) returns jsonb volatile language
   return ctx.ipc.rpc( key, json.loads( value ), format = 'json' )
   $$;
 reset role;
-
--- ---------------------------------------------------------------------------------------------------------
-create function IPC.has_rpc_method( key text ) returns boolean volatile language sql as $$
-  select IPC.rpc( 'has_rpc_method', to_jsonb( key ) )::boolean; $$;
 
 
 
