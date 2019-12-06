@@ -24,7 +24,7 @@ if [ -z ${intershop_guest_modules_path+x} ]; then
 # echo "trying to restart RPC server at $intershop_rpc_path"
 echo "trying to stop RPC server at $intershop_rpc_host:$intershop_rpc_port"
 set +e
-echo '["stop"]' | netcat "$intershop_rpc_host" "$intershop_rpc_port" ; status=$?
+echo '{"$key":"stop"}' | netcat "$intershop_rpc_host" "$intershop_rpc_port" ; status=$?
 set -e
 # echo "status: $status"
 # if [[ $status -eq 0 ]]; then
