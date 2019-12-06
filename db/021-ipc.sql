@@ -65,7 +65,7 @@ set role dba;
 create function IPC.rpc( key text, value jsonb ) returns jsonb volatile language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   import json
-  return ctx.ipc.rpc( key, json.loads( value ) )
+  return ctx.ipc.rpc( key, json.loads( value ), format = 'json' )
   $$;
 reset role;
 

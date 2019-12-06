@@ -49,6 +49,10 @@ process_is_managed        = module is require.main
 
 #-----------------------------------------------------------------------------------------------------------
 @_acquire_host_rpc_routines = ->
+  ### TAINT test for name collisions ###
+  ### TAINT do not require `rpc_` prefix? ###
+  ### TAINT use dedicated namespace (object) to keep RPC methods ###
+  ### TAINT make compatible with xemitter conventions ###
   intershop_host_modules_path = process.env[ 'intershop_host_modules_path' ]
   help '^3334^', "trying to acquire RPC routines from #{rpr intershop_host_modules_path}"
   if ( intershop_host_modules_path )?
@@ -115,7 +119,7 @@ process_is_managed        = module is require.main
     #.......................................................................................................
     pipeline.push source
     pipeline.push SP.$split()
-    pipeline.push $watch ( d ) => urge '^3398^', jr d
+    # pipeline.push $watch ( d ) => urge '^3398^', jr d
     pipeline.push @$show_counts   S
     pipeline.push @$dispatch      S
     pipeline.push $drain()
