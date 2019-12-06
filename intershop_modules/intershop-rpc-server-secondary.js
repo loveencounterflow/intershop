@@ -62,6 +62,10 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this._acquire_host_rpc_routines = function() {
+    /* TAINT test for name collisions */
+    /* TAINT do not require `rpc_` prefix? */
+    /* TAINT use dedicated namespace (object) to keep RPC methods */
+    /* TAINT make compatible with xemitter conventions */
     var error, host_rpc, host_rpc_module_path, intershop_host_modules_path, key, value;
     intershop_host_modules_path = process.env['intershop_host_modules_path'];
     help('^3334^', `trying to acquire RPC routines from ${rpr(intershop_host_modules_path)}`);
@@ -82,10 +86,25 @@
       host_rpc = require(host_rpc_module_path);
       for (key in host_rpc) {
         value = host_rpc[key];
-        info('33829', `add host RPC attribute ${rpr(key)}`);
+        info('^3389^', `add host RPC attribute ${rpr(key)}`);
         this[key] = value;
       }
     }
+    return null;
+  };
+
+  //-----------------------------------------------------------------------------------------------------------
+  this.contract = function(key, method) {
+    var rpc_key;
+    /* TAINT use dedicated namespace (object) to keep RPC methods */
+    /* TAINT make compatible with xemitter conventions */
+    validate.nonempty_text(key);
+    validate.callable(method);
+    rpc_key = `rpc_${key}`;
+    if (this[rpc_key] != null) {
+      throw new Error(`^rpc-secondary/contract@55777^ method already exists: ${rpr(key)} (${rpr(rpc_key)})`);
+    }
+    this[rpc_key] = method;
     return null;
   };
 
@@ -167,9 +186,7 @@
       //.......................................................................................................
       pipeline.push(source);
       pipeline.push(SP.$split());
-      pipeline.push($watch((d) => {
-        return urge('^3398^', jr(d));
-      }));
+      // pipeline.push $watch ( d ) => urge '^3398^', jr d
       pipeline.push(this.$show_counts(S));
       pipeline.push(this.$dispatch(S));
       pipeline.push($drain());
