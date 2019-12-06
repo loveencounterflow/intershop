@@ -61,8 +61,20 @@ process_is_managed        = module is require.main
       return null
     host_rpc = require host_rpc_module_path
     for key, value of host_rpc
-      info '33829', "add host RPC attribute #{rpr key}"
+      info '^3389^', "add host RPC attribute #{rpr key}"
       @[ key ] = value
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@contract = ( key, method ) ->
+  ### TAINT use dedicated namespace (object) to keep RPC methods ###
+  ### TAINT make compatible with xemitter conventions ###
+  validate.nonempty_text key
+  validate.callable method
+  rpc_key = "rpc_#{key}"
+  if @[ rpc_key ]?
+    throw new Error "^rpc-secondary/contract@55777^ method already exists: #{rpr key} (#{rpr rpc_key})"
+  @[ rpc_key ] = method
   return null
 
 #-----------------------------------------------------------------------------------------------------------
