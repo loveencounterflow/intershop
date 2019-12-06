@@ -27,6 +27,11 @@ create schema IPC;
 -- current_database()
 -- select current_setting('application_name');
 
+-- ### TAINT consider to change name acc. to xemitter:
+-- send() -> emit()
+-- rpc()  -> delegate()
+-- (to be used in RPC server): contract(), listen_to()
+
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function IPC.send( key text, value jsonb, rsvp boolean )
