@@ -69,5 +69,9 @@ create function IPC.rpc( key text, value jsonb ) returns jsonb volatile language
   $$;
 reset role;
 
+-- ---------------------------------------------------------------------------------------------------------
+create function IPC.has_rpc_method( key text ) returns boolean volatile language sql as $$
+  select IPC.rpc( 'has_rpc_method', to_jsonb( key ) )::boolean; $$;
+
 
 

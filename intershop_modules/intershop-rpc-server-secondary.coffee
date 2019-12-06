@@ -250,7 +250,10 @@ process_is_managed        = module is require.main
 #===========================================================================================================
 # RPC METHODS
 #-----------------------------------------------------------------------------------------------------------
-# { IDL, IDLX, }            = require 'mojikura-idl'
+@rpc_has_rpc_method = ( S, P ) ->
+  ### TAINT don't do ad-hoc name mangling, use dedicated namespace ###
+  validate.nonempty_text P
+  return @[ "rpc_#{P}" ]?
 
 #-----------------------------------------------------------------------------------------------------------
 @rpc_helo = ( S, P ) ->
