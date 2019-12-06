@@ -40,6 +40,16 @@ def _read_line():
   return _cache[ 'SIGNALS.client_socket_rfile' ].readline().strip()
 
 #-----------------------------------------------------------------------------------------------------------
+def server_is_online():
+  """Return `True` iff RPC server is reachable, `False` otherwise."""
+  try:
+    _prepare()
+    _cache[ 'SIGNALS.client_socket' ].send( str.encode( '{"$key":"~ping","$value":null}\n' ) )
+  except ConnectionRefusedError as e:
+    return False
+  return True
+
+#-----------------------------------------------------------------------------------------------------------
 def rpc( method, parameters ):
   _write_line( _JSON.dumps( { '$key': method, '$value': parameters, '$rsvp': True, } ) )
   rsp       = _JSON.loads( _read_line() )

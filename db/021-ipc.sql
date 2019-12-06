@@ -34,6 +34,18 @@ create schema IPC;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
+create function IPC.server_is_online() returns boolean volatile language plpython3u as $$
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  return ctx.ipc.server_is_online()
+  $$;
+
+comment on function IPC.server_is_online() is 'Return `true` iff RPC server is reachable, `false`
+otherwise.';
+reset role;
+
+
+-- ---------------------------------------------------------------------------------------------------------
+set role dba;
 create function IPC.send( key text, value jsonb, rsvp boolean )
   returns void volatile language plpython3u as $$
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
