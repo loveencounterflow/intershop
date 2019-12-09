@@ -130,7 +130,7 @@ create view CATALOG._functions as (
   where true
     and schema not in ( 'information_schema' )
     and schema !~ '^pg_'
-    and schema !~ '^_'
+    -- and schema !~ '^_'
   );
 
 -- ---------------------------------------------------------------------------------------------------------
