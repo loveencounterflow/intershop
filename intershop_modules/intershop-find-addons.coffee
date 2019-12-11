@@ -107,9 +107,9 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 ############################################################################################################
 if module is require.main then do =>
   for addon_id, addon of @find_addons()
-    urge    "Addon: #{addon_id}"
-    whisper "  path: #{addon.module.path}"
-    info    "  files:"
+    echo  CND.grey  ""
+    echo  CND.white "Addon: #{addon_id}"
+    echo  CND.grey  "  #{addon.module.path}"
     for file_id, file of addon.ipj.targets
       { target, relpath, } = file
       color = switch target
@@ -119,5 +119,6 @@ if module is require.main then do =>
         when 'rebuild'  then CND.red
         else CND.grey
       target = ( ( target + ' ' ).padEnd 10, '—' ) + '>'
-      help "    #{color target} #{CND.lime relpath}"
+      echo "  #{color target} #{CND.lime relpath}"
+    echo  CND.grey  ""
 
