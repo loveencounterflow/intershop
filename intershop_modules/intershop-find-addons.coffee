@@ -107,7 +107,7 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 ############################################################################################################
 if module is require.main then do =>
   for addon_id, addon of @find_addons()
-    echo  CND.grey  ""
+    echo()
     echo  CND.white "Addon: #{addon_id}"
     echo  CND.grey  "  #{addon.module.path}"
     for file_id, file of addon.ipj.targets
@@ -120,5 +120,7 @@ if module is require.main then do =>
         else CND.grey
       target = ( ( target + ' ' ).padEnd 10, '—' ) + '>'
       echo "  #{color target} #{CND.lime relpath}"
-    echo  CND.grey  ""
+    echo()
+  # debug @find_addons()
+
 

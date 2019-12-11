@@ -7,7 +7,7 @@ function append_buildfiles_from_path () {
   shopt -s extglob
   for sql_buildfile_path in $( ls "$1"/@([0-9][0-9][0-9])-* | sort ); do
     sql_buildfile_type=$(get_type_of_buildfile "$sql_buildfile_path")
-    echo 'echo -e $yellow$reverse'  '$reset$yellow '"$sql_buildfile_path"'$reset' >> "$intershop_sql_buildscript_path"
+    echo 'echo -e $yellow$reverse'  '$reset$yellow '"'""$sql_buildfile_path""'"'$reset' >> "$intershop_sql_buildscript_path"
     #.......................................................................................................
     case $sql_buildfile_type in
       #.....................................................................................................
@@ -33,7 +33,7 @@ function append_buildfiles_from_path () {
         exit 1
         ;;
       esac
-    done; }
+      done; }
 
 
 #===========================================================================================================
@@ -62,5 +62,5 @@ echo "adding host SQL files from $intershop_host_sql_path"
 append_buildfiles_from_path "$intershop_host_sql_path"
 
 
-
+node "$intershop_guest_modules_path/intershop-write-addons-buildscript.js" >> "$intershop_sql_buildscript_path"
 
