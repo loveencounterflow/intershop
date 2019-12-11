@@ -331,6 +331,24 @@ comment on function U.is_strict_subarray( anyarray, anyarray ) is 'Returns wheth
   array given is both longer than the first and starts with the same elements as the first.';
 
 -- ---------------------------------------------------------------------------------------------------------
+create or replace function U.array_regex_position( ¶texts text[], ¶regex text )
+  returns bigint immutable parallel safe language sql as $$
+    select nr from unnest( ¶texts ) with ordinality x ( d, nr )
+    where d ~ ¶regex order by nr limit 1; $$;
+
+comment on function U.array_regex_position( text[], text ) is 'Postgres has `array_position( a, v )` to
+locate the first occurrence of a value `v` in an array `a`; `U.array_regex_position( a text[], pattern text
+)` does the same, but returns the first index of array `a` that matches the regular expression `pattern`.';
+
+-- ---------------------------------------------------------------------------------------------------------
+create or replace function U.any_matches( ¶texts text[], ¶regex text )
+  returns boolean immutable parallel safe language sql as $$
+    select U.array_regex_position( ¶texts, ¶regex ) is not null; $$;
+
+comment on function U.any_matches( text[], text ) is 'Same as `U.array_regex_position( a text[], pattern
+text )` but just returns whether `pattern` matches any element of `a`.';
+
+-- ---------------------------------------------------------------------------------------------------------
 create function U.sets_are_equal( anyarray, anyarray )
   returns boolean immutable strict parallel safe language sql as $$
   select $1 <@ $2 and $1 @> $2; $$;
