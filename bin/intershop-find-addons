@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# echo 'intershop_host_bin_path           ' "$intershop_host_bin_path"
+# echo 'intershop_host_configuration_path ' "$intershop_host_configuration_path"
+# echo 'intershop_host_modules_path       ' "$intershop_host_modules_path"
+# echo 'intershop_host_name               ' "$intershop_host_name"
+# echo 'intershop_host_path               ' "$intershop_host_path"
+# echo 'intershop_host_sql_path           ' "$intershop_host_sql_path"
+# echo 'intershop_guest_modules_path      ' "$intershop_guest_modules_path/intershop-find-addons.js"
+node "$intershop_guest_modules_path/intershop-find-addons.js"
+
