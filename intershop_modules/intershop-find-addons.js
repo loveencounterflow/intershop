@@ -144,40 +144,36 @@
   //###########################################################################################################
   if (module === require.main) {
     (() => {
-      var addon, addon_id, color, file, file_id, ref, relpath, results, target;
+      var addon, addon_id, color, file, file_id, ref, ref1, relpath, results, target;
       ref = this.find_addons();
       results = [];
       for (addon_id in ref) {
         addon = ref[addon_id];
-        urge(`Addon: ${addon_id}`);
-        whisper(`  path: ${addon.module.path}`);
-        info("  files:");
-        results.push((function() {
-          var ref1, results1;
-          ref1 = addon.ipj.targets;
-          results1 = [];
-          for (file_id in ref1) {
-            file = ref1[file_id];
-            ({target, relpath} = file);
-            color = (function() {
-              switch (target) {
-                case 'app':
-                  return CND.green;
-                case 'ignore':
-                  return CND.grey;
-                case 'support':
-                  return CND.gold;
-                case 'rebuild':
-                  return CND.red;
-                default:
-                  return CND.grey;
-              }
-            })();
-            target = ((target + ' ').padEnd(10, '—')) + '>';
-            results1.push(help(`    ${color(target)} ${CND.lime(relpath)}`));
-          }
-          return results1;
-        })());
+        echo(CND.grey(""));
+        echo(CND.white(`Addon: ${addon_id}`));
+        echo(CND.grey(`  ${addon.module.path}`));
+        ref1 = addon.ipj.targets;
+        for (file_id in ref1) {
+          file = ref1[file_id];
+          ({target, relpath} = file);
+          color = (function() {
+            switch (target) {
+              case 'app':
+                return CND.green;
+              case 'ignore':
+                return CND.grey;
+              case 'support':
+                return CND.gold;
+              case 'rebuild':
+                return CND.red;
+              default:
+                return CND.grey;
+            }
+          })();
+          target = ((target + ' ').padEnd(10, '—')) + '>';
+          echo(`  ${color(target)} ${CND.lime(relpath)}`);
+        }
+        results.push(echo(CND.grey("")));
       }
       return results;
     })();
