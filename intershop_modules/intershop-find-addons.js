@@ -149,7 +149,7 @@
       results = [];
       for (addon_id in ref) {
         addon = ref[addon_id];
-        echo(CND.grey(""));
+        echo();
         echo(CND.white(`Addon: ${addon_id}`));
         echo(CND.grey(`  ${addon.module.path}`));
         ref1 = addon.ipj.targets;
@@ -173,10 +173,12 @@
           target = ((target + ' ').padEnd(10, '—')) + '>';
           echo(`  ${color(target)} ${CND.lime(relpath)}`);
         }
-        results.push(echo(CND.grey("")));
+        results.push(echo());
       }
       return results;
     })();
   }
+
+  // debug @find_addons()
 
 }).call(this);
