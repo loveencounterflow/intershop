@@ -16,7 +16,6 @@ help                      = CND.get_logger 'help',      badge
 urge                      = CND.get_logger 'urge',      badge
 whisper                   = CND.get_logger 'whisper',   badge
 echo                      = CND.echo.bind CND
-require 'cnd/lib/exception-handler'
 #...........................................................................................................
 # ### TAINT due to the way that intershop determines the locations of `intershop.ptv` configuration files,
 # we have to intermittently `cd` to the app directory: ###
