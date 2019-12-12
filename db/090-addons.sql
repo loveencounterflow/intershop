@@ -18,7 +18,7 @@ create schema ADDONS;
 -- ---------------------------------------------------------------------------------------------------------
 -- ### NOTE this is a very restrictive definition of what addon names may look like, but we can always
 -- relax the constraints later on: ###
-create domain ADDONS._name as text check ( value ~ '^[a-z]+$' );
+create domain ADDONS._aoid as text check ( value ~ '^[-_a-z0-9/]+$' );
 create domain ADDONS._path as text check ( value ~ '.+' );
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -34,16 +34,17 @@ insert into ADDONS.targets values
 
 -- ---------------------------------------------------------------------------------------------------------
 create table ADDONS.addons (
-  aoid    ADDONS._name unique not null primary key,
+  aoid    ADDONS._aoid unique not null primary key,
   path    text unique not null,
   relpath text unique not null );
 
 -- ---------------------------------------------------------------------------------------------------------
 create table ADDONS.files (
-  aoid     ADDONS._name not null primary key references ADDONS.addons ( aoid ),
+  aoid     ADDONS._aoid not null references ADDONS.addons ( aoid ),
   target  text not null references ADDONS.targets ( target ),
-  path    text unique not null,
-  relpath text unique not null );
+  path    text not null,
+  relpath text not null,
+  primary key ( aoid, path ) );
 
 
 /* ###################################################################################################### */
