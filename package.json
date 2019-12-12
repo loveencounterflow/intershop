@@ -37,8 +37,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "bash": "0.0.1",
-    "cnd": "^4.7.3",
+    "cnd": "^4.9.0",
     "coffeescript": "^2.4.1",
     "datom": "^2.4.0",
     "intertype": "^2.8.0",
@@ -48,6 +47,8 @@
     "resolve-from": "^5.0.0",
     "resolve-pkg": "^2.0.0",
     "respawn": "^2.6.0",
+    "squel": "^5.13.0",
+    "stackman": "^4.0.0",
     "steampipes": "^3.2.0"
   },
   "devDependencies": {
