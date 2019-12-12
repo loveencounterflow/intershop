@@ -151,11 +151,10 @@
   //###########################################################################################################
   if (module === require.main) {
     (() => {
-      var addon, addons, color, file, file_id, i, len, ref, ref1, relpath, results, target;
+      var addon, addons, color, file, file_id, i, len, ref, ref1, relpath, target;
       addons = this.find_addons();
       info('^10888^', addons);
       ref = addons.addons;
-      results = [];
       for (i = 0, len = ref.length; i < len; i++) {
         addon = ref[i];
         echo();
@@ -182,9 +181,9 @@
           target = ((target + ' ').padEnd(10, '—')) + '>';
           echo(`  ${color(target)} ${CND.lime(relpath)}`);
         }
-        results.push(echo());
+        echo();
       }
-      return results;
+      throw new Error('^8887^');
     })();
   }
 
