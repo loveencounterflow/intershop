@@ -52,24 +52,24 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this.validate_ipj_targets = function(addon) {
-    var abspath, path, ref, relpath, target, type;
+    var file_id, path, ref, relpath, target, type;
     //.........................................................................................................
-    if ((type = type_of(addon.targets)) !== 'object') {
+    if ((type = type_of(addon.files)) !== 'object') {
       throw new Error(`^intershop/find-addons@478^ expected ${addon.ipj.relpath}#targets to be an object, found ${type}`);
     }
     //.........................................................................................................
-    if (isa.empty(Object.keys(addon.targets))) {
+    if (isa.empty(Object.keys(addon.files))) {
       throw new Error(`^intershop/find-addons@478^ ${addon.ipj.relpath}#targets has no keys`);
     }
-    ref = addon.targets;
+    ref = addon.files;
     //.........................................................................................................
-    for (path in ref) {
-      ({abspath, relpath, target} = ref[path]);
-      if (is_sad(check.is_file(abspath))) {
-        throw new Error(`^intershop/find-addons@478^\nfile ${rpr(abspath)}\nreferred to in targets[ ${rpr(path)} ]\nof ${addon.ipj.relpath}\ndoes not exist`);
+    for (file_id in ref) {
+      ({path, relpath, target} = ref[file_id]);
+      if (is_sad(check.is_file(path))) {
+        throw new Error(`^intershop/find-addons@478^\nfile ${rpr(path)}\nreferred to in targets[ ${rpr(file_id)} ]\nof ${addon.ipj.relpath}\ndoes not exist`);
       }
       if (!isa.ishop_addon_target(target)) {
-        throw new Error(`^intershop/find-addons@478^ unknown target ${rpr(target)} in ${addon.ipj.relpath}#targets[ ${rpr(path)} ]`);
+        throw new Error(`^intershop/find-addons@478^ unknown target ${rpr(target)} in ${addon.ipj.relpath}#targets[ ${rpr(file_id)} ]`);
       }
     }
     //.........................................................................................................
@@ -78,7 +78,7 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this.find_addons = function() {
-    var R, abspath, addon, addons, aoid, error, ipj, package_json, path, ref, relpath, target, type, version;
+    var R, addon, addons, aoid, error, file_id, ipj, package_json, path, ref, relpath, target, type, version;
     validate.nonempty_text(process.env.intershop_host_path);
     validate.nonempty_text(process.env.intershop_tmp_path);
     addons = [];
@@ -132,13 +132,13 @@
       }
       //.......................................................................................................
       addon.ipj.version = ipj['intershop-package-version'];
-      addon.targets = {};
-      ref = ipj.targets;
-      for (path in ref) {
-        target = ref[path];
-        abspath = PATH.resolve(PATH.join(addon.path, path));
-        relpath = PATH.relative(process.cwd(), abspath);
-        addon.targets[path] = {abspath, relpath, target};
+      addon.files = {};
+      ref = ipj.files;
+      for (file_id in ref) {
+        target = ref[file_id];
+        path = PATH.resolve(PATH.join(addon.path, file_id));
+        relpath = PATH.relative(process.cwd(), path);
+        addon.files[file_id] = {path, relpath, target};
       }
       //.......................................................................................................
       this.validate_ipj_targets(addon);
@@ -151,16 +151,17 @@
   //###########################################################################################################
   if (module === require.main) {
     (() => {
-      var addon, addons, color, file, file_id, i, len, ref, ref1, relpath, target;
+      var addon, addons, color, file, file_id, i, len, ref, ref1, relpath, results, target;
       addons = this.find_addons();
       info('^10888^', addons);
       ref = addons.addons;
+      results = [];
       for (i = 0, len = ref.length; i < len; i++) {
         addon = ref[i];
         echo();
         echo(CND.white(`Addon: ${addon.aoid}`));
         echo(CND.grey(`  ${addon.path}`));
-        ref1 = addon.targets;
+        ref1 = addon.files;
         for (file_id in ref1) {
           file = ref1[file_id];
           ({target, relpath} = file);
@@ -181,9 +182,9 @@
           target = ((target + ' ').padEnd(10, '—')) + '>';
           echo(`  ${color(target)} ${CND.lime(relpath)}`);
         }
-        echo();
+        results.push(echo());
       }
-      throw new Error('^8887^');
+      return results;
     })();
   }
 
