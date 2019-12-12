@@ -40,21 +40,21 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 #-----------------------------------------------------------------------------------------------------------
 @validate_ipj_targets = ( addon ) ->
   #.........................................................................................................
-  unless ( type = type_of addon.targets ) is 'object' then throw new Error \
+  unless ( type = type_of addon.files ) is 'object' then throw new Error \
     "^intershop/find-addons@478^ expected #{addon.ipj.relpath}#targets to be an object, found #{type}"
   #.........................................................................................................
-  if ( isa.empty Object.keys addon.targets ) then throw new Error \
+  if ( isa.empty Object.keys addon.files ) then throw new Error \
     "^intershop/find-addons@478^ #{addon.ipj.relpath}#targets has no keys"
   #.........................................................................................................
-  for path, { abspath, relpath, target, } of addon.targets
-    if is_sad check.is_file abspath
+  for file_id, { path, relpath, target, } of addon.files
+    if is_sad check.is_file path
       throw new Error """^intershop/find-addons@478^
-      file #{rpr abspath}
-      referred to in targets[ #{rpr path} ]
+      file #{rpr path}
+      referred to in targets[ #{rpr file_id} ]
       of #{addon.ipj.relpath}
       does not exist"""
     unless isa.ishop_addon_target target then throw new Error \
-      "^intershop/find-addons@478^ unknown target #{rpr target} in #{addon.ipj.relpath}#targets[ #{rpr path} ]"
+      "^intershop/find-addons@478^ unknown target #{rpr target} in #{addon.ipj.relpath}#targets[ #{rpr file_id} ]"
   #.........................................................................................................
   return true
 
@@ -98,11 +98,11 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
       "^intershop/find-addons@478^ expected InterShop Package version 1.0.0, found #{ipj.version} in #{addon.ipj.relpath}#version to be a text, found #{type}"
     #.......................................................................................................
     addon.ipj.version = ipj[ 'intershop-package-version' ]
-    addon.targets     = {}
-    for path, target of ipj.targets
-      abspath                       = PATH.resolve PATH.join addon.path, path
-      relpath                       = PATH.relative process.cwd(), abspath
-      addon.targets[ path ]     = { abspath, relpath, target, }
+    addon.files     = {}
+    for file_id, target of ipj.files
+      path                          = PATH.resolve PATH.join addon.path, file_id
+      relpath                       = PATH.relative process.cwd(), path
+      addon.files[ file_id ]        = { path, relpath, target, }
     #.......................................................................................................
     @validate_ipj_targets addon
     addons.push addon
@@ -118,7 +118,7 @@ if module is require.main then do =>
     echo()
     echo  CND.white "Addon: #{addon.aoid}"
     echo  CND.grey  "  #{addon.path}"
-    for file_id, file of addon.targets
+    for file_id, file of addon.files
       { target, relpath, } = file
       color = switch target
         when 'app'      then CND.green
