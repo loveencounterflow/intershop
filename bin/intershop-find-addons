@@ -8,5 +8,5 @@ set -euo pipefail
 # echo 'intershop_host_path               ' "$intershop_host_path"
 # echo 'intershop_host_sql_path           ' "$intershop_host_sql_path"
 # echo 'intershop_guest_modules_path      ' "$intershop_guest_modules_path/intershop-find-addons.js"
-node "$intershop_guest_modules_path/intershop-find-addons.js"
+"$intershop_guest_bin_path/intershop-nodexh" "$intershop_guest_modules_path/intershop-find-addons.js"
 
