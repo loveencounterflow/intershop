@@ -55,6 +55,14 @@ if [[ $intershop_role == 'guest' ]]; then
   append_buildfiles_from_path "$intershop_guest_sql_path"
   fi
 
+
+#===========================================================================================================
+# ACQUIRE ADDONS
+#-----------------------------------------------------------------------------------------------------------
+node "$intershop_guest_modules_path/intershop-write-addons-buildscript.js" >> "$intershop_sql_buildscript_path"
+echo -e "$red" '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!' $?
+exit 1
+
 #===========================================================================================================
 # ADD HOST SQL BUILDSCRIPT LINES
 #-----------------------------------------------------------------------------------------------------------
@@ -62,5 +70,4 @@ echo "adding host SQL files from $intershop_host_sql_path"
 append_buildfiles_from_path "$intershop_host_sql_path"
 
 
-node "$intershop_guest_modules_path/intershop-write-addons-buildscript.js" >> "$intershop_sql_buildscript_path"
 

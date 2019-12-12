@@ -19,7 +19,6 @@ echo                      = CND.echo.bind CND
 PATH                      = require 'path'
 FS                        = require 'fs'
 resolve_pkg               = require 'resolve-pkg'
-package_json              = require PATH.resolve PATH.join process.env.intershop_host_path, 'package.json'
 #...........................................................................................................
 types                     = new ( require 'intertype' ).Intertype()
 { isa
@@ -30,9 +29,10 @@ types                     = new ( require 'intertype' ).Intertype()
   declare_check
   is_sad
   type_of }               = types.export()
+DATOM                     = require 'datom'
+{ new_datom }             = DATOM.export()
 #...........................................................................................................
 { jr }                    = CND
-require 'cnd/lib/exception-handler'
 
 #-----------------------------------------------------------------------------------------------------------
 declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebuild', ]
@@ -40,13 +40,13 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 #-----------------------------------------------------------------------------------------------------------
 @validate_ipj_targets = ( addon ) ->
   #.........................................................................................................
-  unless ( type = type_of addon.ipj.targets ) is 'object' then throw new Error \
+  unless ( type = type_of addon.targets ) is 'object' then throw new Error \
     "^intershop/find-addons@478^ expected #{addon.ipj.relpath}#targets to be an object, found #{type}"
   #.........................................................................................................
-  if ( isa.empty Object.keys addon.ipj.targets ) then throw new Error \
+  if ( isa.empty Object.keys addon.targets ) then throw new Error \
     "^intershop/find-addons@478^ #{addon.ipj.relpath}#targets has no keys"
   #.........................................................................................................
-  for path, { abspath, relpath, target, } of addon.ipj.targets
+  for path, { abspath, relpath, target, } of addon.targets
     if is_sad check.is_file abspath
       throw new Error """^intershop/find-addons@478^
       file #{rpr abspath}
@@ -60,21 +60,27 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 
 #-----------------------------------------------------------------------------------------------------------
 @find_addons = ->
-  R = {}
-  for id of package_json.dependencies
-    continue unless id.startsWith 'intershop-'
+  validate.nonempty_text process.env.intershop_host_path
+  validate.nonempty_text process.env.intershop_tmp_path
+  addons              = []
+  R                   = { addons, }
+  R.populate_sql_path = PATH.join process.env.intershop_tmp_path, 'populate-addons-table.sql'
+  R.host_path         = process.env.intershop_host_path
+  package_json        = require PATH.join R.host_path, 'package.json'
+  #.........................................................................................................
+  for aoid of package_json.dependencies
+    continue unless aoid.startsWith 'intershop-'
     #.......................................................................................................
-    addon             = { id, }
-    addon.module      = { path: ( resolve_pkg id ), }
+    addon             = { aoid, path: ( resolve_pkg aoid ), }
     #.......................................................................................................
-    unless addon.module.path?
-      warn "^intershop/find-addons@478^ unable to locate #{id}; skipping"
+    unless addon.path?
+      warn "^intershop/find-addons@478^ unable to locate #{aoid}; skipping"
       continue
-    addon.module.relpath  = PATH.relative process.cwd(), addon.module.path
+    addon.relpath         = PATH.relative process.cwd(), addon.path
     #.......................................................................................................
     ### `ipj`: Intershop Package Json ###
     addon.ipj             = {}
-    addon.ipj.path        = PATH.join addon.module.path, 'intershop-package.json'
+    addon.ipj.path        = PATH.join addon.path, 'intershop-package.json'
     addon.ipj.relpath     = PATH.relative process.cwd(), addon.ipj.path
     #.......................................................................................................
     try ipj = require addon.ipj.path catch error
@@ -92,25 +98,27 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
       "^intershop/find-addons@478^ expected InterShop Package version 1.0.0, found #{ipj.version} in #{addon.ipj.relpath}#version to be a text, found #{type}"
     #.......................................................................................................
     addon.ipj.version = ipj[ 'intershop-package-version' ]
-    addon.ipj.targets = {}
+    addon.targets     = {}
     for path, target of ipj.targets
-      abspath                       = PATH.resolve PATH.join addon.module.path, path
+      abspath                       = PATH.resolve PATH.join addon.path, path
       relpath                       = PATH.relative process.cwd(), abspath
-      addon.ipj.targets[ path ]     = { abspath, relpath, target, }
+      addon.targets[ path ]     = { abspath, relpath, target, }
     #.......................................................................................................
     @validate_ipj_targets addon
-    R[ addon.id ] = addon
+    addons.push addon
   #.........................................................................................................
-  return R
+  return new_datom '^intershop-addons', R
 
 
 ############################################################################################################
 if module is require.main then do =>
-  for addon_id, addon of @find_addons()
+  addons = @find_addons()
+  info '^10888^', addons
+  for addon in addons.addons
     echo()
-    echo  CND.white "Addon: #{addon_id}"
-    echo  CND.grey  "  #{addon.module.path}"
-    for file_id, file of addon.ipj.targets
+    echo  CND.white "Addon: #{addon.aoid}"
+    echo  CND.grey  "  #{addon.path}"
+    for file_id, file of addon.targets
       { target, relpath, } = file
       color = switch target
         when 'app'      then CND.green
