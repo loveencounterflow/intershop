@@ -62,8 +62,6 @@ if [[ $intershop_role == 'guest' ]]; then
 "$intershop_guest_bin_path/intershop-nodexh" \
   "$intershop_guest_modules_path/intershop-write-addons-buildscript.js" \
   >> "$intershop_sql_buildscript_path"
-echo -e "$red" '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!' $?
-exit 1
 
 #===========================================================================================================
 # ADD HOST SQL BUILDSCRIPT LINES
