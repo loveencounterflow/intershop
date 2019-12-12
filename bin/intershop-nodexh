@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ~/jzr/cnd/bin/nodexh "$@"
+set -euo pipefail
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+node --require "$intershop_guest_modules_path/exception-handler.js" -p 'xxx'
+
+
+
+
