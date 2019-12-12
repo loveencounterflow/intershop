@@ -113,7 +113,6 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 ############################################################################################################
 if module is require.main then do =>
   addons = @find_addons()
-  info '^10888^', addons
   for addon in addons.addons
     echo()
     echo  CND.white "Addon: #{addon.aoid}"
