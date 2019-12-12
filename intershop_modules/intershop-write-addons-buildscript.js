@@ -43,8 +43,6 @@
 
   squel = (require('squel')).useFlavour('postgres');
 
-  // require 'cnd/lib/exception-handler'
-
   //-----------------------------------------------------------------------------------------------------------
   this.as_line = function(sql) {
     return sql.toString() + ';';

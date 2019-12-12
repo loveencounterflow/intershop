@@ -30,8 +30,6 @@
   respawn = require('respawn');
 
   //...........................................................................................................
-  require('cnd/lib/exception-handler');
-
   O = require('./options');
 
   monitor = respawn(O.respawn);
