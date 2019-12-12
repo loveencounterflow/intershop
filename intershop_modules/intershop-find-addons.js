@@ -153,7 +153,6 @@
     (() => {
       var addon, addons, color, file, file_id, i, len, ref, ref1, relpath, results, target;
       addons = this.find_addons();
-      info('^10888^', addons);
       ref = addons.addons;
       results = [];
       for (i = 0, len = ref.length; i < len; i++) {
