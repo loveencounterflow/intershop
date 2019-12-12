@@ -14,11 +14,19 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
 - [Installation](#installation)
   - [Dependencies](#dependencies)
     - [Postgres](#postgres)
+      - [Configure Postgres](#configure-postgres)
+      - [Find Configuration File Locations](#find-configuration-file-locations)
       - [Statement-Level Statistics](#statement-level-statistics)
     - [Peru](#peru)
     - [Python](#python)
   - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
     - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
+- [InterShop Commands](#intershop-commands)
+  - [`intershop node` and `intershop nodexh`](#intershop-node-and-intershop-nodexh)
+  - [`intershop psql`](#intershop-psql)
+  - [`intershop rebuild`](#intershop-rebuild)
+- [InterShop AddOns](#intershop-addons)
+  - [Format of `intershop-package.json`](#format-of-intershop-packagejson)
     - [Running Tests](#running-tests)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
@@ -284,6 +292,58 @@ do $$ begin
     create function ...;
     end if;
   $$
+```
+
+# InterShop Commands
+
+## `intershop node` and `intershop nodexh`
+## `intershop psql`
+## `intershop rebuild`
+
+# InterShop AddOns
+
+* first example of this: [InterShop RPC](https://github.com/loveencounterflow/intershop-rpc), a package to
+  enable Inter-Process Communication (IPC), including Remote Procedure Calls (RPCs) to be executed by NodeJS
+* generally, a way to extend functionalities of the DB
+* may consist of
+  * `*.sql` files containing table definitions and so on that should be read during DB rebuilds
+  * `*.py` files that are visible to the plPython3u subsystem
+  * `*.js` files to be run by NodeJS
+  * other files to be ignored by the ISAO subsystem
+
+## Format of `intershop-package.json`
+
+* decribes what to do with the files in the package
+* outermost values must be a JSON object
+* with one entry `intershop-package-version` that specifies the version of the format itself; must currently
+  be `1.0.0`
+* another entry `"targets": {...}` that describes how to treat the source files
+* `targets` maps from filenames (relative to package root) to purposes
+* purpose may be either one of
+  * `"ignore"`—do nothing; used e.g. for source files that have to be transpiled. This is the default and
+    may be left out
+  * `"app"`—intended for the InterShop host application; as far as InterShop is concerned, equivalent to
+    `"ignore"`
+  * `"support"`—will be imported by the InterShop `plpython3u` subsystem ('support' meaning 'supporting
+    plPython3u library')
+  * `"rebuild"`—to be executed when the DB is rebuilt from scratch with the `intershop rebuild` command
+<!--   * `"redo"`—to be executed when part of the DB is redone with the `intershop redo` command (pending
+    official implementation of this feature) -->
+<!-- * or a list with a number of choices; currently only `["rebuild","redo"]` (in either order) is allowed -->
+* `intershop-package.json` files that do not meet the above criteria will cause an error
+
+Example:
+
+```json
+{
+  "intershop-package-version": "1.0.0",
+  "files": {
+    "ipc.sql":                                "rebuild",
+    "intershop-rpc-server-secondary.js":      "app",
+    "intershop-rpc-server-secondary.coffee":  "ignore",
+    "ipc.py":                                 "support"
+  }
+}
 ```
 
 
