@@ -22,9 +22,11 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
   - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
     - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
 - [InterShop Commands](#intershop-commands)
-  - [`intershop node` and `intershop nodexh`](#intershop-node-and-intershop-nodexh)
-  - [`intershop psql`](#intershop-psql)
-  - [`intershop rebuild`](#intershop-rebuild)
+  - [Built-In Commands](#built-in-commands)
+    - [`intershop node` and `intershop nodexh`](#intershop-node-and-intershop-nodexh)
+    - [`intershop psql`](#intershop-psql)
+    - [`intershop rebuild`](#intershop-rebuild)
+  - [User-Defined Commands](#user-defined-commands)
 - [InterShop AddOns](#intershop-addons)
   - [Format of `intershop-package.json`](#format-of-intershop-packagejson)
     - [Running Tests](#running-tests)
@@ -296,9 +298,13 @@ do $$ begin
 
 # InterShop Commands
 
-## `intershop node` and `intershop nodexh`
-## `intershop psql`
-## `intershop rebuild`
+## Built-In Commands
+
+### `intershop node` and `intershop nodexh`
+### `intershop psql`
+### `intershop rebuild`
+
+## User-Defined Commands
 
 # InterShop AddOns
 
