@@ -90,10 +90,6 @@
   TAP.test("matching", function(T) {
     var i, j, len, len1, path, pattern, probe, ref, ref1, type, value;
     probe = {
-      'intershop/rpc/respawn/fork': {
-        type: 'boolean',
-        value: 'true'
-      },
       'intershop/path': {
         type: 'text/path/folder',
         value: '/path/to/foobar'

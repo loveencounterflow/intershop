@@ -66,10 +66,10 @@ create function U.py_init() returns void language plpython3u as $$
       rows  = plpy.execute( plan )
       for row in rows:
         ctx[ row[ 'key' ] ] = row[ 'value' ]
-      ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
-      ### TAINT for the moment we manually cast some values:
-      ctx.intershop_rpc_port = int( ctx.intershop_rpc_port )
-      ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+      # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+      # ### TAINT for the moment we manually cast some values:
+      # ctx.intershop_rpc_port = int( ctx.intershop_rpc_port )
+      # ### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
     #.......................................................................................................
     ### TAINT some variables will have wrong type (stringly typed enviroment variables) ###
     _absorb_environment( ctx )
@@ -126,21 +126,21 @@ create function log() returns void language sql as $$ select log( '' ); $$;
 do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 */
 
--- ---------------------------------------------------------------------------------------------------------
-set role dba;
-create function U._benchmark_rpc() returns void language plpython3u as $$
-  import time
-  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
-  n = 10000
-  t0 = time.time()
-  for i in range( 0, n ):
-    R = ctx.ipc.rpc( 'add', [ 42, i, ] )
-    # ctx.log( '!!!!!!!!!!!', R )
-  t1  = time.time()
-  dt  = t1 - t0
-  ctx.log( '29091', 'n', n, 'dt', dt )
-  $$;
-reset role;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- set role dba;
+-- create function U._benchmark_rpc() returns void language plpython3u as $$
+--   import time
+--   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+--   n = 10000
+--   t0 = time.time()
+--   for i in range( 0, n ):
+--     R = ctx.ipc.rpc( 'add', [ 42, i, ] )
+--     # ctx.log( '!!!!!!!!!!!', R )
+--   t1  = time.time()
+--   dt  = t1 - t0
+--   ctx.log( '29091', 'n', n, 'dt', dt )
+--   $$;
+-- reset role;
 
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
@@ -157,7 +157,7 @@ create function U._test_py_init() returns void language plpython3u as $$
   #   # if key.startswith( '_' ): continue
   #   ctx.log( 'ctx.ipc.' + key )
   for i in range( 0, 3 ):
-    ctx.log( '87321', 'RPC result:', repr( ctx.ipc.rpc( 'add', [ 42, i, ] ) ) )
+    ctx.log( '87321', 'logging:', repr( i ) )
   $$;
 reset role;
 
@@ -166,7 +166,6 @@ reset role;
 
 -- select * from U.variables where key ~ 'intershop' order by key;
 do $$ begin perform U._test_py_init(); end; $$;
--- do $$ begin perform U._benchmark_rpc(); end; $$;
 do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit

@@ -48,7 +48,6 @@ TAP.test "line splitting", ( T ) ->
 #-----------------------------------------------------------------------------------------------------------
 TAP.test "matching", ( T ) ->
   probe = {
-    'intershop/rpc/respawn/fork':  { type: 'boolean',          value: 'true',                       },
     'intershop/path':              { type: 'text/path/folder', value: '/path/to/foobar',            },
     'intershop/rack/path':         { type: 'text/path/folder', value: '/path/to/foobar/..',         },
     'intershop/jzrds':             { type: 'text',             value: 'whtever1',   },

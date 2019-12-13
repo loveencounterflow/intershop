@@ -109,7 +109,7 @@ select _VAR_.¶resolve( '${intershop/db/port}\${intershop/db/user}' );
 
 select format( 'welcome to %s (not %%sLemuria!!!', 'intershop/db/name' );
 select _VAR_.¶format( 'welcome to %s (not %%sLemuria)!!!', 'intershop/db/name' );
-select _VAR_.¶format( 'connecting to %s:%s', 'intershop/rpc/host', 'intershop/rpc/port' );
+-- select _VAR_.¶format( 'connecting to %s:%s', 'intershop/rpc/host', 'intershop/rpc/port' );
 -- select format( '${intershop/db/port}' );
 -- select format( '${intershop/db/port}${intershop/db/user}' );
 -- select format( '${intershop/db/port}\${intershop/db/user}' );

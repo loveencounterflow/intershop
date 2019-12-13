@@ -224,8 +224,6 @@ intershop/host/name                             ::text=               myapp
 intershop/db/port                               ::integer=            5432
 intershop/db/name                               ::text=               ${intershop/host/name}
 intershop/db/user                               ::text=               ${intershop/host/name}
-intershop/rpc/port                              ::integer=            23001
-intershop/rpc/host                              ::text/ip-address=    127.0.0.1
 ```
 
 You are now ready to start installation: `peru sync` will pull the latest InterShop sources; `rake
