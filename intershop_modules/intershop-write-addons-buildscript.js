@@ -97,6 +97,20 @@
   };
 
   //-----------------------------------------------------------------------------------------------------------
+  this.write_summary = function(addons) {
+    var bin_path, mod_path;
+    validate.object(addons);
+    validate.nonempty_text(bin_path = process.env.intershop_guest_bin_path);
+    validate.nonempty_text(mod_path = process.env.intershop_guest_modules_path);
+    echo();
+    echo(`${bin_path}/intershop-nodexh ${mod_path}/intershop-find-addons.js`);
+    echo("echo -e \"$steel$reverse\" 'ADDONS.files' \"$reset\"");
+    echo("postgres_unpaged -c 'select aoid, target, relpath from ADDONS.files order by aoid, target, relpath;'");
+    echo();
+    return null;
+  };
+
+  //-----------------------------------------------------------------------------------------------------------
   this.write_sql_inserts = function(addons) {
     var addon, file, file_id, i, len, path, ref, ref1, relpath, target, write;
     validate.object(addons);
@@ -136,6 +150,7 @@
     addons = (require('./intershop-find-addons')).find_addons();
     this.write_buildscript(addons);
     this.write_sql_inserts(addons);
+    this.write_summary(addons);
     return null;
   };
 
