@@ -19,7 +19,7 @@ Prepare the data by selecting one or more columns to derive the fingerprint from
 any kind of text input is acceptable. The column to hold the fingerprint must be
 declared as `bit(68)`.
 
-To obtain a random sample of the tbale data, you need a sieve which is a combination
+To obtain a random sample of the table data, you need a sieve which is a combination
 of a bit mask (the 'stencil') and a random collection of bits (the 'pattern'). A
 sieve may be obtained by either calling `SIEVE.new_sieve( n )` where `n` is the
 number of bits to match, or else `SIEVE.new_big_sieve( sample, total )` or
