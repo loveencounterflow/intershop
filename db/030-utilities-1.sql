@@ -415,5 +415,14 @@ comment on function U.choose_coalescent( anyarray, integer[] ) is 'Try to find t
 -- select U.choose_coalescent( array[ null, 1, 2, 3 ]::integer[], '{a,b,c,d}'::text[] );
 -- select U.choose_coalescent( array[ null, 'a', 'b', 'c' ]::text[], '{1,2,3,4}'::integer[] );
 
+-- ---------------------------------------------------------------------------------------------------------
+-- thx to https://stackoverflow.com/a/4565551/7568091
+create function U.random_word( ¶length int ) returns text volatile parallel safe language sql as $$
+  select array_to_string( array( select chr( ( 97 + round( random() * 25 ) ):: integer )
+    from generate_series( 1, ¶length ) ), ''); $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+comment on function U.random_word( integer ) is 'Return a random string of `n` letters chosen from `[a-z]`.';
+
 \quit
 
