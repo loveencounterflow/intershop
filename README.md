@@ -32,6 +32,7 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
     - [Running Tests](#running-tests)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
+  - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -372,3 +373,11 @@ is responsible for handling all read-only linewise file access. Have a look at
 docs](https://github.com/loveencounterflow/intershop/blob/master/documentation/mirage.md)
 and [the
 demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-files-with-mirage.sql).
+
+
+## To Do
+
+* [ ] Remove npm dependency `squel`, replace by other query builder b/c of `npm audit`: `Failure to sanitize
+  quotes which can lead to sql injection`, `Package: squel`, `No patch available`, see
+  https://npmjs.com/advisories/575
+
