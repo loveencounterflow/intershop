@@ -191,6 +191,23 @@ sudo apt update
 sudo apt install peru
 ```
 
+A quick rundown of `peru` commands copied from [the Peru documentation]():
+
+* **`peru sync`**—Pull in your imports. sync yells at you instead of overwriting existing or modified files.
+  Use `--force`/`-f` to tell it you're serious.
+* **`peru clean`**—Remove imported files. Same `--force`/`-f` flag as `sync`.
+* **`peru reup`**—Update module fields with new revision information. For `git`, `hg`, and `svn`, this
+  updates the `rev` field. For `curl`, this sets the `sha1` field. You can optionally give specific module
+  names as arguments.
+* **`peru copy`**—Make a copy of all the files in a module. Either specify a directory to put them in, or
+  peru will create a temp dir for you. You can use this to see modules you don't normally import, or to play
+  with different module/rule combinations (see
+  [Rules](https://github.com/buildinspace/peru/blob/master/README.md#rules)).
+* **`peru override`**—Replace the contents of a module with a local directory path, usually a clone you've
+  made of the same repo. This lets you test changes to imported modules without needing to push your changes
+  upstream or edit peru.yaml.
+
+
 ### Python
 
 ```bash
@@ -403,6 +420,16 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [ ] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
   updating datasources on rebuild; documentation
 * [ ] replace most `bash` files with a sane language (any of JS, ?Ruby?, ?Python?)
-* [ ] replace `rakefile` with other language to get rid of Ruby?
+* [ ] replace `rake`, `rakefile` with other language to get rid of Ruby?
+* [ ] confusingly, `rake --tasks` does not display tasks, but dumps `intershop.ptv` configuration; `rake -P`
+  (`rake ----prereqs`) does list tasks and their prerequisits, neither is not documented, nor are tasks
+  documented. Observe that [Only tasks with descriptions set will appear in `rake
+  -T`](https://stackoverflow.com/a/8713254/7568091)
+* [ ] confusingly, `rake` ≡ `rake default` ≡ `rake update` ≡ `rake peru_update`; ideally there should only
+  be 1 way to do it, so get rid of other 3 ways
+* [ ] replace Peru?
+
+
+
 
 
