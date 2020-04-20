@@ -393,8 +393,21 @@ py.test --tap-files
 
 # The InterShop Dev Cycle
 
+In the normal course of events where one just wants to use InterShop for the benefits it offers, it is
+sufficient to just do either
+
+* `peru reup` to update to the newest version, or
+* `peru sync` to pull in either the newest version (if no current version has been pulled so far) or the
+  current version (that is, make sure)
+
+
 (how to use `peru override`)[https://github.com/buildinspace/peru/issues/187]
 
+In your host app, register an 'override' for your local `intershop` repo with `peru`:
+
+```bash
+peru override add intershop ~/path/to/local/clone/of/intershop
+```
 
 # No More FDWs FTW
 
