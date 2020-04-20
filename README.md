@@ -434,7 +434,8 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [ ] confusingly, `rake` ≡ `rake default` ≡ `rake update` ≡ `rake peru_update`; ideally there should only
   be 1 way to do it, so get rid of other 3 ways
 * [ ] replace Peru?
-
+* [ ] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
+  to local directory
 
 
 
