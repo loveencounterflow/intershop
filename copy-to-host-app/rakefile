@@ -13,8 +13,8 @@ require_relative './intershop/intershop_modules/trm'
 # puts split_ptv_line 'respawn/sleep               unit            1 s'
 options = PTV.hash_from_path './intershop.ptv'
 
-log TRM.green  PTV.options_as_facet_json    options
-log TRM.orange PTV.options_as_untyped_json  options
+# log TRM.green  PTV.options_as_facet_json    options
+# log TRM.orange PTV.options_as_untyped_json  options
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ task :default => :update
 task :update  => :peru_update
 
 #-----------------------------------------------------------------------------------------------------------
+desc "same as `intershop_npm_install`, `intershop_configuration_where_missing`"
 task :peru_sync do
   sh 'peru sync'
   Rake::Task[ 'intershop_npm_install' ].invoke
@@ -29,6 +30,7 @@ task :peru_sync do
   end
 
 #-----------------------------------------------------------------------------------------------------------
+desc "same as `peru reup`, `intershop_npm_install`, `intershop_configuration_where_missing`"
 task :peru_update do
   sh 'peru reup'
   Rake::Task[ 'intershop_npm_install' ].invoke
@@ -36,11 +38,13 @@ task :peru_update do
   end
 
 #-----------------------------------------------------------------------------------------------------------
+desc "install all npm dependencies"
 task :intershop_npm_install do
   sh '( cd intershop && npm install )'
   end
 
 #-----------------------------------------------------------------------------------------------------------
+desc "copy `intershop.ptv`, `peru.yaml`, `rakefile` to host where missing"
 task :intershop_configuration_where_missing do
   copy_if_new './intershop/intershop.ptv',                './intershop.ptv'
   copy_if_new './intershop/copy-to-host-app/peru.yaml',   './peru.yaml'
