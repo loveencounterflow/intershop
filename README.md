@@ -406,6 +406,7 @@ implement some new InterShop features and have them immediately available in the
 inside a local copy of the remote repo, say `~/path/to/local/clone/of/intershop`; however, that would entail
 having to push all changes to the remote prior to updating the local copy, which gets tedious very soon.
 
+
 (how to use `peru override`)[https://github.com/buildinspace/peru/issues/187]
 
 In your host app, register an 'override' for your local `intershop` repo with `peru`:
