@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail; IFS=$'\n\t'
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+node "$intershop_guest_modules_path/refresh-mirage-datasources.js"
+
+
+
