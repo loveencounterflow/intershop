@@ -396,10 +396,15 @@ py.test --tap-files
 In the normal course of events where one just wants to use InterShop for the benefits it offers, it is
 sufficient to just do either
 
-* `peru reup` to update to the newest version, or
+* `peru reup` to update to the newest version as available on https://github.com, or
 * `peru sync` to pull in either the newest version (if no current version has been pulled so far) or the
-  current version (that is, make sure)
+  current version (that is, make sure there are no changes in your local copy that deviate from the
+  current version).
 
+In this setup (where the `intershop` directory is essentially a clone of a remote repo), in order to
+implement some new InterShop features and have them immediately available in the host app, one *could* work
+inside a local copy of the remote repo, say `~/path/to/local/clone/of/intershop`; however, that would entail
+having to push all changes to the remote prior to updating the local copy, which gets tedious very soon.
 
 (how to use `peru override`)[https://github.com/buildinspace/peru/issues/187]
 
