@@ -20,6 +20,9 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
     - [Peru](#peru)
     - [Python](#python)
   - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
+    - [Some Queries of Interest](#some-queries-of-interest)
+      - [Showing Configuration Variables](#showing-configuration-variables)
+      - [Adding File Contents Via Mirage](#adding-file-contents-via-mirage)
     - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
 - [InterShop Commands](#intershop-commands)
   - [Built-In Commands](#built-in-commands)
@@ -259,6 +262,16 @@ Whether or not to add the `intershop` submodule to git is a matter of taste:
 ```bash
 git add intershop && git commit -m'updates from upstream'
 ```
+
+### Some Queries of Interest
+
+#### Showing Configuration Variables
+
+```bash
+intershop psql -c "select * from U.variables order by key;"
+```
+
+#### Adding File Contents Via Mirage
 
 
 ### Using PTV Configuration Variables in SQL
