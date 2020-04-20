@@ -37,7 +37,7 @@
   DB = require('./db');
 
   //...........................................................................................................
-  INTERSHOP = require('../intershop');
+  INTERSHOP = require('..');
 
   O = INTERSHOP.settings;
 
@@ -47,7 +47,9 @@
   //   info ( path.padEnd 45 ), ( CND.grey type.padEnd 15 ), ( CND.white value )
   /* TAINT PTV reader should cast values */
   /* TAINT need API (proxy?) so we get error for non-existant names */
-  dsk_parallel_limit = parseInt(O['mojikura/mirage/parallel-limit'].value, 10);
+  dsk_parallel_limit = parseInt(O['intershop/mirage/parallel-limit'].value, 10);
+
+  debug('^3344^', 'dsk_parallel_limit:', dsk_parallel_limit);
 
   //===========================================================================================================
 
@@ -55,11 +57,11 @@
   this.get_dsk_definitions = function() {
     var R, _, dsk, i, idx, len, match, mode, path, ref, settings_path, type, value;
     R = {};
-    ref = PTVR.match(O, 'mojikura/mirage/dsk/**');
+    ref = PTVR.match(O, 'intershop/mirage/dsk/**');
     //.........................................................................................................
     for (i = 0, len = ref.length; i < len; i++) {
       [settings_path, {type, value}] = ref[i];
-      dsk = settings_path.replace(/^mojikura\/mirage\/dsk\//g, '');
+      dsk = settings_path.replace(/^intershop\/mirage\/dsk\//g, '');
       //.......................................................................................................
       if (type !== 'url') {
         throw new Error(`expected type 'url', got type ${rpr(type)}`);
@@ -182,6 +184,7 @@
     (async function() {
       var dsk_definitions;
       dsk_definitions = RMDSKS.get_dsk_definitions();
+      debug('^5566^', dsk_definitions);
       await RMDSKS.procure_mirage_datasources(dsk_definitions);
       // await RMDSKS.clear_mirage_cache()
       await RMDSKS.refresh_dsks(dsk_definitions, dsk_parallel_limit);
