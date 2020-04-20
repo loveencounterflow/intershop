@@ -26,6 +26,7 @@
     "cnd": "^5.3.1",
     "coffeescript": "^2.5.1",
     "datom": "^5.0.0",
+    "forever-parallel": "0.0.4",
     "intertype": "^3.4.0",
     "minimatch": "^3.0.4",
     "pg": "^8.0.2",
