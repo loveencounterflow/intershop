@@ -21,8 +21,6 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
     - [Python](#python)
   - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
     - [Some Queries of Interest](#some-queries-of-interest)
-      - [Showing Configuration Variables](#showing-configuration-variables)
-      - [Adding File Contents Via Mirage](#adding-file-contents-via-mirage)
     - [Using PTV Configuration Variables in SQL](#using-ptv-configuration-variables-in-sql)
 - [InterShop Commands](#intershop-commands)
   - [Built-In Commands](#built-in-commands)
@@ -33,9 +31,10 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
 - [InterShop AddOns](#intershop-addons)
   - [Format of `intershop-package.json`](#format-of-intershop-packagejson)
     - [Running Tests](#running-tests)
+- [The InterShop Dev Cycle](#the-intershop-dev-cycle)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
-  - [To Do](#to-do)
+- [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -286,16 +285,14 @@ git add intershop && git commit -m'updates from upstream'
 
 ### Some Queries of Interest
 
-#### Showing Configuration Variables
+
+### Using PTV Configuration Variables in SQL
+
+In order to show a table of all current variables, run
 
 ```bash
 intershop psql -c "select * from U.variables order by key;"
 ```
-
-#### Adding File Contents Via Mirage
-
-
-### Using PTV Configuration Variables in SQL
 
 Later on, you may want to add your own options into `intershop.ptv` so you can access those configuration
 settings from SQL; it's customary to prefix those options with the name of your app (but anything will work
@@ -394,6 +391,11 @@ py.test --tap-files
 ```
 
 
+# The InterShop Dev Cycle
+
+(how to use `peru override`)[https://github.com/buildinspace/peru/issues/187]
+
+
 # No More FDWs FTW
 
 see [documentation/no-more-fdws-ftw.md](documentation/no-more-fdws-ftw.md)
@@ -409,7 +411,7 @@ and [the
 demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-files-with-mirage.sql).
 
 
-## To Do
+# To Do
 
 * [ ] Remove npm dependency `squel`, replace by other query builder b/c of `npm audit`: `Failure to sanitize
   quotes which can lead to sql injection`, `Package: squel`, `No patch available`, see

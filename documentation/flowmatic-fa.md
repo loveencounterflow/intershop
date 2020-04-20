@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [The FlowMatic Finite Automaton](#the-flowmatic-finite-automaton)
+  - [Symbolic and Built-In States](#symbolic-and-built-in-states)
+  - [Symbolic and Built-In Acts](#symbolic-and-built-in-acts)
+  - [Constraints on Transitions Table](#constraints-on-transitions-table)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # The FlowMatic Finite Automaton
 
 ## Symbolic and Built-In States
