@@ -400,5 +400,6 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
   [hengist](https://github.com/loveencounterflow/hengist))
 * [ ] document dev cycle (i.e. how to develop features in local copy w/out having to re-published for each
   change)
-
+* [ ] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
+  updating datasources on rebuild; documentation
 
