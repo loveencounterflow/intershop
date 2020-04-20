@@ -402,4 +402,7 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
   change)
 * [ ] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
   updating datasources on rebuild; documentation
+* [ ] replace most `bash` files with a sane language (any of JS, ?Ruby?, ?Python?)
+* [ ] replace `rakefile` with other language to get rid of Ruby?
+
 
