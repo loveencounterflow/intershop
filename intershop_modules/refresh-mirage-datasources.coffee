@@ -23,7 +23,7 @@ PATH                      = require 'path'
 parallel                  = require './parallel-promise'
 DB                        = require './db'
 #...........................................................................................................
-INTERSHOP                 = require '../intershop'
+INTERSHOP                 = require '..'
 O                         = INTERSHOP.settings
 PTVR                      = INTERSHOP.PTV_READER
 
@@ -32,7 +32,8 @@ PTVR                      = INTERSHOP.PTV_READER
 
 ### TAINT PTV reader should cast values ###
 ### TAINT need API (proxy?) so we get error for non-existant names ###
-dsk_parallel_limit        = parseInt O[ 'mojikura/mirage/parallel-limit' ].value, 10
+dsk_parallel_limit        = parseInt O[ 'intershop/mirage/parallel-limit' ].value, 10
+debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
 
 
 #===========================================================================================================
@@ -41,8 +42,8 @@ dsk_parallel_limit        = parseInt O[ 'mojikura/mirage/parallel-limit' ].value
 @get_dsk_definitions = ->
   R = {}
   #.........................................................................................................
-  for [ settings_path, { type, value, }, ] in PTVR.match O, 'mojikura/mirage/dsk/**'
-    dsk = settings_path.replace /^mojikura\/mirage\/dsk\//g, ''
+  for [ settings_path, { type, value, }, ] in PTVR.match O, 'intershop/mirage/dsk/**'
+    dsk = settings_path.replace /^intershop\/mirage\/dsk\//g, ''
     #.......................................................................................................
     unless type is 'url'
       throw new Error "expected type 'url', got type #{rpr type}"
@@ -125,6 +126,7 @@ unless module.parent?
   RMDSKS = @
   do ->
     dsk_definitions = RMDSKS.get_dsk_definitions()
+    debug '^5566^', dsk_definitions
     await RMDSKS.procure_mirage_datasources dsk_definitions
     # await RMDSKS.clear_mirage_cache()
     await RMDSKS.refresh_dsks dsk_definitions, dsk_parallel_limit
