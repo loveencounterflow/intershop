@@ -237,6 +237,10 @@ use cases this is actually the recommended way):
 wget https://raw.githubusercontent.com/loveencounterflow/intershop/master/.gitignore
 ```
 
+**You probably do not want to add the directories `.peru` and `intershop` to your git repo, so make sure
+that both entries do appear in your `.gitignore` file.**
+
+
 Edit `intershop.ptv` so the line `intershop/host/name` spells out the name of your app (let's call it
 `myapp` here), which will also become the name of the database and the Postgres user:
 
