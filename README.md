@@ -394,3 +394,11 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
   quotes which can lead to sql injection`, `Package: squel`, `No patch available`, see
   https://npmjs.com/advisories/575
 
+* [ ] Better docs, esp. section with useful command lines, queries
+* [ ] fix add-ons, documentation
+* [ ] remove stand-alone capabilities as they are not needed (dev inside
+  [hengist](https://github.com/loveencounterflow/hengist))
+* [ ] document dev cycle (i.e. how to develop features in local copy w/out having to re-published for each
+  change)
+
+
