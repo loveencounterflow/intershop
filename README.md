@@ -480,18 +480,19 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
   [hengist](https://github.com/loveencounterflow/hengist))
 * [ ] document dev cycle (i.e. how to develop features in local copy w/out having to re-published for each
   change)
-* [ ] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
+* [X] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
   updating datasources on rebuild; documentation
+* [ ] Mirage documentation
 * [ ] replace most `bash` files with a sane language (any of JS, ?Ruby?, ?Python?)
 * [ ] replace `rake`, `rakefile` with other language to get rid of Ruby?
-* [ ] confusingly, `rake --tasks` does not display tasks, but dumps `intershop.ptv` configuration; `rake -P`
+* [X] confusingly, `rake --tasks` does not display tasks, but dumps `intershop.ptv` configuration; `rake -P`
   (`rake ----prereqs`) does list tasks and their prerequisits, neither is not documented, nor are tasks
   documented. Observe that [Only tasks with descriptions set will appear in `rake
   -T`](https://stackoverflow.com/a/8713254/7568091)
 * [ ] confusingly, `rake` ≡ `rake default` ≡ `rake update` ≡ `rake peru_update`; ideally there should only
   be 1 way to do it, so get rid of other 3 ways
 * [ ] replace Peru?
-* [ ] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
+* [X] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
   to local directory
 * [ ] PTV readers: do not allow empty substitutions (`${}`) but throw explit error
 
