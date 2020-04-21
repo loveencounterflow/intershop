@@ -8,7 +8,7 @@
 
   rpr = CND.rpr;
 
-  badge = 'MOJIKURA3';
+  badge = 'REFRESH-MIRAGE-DATASOURCES';
 
   log = CND.get_logger('plain', badge);
 
@@ -131,7 +131,8 @@
         return tasks.push(async function() {
           var q;
           q = ['select MIRAGE.procure_dsk_pathmode( $1, $2, $3 )', dsk, path, mode];
-          return help(dsk, (await DB.query_single(q)));
+          whisper(`^447^ procuring DSK ${rpr(dsk)}`);
+          return (await DB.query_single(q));
         });
       })(dsk, path, mode);
     }
@@ -178,13 +179,36 @@
     return null;
   };
 
+  //-----------------------------------------------------------------------------------------------------------
+  this._show_dsk_definitions = function(dsk_definitions) {
+    var cwd, dsk, dsk_txt, i, idx, len, mode, modepath_txt, modepaths, nr_txt, path;
+    cwd = process.cwd();
+    echo(CND.steel(CND.reverse(CND.bold(" Mirage Data Sources "))));
+    echo(CND.grey("DSK                                 DSNR  path"));
+    echo(CND.grey("——————————————————————————————————— ————— —————————————————————————————————————"));
+    for (dsk in dsk_definitions) {
+      modepaths = dsk_definitions[dsk];
+      dsk_txt = (CND.white(dsk)).padEnd(50);
+      for (idx = i = 0, len = modepaths.length; i < len; idx = ++i) {
+        ({mode, path} = modepaths[idx]);
+        if (path.startsWith(cwd)) {
+          path = PATH.relative(cwd, path);
+        }
+        modepath_txt = (CND.yellow(mode)) + (CND.grey(':')) + (CND.lime(path));
+        nr_txt = (`${idx + 1}`.padStart(2)) + '    ';
+        echo(dsk_txt, nr_txt, modepath_txt);
+      }
+    }
+    return null;
+  };
+
   //###########################################################################################################
   if (module.parent == null) {
     RMDSKS = this;
     (async function() {
       var dsk_definitions;
       dsk_definitions = RMDSKS.get_dsk_definitions();
-      debug('^5566^', dsk_definitions);
+      RMDSKS._show_dsk_definitions(dsk_definitions);
       await RMDSKS.procure_mirage_datasources(dsk_definitions);
       // await RMDSKS.clear_mirage_cache()
       await RMDSKS.refresh_dsks(dsk_definitions, dsk_parallel_limit);
