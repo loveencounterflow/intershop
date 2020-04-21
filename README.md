@@ -493,7 +493,7 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [ ] replace Peru?
 * [ ] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
   to local directory
-
+* [ ] PTV readers: do not allow empty substitutions (`${}`) but throw explit error
 
 
 
