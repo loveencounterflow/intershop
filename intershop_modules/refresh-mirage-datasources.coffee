@@ -40,7 +40,8 @@ debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
 #
 #-----------------------------------------------------------------------------------------------------------
 @get_dsk_definitions = ->
-  R = {}
+  R                     = {}
+  intershop_host_path   = O[ 'intershop/host/path' ].value
   #.........................................................................................................
   for [ settings_path, { type, value, }, ] in PTVR.match O, 'intershop/mirage/dsk/**'
     dsk = settings_path.replace /^intershop\/mirage\/dsk\//g, ''
@@ -51,6 +52,7 @@ debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
     unless ( match = value.match /^([^:]+):(.*$)/ )?
       throw new Error "expected value like 'mode:/path/to/source...', got #{rpr value}"
     [ _, mode, path, ] = match
+    path = PATH.resolve intershop_host_path, path
     #.......................................................................................................
     if ( match = dsk.match /-([0-9]+)$/ )?
       [ _, idx, ] = match
