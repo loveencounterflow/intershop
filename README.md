@@ -32,6 +32,9 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
   - [Format of `intershop-package.json`](#format-of-intershop-packagejson)
     - [Running Tests](#running-tests)
 - [The InterShop Dev Cycle](#the-intershop-dev-cycle)
+  - [Setup 1: 'Regular' InterShop setup](#setup-1-regular-intershop-setup)
+  - [Setup 2: Clone InterShop from Within App Folder](#setup-2-clone-intershop-from-within-app-folder)
+  - [Setup 3: Put Symlink to Local InterShop Repo into App Folder](#setup-3-put-symlink-to-local-intershop-repo-into-app-folder)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
 - [To Do](#to-do)
@@ -403,7 +406,7 @@ sufficient to just do either
 
 In this setup (where the `intershop` directory is essentially a clone of a remote repo), in order to
 implement some new InterShop features and have them immediately available in the host app, one *could* work
-inside a local copy of the remote repo, say `~/path/to/local/clone/of/intershop`; however, that would entail
+inside a local copy of the remote repo, say `path/to/local/clone/of/intershop`; however, that would entail
 having to push all changes to the remote prior to updating the local copy, which gets tedious very soon.
 
 
@@ -411,9 +414,37 @@ having to push all changes to the remote prior to updating the local copy, which
 
 In your host app, register an 'override' for your local `intershop` repo with `peru`:
 
+## Setup 1: 'Regular' InterShop setup
+
+`intershop` dependency managed by peru
+
 ```bash
-peru override add intershop ~/path/to/local/clone/of/intershop
+peru override add intershop path/to/local/clone/of/intershop
 ```
+
+```bash
+# ... edit some InterShop source file, then ...
+cd path/to/local/clone/of/intershop                     # ... CD into intershop repo
+coffee --map -o intershop_modules -c intershop_modules  # ... do whatever to build your code
+cd -                                                    # ... CD back to project folder
+peru sync                                               # ... make Peru pull changes from local InterShop repo
+intershop refresh-mirage-datasources                    # ... issue suitable commands to see whether
+intershop psql -c "select * from MIRAGE.mirror;"        #     everything works OK.
+```
+
+Putting everything on a single line:
+
+```bash
+( cd path/to/local/clone/of/intershop && coffee --map -o intershop_modules -c intershop_modules ) && peru sync && intershop refresh-mirage-datasources && intershop psql -c "select * from MIRAGE.mirror order by dsk, dsnr, linenr;"
+```
+
+## Setup 2: Clone InterShop from Within App Folder
+
+TBW
+
+## Setup 3: Put Symlink to Local InterShop Repo into App Folder
+
+TBW
 
 # No More FDWs FTW
 
