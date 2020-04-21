@@ -357,8 +357,8 @@ do $$ begin
 * outermost values must be a JSON object
 * with one entry `intershop-package-version` that specifies the version of the format itself; must currently
   be `1.0.0`
-* another entry `"targets": {...}` that describes how to treat the source files
-* `targets` maps from filenames (relative to package root) to purposes
+* another entry `"files": {...}` that describes how to treat the source files
+* `files` maps from filenames (relative to package root) to purposes
 * purpose may be either one of
   * `"ignore"`—do nothing; used e.g. for source files that have to be transpiled. This is the default and
     may be left out
