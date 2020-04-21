@@ -7,7 +7,7 @@
 ############################################################################################################
 CND                       = require 'cnd'
 rpr                       = CND.rpr
-badge                     = 'MOJIKURA3'
+badge                     = 'REFRESH-MIRAGE-DATASOURCES'
 log                       = CND.get_logger 'plain',     badge
 debug                     = CND.get_logger 'debug',     badge
 info                      = CND.get_logger 'info',      badge
@@ -90,7 +90,8 @@ debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
   for { dsk, path, mode, } from @_walk_dsk_pathmodes dsk_definitions
     do ( dsk, path, mode ) -> tasks.push ->
       q = [ 'select MIRAGE.procure_dsk_pathmode( $1, $2, $3 )', dsk, path, mode, ]
-      help dsk, await DB.query_single q
+      whisper "^447^ procuring DSK #{rpr dsk}"
+      await DB.query_single q
   await parallel tasks, 1
 
 #-----------------------------------------------------------------------------------------------------------
@@ -120,13 +121,28 @@ debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
   await parallel tasks, parallel_limit
   return null
 
+#-----------------------------------------------------------------------------------------------------------
+@_show_dsk_definitions = ( dsk_definitions ) ->
+  cwd = process.cwd()
+  echo CND.steel CND.reverse CND.bold " Mirage Data Sources "
+  echo CND.grey "DSK                                 DSNR  path"
+  echo CND.grey "——————————————————————————————————— ————— —————————————————————————————————————"
+  for dsk, modepaths of dsk_definitions
+    dsk_txt       = ( CND.white dsk ).padEnd 50
+    for { mode, path, }, idx in modepaths
+      path          = ( PATH.relative cwd, path ) if path.startsWith cwd
+      modepath_txt  = ( CND.yellow mode ) + ( CND.grey ':' ) + ( CND.lime path )
+      nr_txt        = ( "#{idx + 1}".padStart 2 ) + '    '
+      echo dsk_txt, nr_txt, modepath_txt
+  return null
+
 
 ############################################################################################################
 unless module.parent?
   RMDSKS = @
   do ->
     dsk_definitions = RMDSKS.get_dsk_definitions()
-    debug '^5566^', dsk_definitions
+    RMDSKS._show_dsk_definitions dsk_definitions
     await RMDSKS.procure_mirage_datasources dsk_definitions
     # await RMDSKS.clear_mirage_cache()
     await RMDSKS.refresh_dsks dsk_definitions, dsk_parallel_limit
