@@ -55,8 +55,9 @@
 
   //-----------------------------------------------------------------------------------------------------------
   this.get_dsk_definitions = function() {
-    var R, _, dsk, i, idx, len, match, mode, path, ref, settings_path, type, value;
+    var R, _, dsk, i, idx, intershop_host_path, len, match, mode, path, ref, settings_path, type, value;
     R = {};
+    intershop_host_path = O['intershop/host/path'].value;
     ref = PTVR.match(O, 'intershop/mirage/dsk/**');
     //.........................................................................................................
     for (i = 0, len = ref.length; i < len; i++) {
@@ -71,6 +72,9 @@
         throw new Error(`expected value like 'mode:/path/to/source...', got ${rpr(value)}`);
       }
       [_, mode, path] = match;
+      debug('^4489^', rpr(path));
+      path = PATH.resolve(intershop_host_path, path);
+      debug('^4489^', rpr(path));
       //.......................................................................................................
       if ((match = dsk.match(/-([0-9]+)$/)) != null) {
         [_, idx] = match;
