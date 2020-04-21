@@ -35,6 +35,7 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
   - [Setup 1: 'Regular' InterShop setup](#setup-1-regular-intershop-setup)
   - [Setup 2: Clone InterShop from Within App Folder](#setup-2-clone-intershop-from-within-app-folder)
   - [Setup 3: Put Symlink to Local InterShop Repo into App Folder](#setup-3-put-symlink-to-local-intershop-repo-into-app-folder)
+  - [Future](#future)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
 - [To Do](#to-do)
@@ -445,6 +446,12 @@ TBW
 ## Setup 3: Put Symlink to Local InterShop Repo into App Folder
 
 TBW
+
+## Future
+
+* drop stand-alone mode of InterShop
+* make `npm install`able
+* dev cycle will become standard NodeJS module dev cycle, no more `peru`
 
 # No More FDWs FTW
 
