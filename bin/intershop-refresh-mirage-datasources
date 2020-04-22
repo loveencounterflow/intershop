@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-set -euo pipefail; IFS=$'\n\t'
+set -euo pipefail
 
 # #-----------------------------------------------------------------------------------------------------------
 # home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 # cd "$home"
 
 #-----------------------------------------------------------------------------------------------------------
-node "$intershop_guest_modules_path/refresh-mirage-datasources.js"
+"$intershop_guest_bin_path/intershop-nodexh" "$intershop_guest_modules_path/refresh-mirage-datasources.js"
 
 
 
