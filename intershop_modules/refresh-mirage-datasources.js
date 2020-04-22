@@ -72,9 +72,7 @@
         throw new Error(`expected value like 'mode:/path/to/source...', got ${rpr(value)}`);
       }
       [_, mode, path] = match;
-      debug('^4489^', rpr(path));
       path = PATH.resolve(intershop_host_path, path);
-      debug('^4489^', rpr(path));
       //.......................................................................................................
       if ((match = dsk.match(/-([0-9]+)$/)) != null) {
         [_, idx] = match;
