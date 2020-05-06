@@ -27,12 +27,12 @@ create extension if not exists pgcrypto   with schema _pgcrypto;
 create extension if not exists tablefunc  with schema _tablefunc;
 
 -- ---------------------------------------------------------------------------------------------------------
-/* https://github.com/ChristophBerg/postgresql-unit */
-create extension if not exists unit;
-grant select, insert, update on unit_units, unit_prefixes to public;
+-- /* https://github.com/ChristophBerg/postgresql-unit */
+-- create extension if not exists unit;
+-- grant select, insert, update on unit_units, unit_prefixes to public;
 
 -- ---------------------------------------------------------------------------------------------------------
-set search_path = public, pg_catalog, _plpgsql, _pgcrypto, pgunit;
+set search_path = public, pg_catalog, _plpgsql, _pgcrypto; -- pgunit;
 reset role;
 
 
