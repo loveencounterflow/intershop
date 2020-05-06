@@ -14,7 +14,7 @@ function help () { set +u;  printf "$grey""INTERSHOP ""$lime%s$reset\n" "$1 $2 $
 function urge () { set +u;  printf "$grey""INTERSHOP ""$orange%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
 function warn () { set +u;  printf "$grey""INTERSHOP ""$red%s$reset\n" "$1 $2 $3 $4 $5 $6"; set -u; }
 
-info 'intershop command '"$0" "$@"
+info '^776-100^ intershop command '"$0" "$@"
 
 # declare -A commands
 # commands[foo]=bin/intershop-foo
@@ -74,27 +74,27 @@ intershop_host_sql_path="$intershop_host_path"/db
 
 #-----------------------------------------------------------------------------------------------------------
 if ! [[ -f $intershop_host_configuration_path ]]; then
-  info 'unable to find '"$intershop_host_configuration_path"
-  info 'not an intershop module: '"$intershop_host_path"
+  info '^776-101^ unable to find '"$intershop_host_configuration_path"
+  info '^776-102^ not an intershop module: '"$intershop_host_path"
   exit 1
   fi
-info 'found intershop host configuration at '"$intershop_host_configuration_path"
+info '^776-103^ found intershop host configuration at '"$intershop_host_configuration_path"
 #...........................................................................................................
 if [[ -d $intershop_guest_path ]]; then
-  info 'found intershop guest path at '"$intershop_guest_path"
+  info '^776-104^ found intershop guest path at '"$intershop_guest_path"
   if [[ -f $intershop_guest_configuration_path ]]; then
-    info 'found intershop guest configuration at '"$intershop_guest_configuration_path"
-    info 'intershop guest bin path at '"$intershop_guest_bin_path"
+    info '^776-105^ found intershop guest configuration at '"$intershop_guest_configuration_path"
+    info '^776-106^ intershop guest bin path at '"$intershop_guest_bin_path"
     intershop_role=guest
     intershop_modules_path="$intershop_guest_modules_path"
   else
-    info 'intershop guest configuration path not found at '"$intershop_guest_configuration_path"
+    info '^776-107^ intershop guest configuration path not found at '"$intershop_guest_configuration_path"
     fi
   fi
 #...........................................................................................................
 if [[ $intershop_role == 'UNKNOWN' ]]; then
-  info 'no intershop guest path at '"$intershop_guest_path"
-  info 'intershop host bin path at '"$intershop_host_bin_path"
+  info '^776-108^ no intershop guest path at '"$intershop_guest_path"
+  info '^776-109^ intershop host bin path at '"$intershop_host_bin_path"
   intershop_role=host
   intershop_modules_path="$intershop_host_modules_path"
   intershop_guest_bin_path="$intershop_host_bin_path"
@@ -104,7 +104,7 @@ if [[ $intershop_role == 'UNKNOWN' ]]; then
   intershop_guest_sql_path="$intershop_host_sql_path"
   fi;
 #...........................................................................................................
-info 'intershop role is '"$intershop_role"
+info '^776-110^ intershop role is '"$intershop_role"
 
 #-----------------------------------------------------------------------------------------------------------
 function find_intershop_subcommand () {
@@ -119,7 +119,7 @@ function find_intershop_subcommand () {
 
 #-----------------------------------------------------------------------------------------------------------
 function _list_intershop_subcommands () {
-  info 'looking for intershop subcommands in '"$1"
+  info '^776-111^ looking for intershop subcommands in '"$1"
   for filepath in "$1"/intershop-*; do
     subcommand=$(printf '%s' "$filepath" | sed -re 's/^.*\/intershop-(.+)$/\1/')
     help intershop "$subcommand"
@@ -166,7 +166,7 @@ if [[ $intershop_role == 'guest' ]]; then
   update_settings_from_ptv_file "$intershop_guest_configuration_path"
   fi
 update_settings_from_ptv_file "$intershop_host_configuration_path"
-info 'Using DB '"$intershop_db_name"
+info '^776-112^ Using DB '"$intershop_db_name"
 
 #-----------------------------------------------------------------------------------------------------------
 intershop_tmp_path="/tmp/intershop-$intershop_db_name"
@@ -221,7 +221,7 @@ trap 'terminate_if_running $psql_tailer_pid' EXIT
 ### Locate and execute subcommand: ###
 set +u; subcommand="$1"; set -u
 if [ -z "$subcommand" ]; then
-  urge 'no subcommand given; available commands:'
+  urge '^776-113^ no subcommand given; available commands:'
   list_intershop_subcommands
   exit 1
 else
