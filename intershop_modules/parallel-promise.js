@@ -40,5 +40,3 @@
   };
 
 }).call(this);
-
-//# sourceMappingURL=parallel-promise.js.map
