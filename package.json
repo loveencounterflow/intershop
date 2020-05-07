@@ -26,6 +26,7 @@
     "cnd": "^5.3.1",
     "coffeescript": "^2.5.1",
     "datom": "^5.0.0",
+    "executable": "^4.1.1",
     "forever-parallel": "0.0.4",
     "intertype": "^3.4.0",
     "minimatch": "^3.0.4",
@@ -34,6 +35,7 @@
     "resolve-from": "^5.0.0",
     "resolve-pkg": "^2.0.0",
     "respawn": "^2.6.0",
+    "shelljs": "^0.8.4",
     "squel": "^5.13.0",
     "stackman": "^4.0.1",
     "steampipes": "^6.1.1"
