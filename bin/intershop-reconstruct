@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+echo "$intershop_guest_modules_path/intershop-reconstruct.js"
+node "$intershop_guest_modules_path/intershop-reconstruct.js" "$@"
+
