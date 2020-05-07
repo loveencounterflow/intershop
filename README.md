@@ -497,6 +497,6 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [ ] PTV readers: do not allow empty substitutions (`${}`) but throw explit error
 * [ ] `intershop` commands:
   * [ ] `intershop list-databases`
-  * [ ] `intershop reconstruct` (in addition to or as expansion of `rebuild`)
+  * [X] `intershop reconstruct` (in addition to or as expansion of `rebuild`)
 
 
