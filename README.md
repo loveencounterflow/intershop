@@ -495,6 +495,8 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [X] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
   to local directory
 * [ ] PTV readers: do not allow empty substitutions (`${}`) but throw explit error
-
+* [ ] `intershop` commands:
+  * [ ] `intershop list-databases`
+  * [ ] `intershop reconstruct` (in addition to or as expansion of `rebuild`)
 
 
