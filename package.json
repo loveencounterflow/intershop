@@ -23,22 +23,22 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "cnd": "^5.3.1",
+    "cnd": "^6.0.0",
     "coffeescript": "^2.5.1",
     "datom": "^5.0.0",
     "executable": "^4.1.1",
-    "forever-parallel": "0.0.4",
-    "intertype": "^3.4.0",
+    "forever-parallel": "0.0.5",
+    "intertype": "^3.4.1",
     "minimatch": "^3.0.4",
-    "pg": "^8.0.2",
-    "pg-cursor": "^2.1.9",
+    "pg": "^8.0.3",
+    "pg-cursor": "^2.1.10",
     "resolve-from": "^5.0.0",
     "resolve-pkg": "^2.0.0",
     "respawn": "^2.6.0",
     "shelljs": "^0.8.4",
     "squel": "^5.13.0",
     "stackman": "^4.0.1",
-    "steampipes": "^6.1.1"
+    "steampipes": "^6.1.2"
   },
   "devDependencies": {}
 }
