@@ -4,7 +4,8 @@ set -euo pipefail
 # home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 # cd "$home"
 
-node --require "$intershop_guest_modules_path/exception-handler.js" "$@"
+node --trace-warnings --require "$intershop_guest_modules_path/exception-handler.js" "$@"
+# node --require "$intershop_guest_modules_path/exception-handler.js" "$@"
 
 
 
