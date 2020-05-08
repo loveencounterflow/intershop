@@ -512,6 +512,6 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
     **-(blanks)->** *compact lines* **-(comments)->** *compact comment-less lines* **-(tsv)->** *fields*;
     first two steps are implicit and non-configurable (i.e. we only deal with line-oriented text files);
     as soon as fields have been derived, a recurring task is to cast them to known data types
-
+* [ ] `053-immutable.sql`: implement generalized DynSQL trigger functions to make immutable records easier
 
 
