@@ -24,6 +24,12 @@ create function IMMUTABLE.record_has_changed( old record, new record ) returns b
   begin
     return IMMUTABLE.record_has_changed( old, new, array[] ); end; $$;
 
+/*
+
+* see https://github.com/loveencounterflow/gaps-and-islands#immutable-columns-in-sql
+* see datamill table datoms for triggers, should incorporate generalized version
+
+*/
 
 
 /* ###################################################################################################### */
