@@ -480,9 +480,7 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
   [hengist](https://github.com/loveencounterflow/hengist))
 * [ ] document dev cycle (i.e. how to develop features in local copy w/out having to re-published for each
   change)
-* [X] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
   updating datasources on rebuild; documentation
-* [ ] Mirage documentation
 * [ ] replace most `bash` files with a sane language (any of JS, ?Ruby?, ?Python?)
 * [ ] replace `rake`, `rakefile` with other language to get rid of Ruby?
 * [X] confusingly, `rake --tasks` does not display tasks, but dumps `intershop.ptv` configuration; `rake -P`
@@ -492,11 +490,28 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 * [ ] confusingly, `rake` ≡ `rake default` ≡ `rake update` ≡ `rake peru_update`; ideally there should only
   be 1 way to do it, so get rid of other 3 ways
 * [ ] replace Peru?
-* [X] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
-  to local directory
 * [ ] PTV readers: do not allow empty substitutions (`${}`) but throw explit error
 * [ ] `intershop` commands:
   * [ ] `intershop list-databases`
   * [X] `intershop reconstruct` (in addition to or as expansion of `rebuild`)
+
+* [ ] Mirage documentation
+* [X] Mirage: local file paths like `./README.md` do not work although `¶( 'os/env/PWD' )` correctly points
+  to local directory
+* [X] make InterShop Mirage more useful by providing out-of-the-box configuration directives, default to
+* [ ] Mirage declarations must use keys `intershop/mirage/*`
+* [ ] simplify Mirage implementation:
+  * [ ] separate into layers:
+    * lowest level: only file content caching
+    * intermediate level: file concatenation
+    * higher level: format application (320 lines = 50% of mirage.sql, sections *Modes*, *Readers*)
+  * [ ] each DSK either identifies one path and a format, or else a series of DSKs for either concatenation
+    (independent lines) or composition (interdependent lines)
+  <!-- * `path : dsk : format` is `1:1:1` -->
+  * format is really a layering in itself: *bits* **-(\*utf8)->** *text* **-(\*nls)->** *lines*
+    **-(blanks)->** *compact lines* **-(comments)->** *compact comment-less lines* **-(tsv)->** *fields*;
+    first two steps are implicit and non-configurable (i.e. we only deal with line-oriented text files);
+    as soon as fields have been derived, a recurring task is to cast them to known data types
+
 
 
