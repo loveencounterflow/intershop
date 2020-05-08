@@ -25,6 +25,7 @@ create extension if not exists plpython3u with schema pg_catalog;
 create extension if not exists plpgsql    with schema _plpgsql;
 create extension if not exists pgcrypto   with schema _pgcrypto;
 create extension if not exists tablefunc  with schema _tablefunc;
+create extension if not exists hstore;
 
 -- ---------------------------------------------------------------------------------------------------------
 -- /* https://github.com/ChristophBerg/postgresql-unit */
