@@ -194,3 +194,5 @@ does not exist`);
   // debug @find_addons()
 
 }).call(this);
+
+//# sourceMappingURL=intershop-find-addons.js.map
