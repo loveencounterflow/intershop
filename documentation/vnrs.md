@@ -101,13 +101,14 @@ sorting which is the cause of all the faults in this listing.
   [ a, 1, ]`), we **use a generated column (conventionally called `_vnr0`)** that has the original VNR
   with a zero appended (such that `order by _vnr0` will result in `[ a, -1, 0, ] ≺ [ a, 0, ] ≺ [ a, 0, 0, ]
   ≺ [ a, 1, 0, ]`, which is OK)
-* let's call the function used for the generated column `add_final_zero( vnr )`
+* let's call the function used for the generated column `VNR.push_zero( vnr )`
 * if preferrable, one could always forego the generated column and use the zero-appending function in an
-  `order by` clause instead, as in: `order by add_final_zero( vnr )`
-  * this can also be indexed: `create index on X.t ( add_final_zero( vnr ) )` to prevent re-computation on
+  `order by` clause instead, as in: `order by VNR.push_zero( vnr )`
+  * this can also be indexed: `create index on X.t ( VNR.push_zero( vnr ) )` to prevent re-computation on
     `select`
 * another alternative to using a generated column or ordering-by-function is to define a custom operator,
-  call it `<<<`, such that one can write `order by vnr using <<<`. However, this approach suffers from
+  call it `<<<`, such that one can write `order by vnr using <<<` (or maybe even `order by vnr using
+  VNR.<<<`). However, this approach suffers from
   * having an annoying syntax (an unquoted operator used as a name),
   * is longer to write, but also
   * is less obvious (can't rely on givens in table, must lookup definition of `<<<`)
