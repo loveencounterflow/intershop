@@ -3,12 +3,27 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [No More FDWs FTW!](#no-more-fdws-ftw)
+  - [A Repeating Pattern](#a-repeating-pattern)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 
-# No More FDWs FTW!
+## No More FDWs FTW!
+
+### A Repeating Pattern
+
+also applies to custom collations and custom operators:
+
+> once more, that old chestnut has proven itself to be true: **When in need of a custom ordering, do not
+> attempt to define custom collations or custom operators, instead, generate a sortfield**
+
+The Postgres devs seem to have a penchant for more complex, more specific solutions that are significantly
+harder to use than the more generic, obvious ones, e.g. custom sorting could be done by a JS-style `cmp()`
+function, but instead requires the definition of a custom operator—something which is underdocumented,
+almost impossible to find on the Internet, is wildly more complex, requires superuser rights to the DB and
+affects the entire DB.
+
 
 In my ongoing search on how to best feed data from the outside world into an
 RDBMS, I started by using a client library
