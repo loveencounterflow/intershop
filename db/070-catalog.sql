@@ -169,10 +169,10 @@ create view CATALOG._tables_and_views as (
     from CATALOG._tables_and_views_all
     where true
       -- and t = 'rt'
-      and schema not in (
-        'pg_toast',
-        'pg_catalog',
-        'information_schema' )
+      -- and schema not in (
+      --   'pg_toast',
+      --   'pg_catalog',
+      --   'information_schema' )
   );
 
 -- ---------------------------------------------------------------------------------------------------------
