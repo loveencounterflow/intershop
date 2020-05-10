@@ -70,7 +70,7 @@ create function DEMO.expand_vnr_for_sorting( ¶vnr float8[] )
   returns float8[] immutable parallel safe language plpgsql as $$
   declare
     ¶max_length integer := 20;
-    ¶length     integer := array_length( ¶vnr, 1 );
+    ¶length     integer := coalesce( array_length( ¶vnr, 1 ), 0 );
   begin
     if ¶length > ¶max_length then
       raise sqlstate 'VNR72' using message = format(
