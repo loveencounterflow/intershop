@@ -22,7 +22,7 @@ create function IMMUTABLE.record_has_changed( old record, new record, excludes t
 
 create function IMMUTABLE.record_has_changed( old record, new record ) returns boolean language plpgsql as $$
   begin
-    return IMMUTABLE.record_has_changed( old, new, array[] ); end; $$;
+    return IMMUTABLE.record_has_changed( old, new, array[]::text[] ); end; $$;
 
 /*
 
