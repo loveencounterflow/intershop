@@ -112,10 +112,15 @@ create table DEMO.vnr_integer (
   );
 
 insert into DEMO.vnr_float8 ( vnr ) values
+  ( array[ -1                           ] ),
+  ( array[]::float8[] ),
+  -- ( array[ null::float8 ] ),
+  ( array[ 1                            ] ),
   ( array[ 2, '-infinity'::float8       ] ),
   ( array[ 2, -9007199254740991         ] ), -- JS `Number.MIN_SAFE_INTEGER`
   ( array[ 2, -2147483648               ] ), -- PG min `integer`
   ( array[ 2, -9999999                  ] ),
+  ( array[ 2                            ] ),
   ( array[ 2, 0                         ] ),
   ( array[ 2, 5e-324                    ] ), -- JS `Number.MIN_VALUE`
   ( array[ 2, 1                         ] ),
@@ -156,8 +161,8 @@ create unique index on DEMO.vnr_integer ( DEMO.add_final_zero( vnr ) );
 select * from DEMO.vnr_float8 order by vnr;
 -- select * from DEMO.vnr_float8 order by vnr_long;
 select * from DEMO.vnr_float8 order by vnr0;
-select * from DEMO.vnr_float8 order by DEMO.add_final_zero( vnr );
-explain analyze select * from DEMO.vnr_float8 order by DEMO.add_final_zero( vnr );
+-- select * from DEMO.vnr_float8 order by DEMO.add_final_zero( vnr );
+-- explain analyze select * from DEMO.vnr_float8 order by DEMO.add_final_zero( vnr );
 -- select * from DEMO.vnr_integer order by vnr0;
 -- select * from DEMO.vnr_integer order by vnr_long;
 -- select '+infinity'::float8, '-infinity'::float8;
