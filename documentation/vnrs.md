@@ -35,7 +35,7 @@
     `s` with `[ a, b, c, x, ]`; if `x` is negative, `s` will be sorted before `r`; if it is not negative,
     `s` will be sorted *after* `r`. This is called **Fair Ordering**;  a 'naive', 'lexicographic' ordering
     would put both `[ a, -1, ]` and `[ a, +1, ]` *behind* `[ a, ]` because the former ones are *longer* than
-    the latter one; whis is not what we want; see
+    the latter one; whis is not what we want; see [Demo, Tests](#demo-tests), below
   * updates work exactly like insertions, except that the old row has to be deprecated by setting field
     `stamped` to `true` (like the post office stamps a letter to mark it as 'processed')
   * see InterShop schema `IMMUTABLE` for an implementation of an `on before update` trigger that makes sure
