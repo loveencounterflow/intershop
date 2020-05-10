@@ -38,6 +38,7 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
   - [Future](#future)
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
+- [VNRs](#vnrs)
 - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -455,7 +456,7 @@ TBW
 
 # No More FDWs FTW
 
-see [documentation/no-more-fdws-ftw.md](documentation/no-more-fdws-ftw.md)
+See [documentation/no-more-fdws-ftw.md](documentation/no-more-fdws-ftw.md).
 
 # The MIRAGE File Mirror Module
 
@@ -467,6 +468,9 @@ docs](https://github.com/loveencounterflow/intershop/blob/master/documentation/m
 and [the
 demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-files-with-mirage.sql).
 
+# VNRs
+
+See [documentation/vnrs.md](documentation/vnrs.md).
 
 # To Do
 
