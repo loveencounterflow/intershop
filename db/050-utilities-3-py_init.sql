@@ -50,13 +50,20 @@ create function U.py_init() returns void language plpython3u as $$
         raise Exception( "unable to find setting " + repr( key ) + " in U.variables" )
       return rows[ 0 ][ 'value' ]
     #.......................................................................................................
+    def get_variable_names():
+      sql   = """select key from U.variables order by key"""
+      plan  = plpy.prepare( sql )
+      rows  = plpy.execute( plan )
+      return list( row[ 'key' ] for row in rows )
+    #.......................................................................................................
     def set_variable( key, value ):
       sql   = """select ¶( $1, $2 )"""
       plan  = plpy.prepare( sql, [ 'void', ] )
       rows  = plpy.execute( plan, [ key, value, ] )
     #.......................................................................................................
-    ctx.get_variable = get_variable
-    ctx.set_variable = set_variable
+    ctx.get_variable        = get_variable
+    ctx.get_variable_names  = get_variable_names
+    ctx.set_variable        = set_variable
     #.......................................................................................................
     def _absorb_environment( ctx ):
       sql   = """
