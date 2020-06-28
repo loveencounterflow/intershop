@@ -181,12 +181,11 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
         return on_end() if rows.length is 0
         resolve rows
     #.......................................................................................................
-    source.start = ->
-      do =>
-        loop
-          rows = await read()
-          source.send row for row in rows
-        return null
+    source.start = -> do => ### Note: must be function, not asyncfunction ###
+      loop
+        rows = await read()
+        source.send row for row in rows
+      return null
     return resolve source
   #.........................................................................................................
   catch error
