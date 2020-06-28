@@ -286,7 +286,7 @@
         };
         //.......................................................................................................
         source.start = function() {
-          return (async() => {
+          return (async()/* Note: must be function, not asyncfunction */ => {
             var i, len, row, rows;
             while (true) {
               rows = (await read());
@@ -390,56 +390,6 @@
   this._db = db;
 
   this._pool = pool;
-
-  // debug '^773^', ( require './types' ).all_keys_of pool
-// __defineGetter__
-// __defineSetter__
-// __lookupGetter__
-// __lookupSetter__
-// __proto__
-// _acquireClient
-// _clients
-// _events
-// _eventsCount
-// _idle
-// _isFull
-// _pendingQueue
-// _pulseQueue
-// _release
-// _releaseOnce
-// _remove
-// addListener
-// Client
-// connect
-// constructor
-// emit
-// end
-// ended
-// ending
-// eventNames
-// getMaxListeners
-// hasOwnProperty
-// isPrototypeOf
-// listenerCount
-// listeners
-// log
-// newClient
-// off
-// on
-// once
-// options
-// prependListener
-// prependOnceListener
-// Promise
-// propertyIsEnumerable
-// query
-// rawListeners
-// removeAllListeners
-// removeListener
-// setMaxListeners
-// toLocaleString'
-// toString
-// valueOf
 
 }).call(this);
 
