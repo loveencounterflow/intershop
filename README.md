@@ -17,7 +17,6 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
       - [Configure Postgres](#configure-postgres)
       - [Find Configuration File Locations](#find-configuration-file-locations)
       - [Statement-Level Statistics](#statement-level-statistics)
-    - [Peru](#peru)
     - [Python](#python)
   - [InterShop Initialization and (Re-) Building](#intershop-initialization-and-re--building)
     - [Some Queries of Interest](#some-queries-of-interest)
@@ -170,7 +169,7 @@ In `postgresql.conf`:
 shared_preload_libraries = 'pg_stat_statements'     # (change requires restart)
 ```
 
-(must restart with `sudo /etc/init.d/postgresql restart 10` or similar after change; note that errors
+(must restart with `sudo /etc/init.d/postgresql restart 12` or similar after change; note that errors
 in this settings might not lead to visible error messages, but still prevent the server from restarting).
 
 Otherwise, comment this out in `020-extensions.sql`:
@@ -181,7 +180,7 @@ create extension if not exists pg_stat_statements;
 
 Also see [here](https://pganalyze.com/docs/install/01_enabling_pg_stat_statements).
 
-### Peru
+<!-- ### Peru
 
 [Peru](https://github.com/buildinspace/peru) is "a tool for including other
 people's code in your projects"; it is the most convenient and promising way
@@ -210,7 +209,7 @@ A quick rundown of `peru` commands copied from [the Peru documentation]():
 * **`peru override`**—Replace the contents of a module with a local directory path, usually a clone you've
   made of the same repo. This lets you test changes to imported modules without needing to push your changes
   upstream or edit peru.yaml.
-
+ -->
 
 ### Python
 
@@ -219,9 +218,21 @@ sudo pip install pipenv
 pipenv install tap.py pytest
 ```
 
+```bash
+cp ~/jzr/hengist/intershop.ptv .
+ln -s ../intershop
+intershop rebuild
+pip3 install setuptools
+pip3 install --user pipenv
+pipenv install uharfbuzz
+pipenv shell
+intershop psql -f db/100-harfbuzz.sql
+```
+
 
 ## InterShop Initialization and (Re-) Building
 
+<strike>
 To get started with your app, create a directory for it and `cd` into it; then, copy the three essential
 configuration files using `wget` (`curl` works similar):
 
@@ -260,9 +271,11 @@ intershop_npm_install` will run `npm install` inside the newly established `inte
 `intershop rebuild` will create a Postgres DB (named `myapp` or whatever name you chose) and a user by the
 same name and run all the `*.sql` files in `intershop/db`:
 
-```bash
 peru reup && peru sync
 rake intershop_npm_install
+</strike>
+
+```bash
 intershop rebuild
 ```
 
