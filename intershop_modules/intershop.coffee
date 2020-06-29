@@ -34,6 +34,7 @@ intershop_guest_configuration_path  = resolve join intershop_guest_path, 'inters
 @settings[ 'intershop/guest/path'               ] = { type: 'text/path/folder', value: intershop_guest_path, }
 @settings[ 'intershop/host/configuration/path'  ] = { type: 'text/path/folder', value: intershop_host_configuration_path, }
 @settings[ 'intershop/guest/configuration/path' ] = { type: 'text/path/folder', value: intershop_guest_configuration_path, }
+@settings[ "os/env/#{key}"                      ] = { type: 'text', value, } for key, value of process.env
 #...........................................................................................................
 try
   @PTV_READER.update_hash_from_path intershop_guest_configuration_path, @settings
