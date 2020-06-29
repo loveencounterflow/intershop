@@ -530,5 +530,5 @@ See [documentation/vnrs.md](documentation/vnrs.md).
     first two steps are implicit and non-configurable (i.e. we only deal with line-oriented text files);
     as soon as fields have been derived, a recurring task is to cast them to known data types
 * [ ] `053-immutable.sql`: implement generalized DynSQL trigger functions to make immutable records easier
-
+* [ ] `U.variables`: references in variable values are not resolved
 
