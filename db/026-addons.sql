@@ -46,6 +46,34 @@ create table ADDONS.files (
   relpath text not null,
   primary key ( aoid, path ) );
 
+-- ---------------------------------------------------------------------------------------------------------
+set role dba;
+create function ADDONS.import_python_addons() returns void language plpython3u as $$
+  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+  #.........................................................................................................
+  sql   = """
+    select
+        aoid,
+        target,
+        path
+      from ADDONS.files
+      where target = 'support'
+      order by aoid, path;"""
+  plan  = plpy.prepare( sql )
+  rows  = plpy.execute( plan )
+  for row in rows:
+    # ctx[ row[ 'key' ] ] = row[ 'value' ]
+    ctx.log( '^5554^', "row", row )
+    ctx.addons[ row[ 'aoid' ] ] = ctx.module_from_path( ctx, row[ 'aoid' ], row[ 'path' ] )
+  #.........................................................................................................
+  ### TAINT use dedicated function to set variable ###
+  sql = """select ¶( 'intershop/addons/loaded', 'true'::text );"""
+  plan  = plpy.prepare( sql )
+  rows  = plpy.execute( plan )
+  $$;
+reset role;
+
+
 
 /* ###################################################################################################### */
 \echo :red ———{ :filename 2 }———:reset

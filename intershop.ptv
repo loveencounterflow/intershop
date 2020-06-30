@@ -18,7 +18,9 @@ intershop/mirage/parallel-limit       ::integer=          2
 # intershop/mirage/dsk/configuration    ::url=                ptv:${intershop/host/configuration/path}
 intershop/mirage/dsk/pkgjson          ::url=              plain:${intershop/guest/path}/package.json
 
-
+#-----------------------------------------------------------------------------------------------------------
+# Used by `U.py_init()` to determin whether addons tables are already filled:
+intershop/addons/loaded               ::boolean=          false
 
 
 

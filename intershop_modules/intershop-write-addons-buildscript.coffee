@@ -77,6 +77,7 @@ squel                     = ( require 'squel' ).useFlavour 'postgres'
         #   echo "# skipping #{target} file #{path}"
   echo "echo -e $orange$reverse $reset$orange '#{addons.populate_sql_path}'$reset"
   echo "postgres_unpaged -f #{addons.populate_sql_path}"
+  # echo "postgres_unpaged -c 'select ADDONS.import_python_addons();'" # not necessary, done by `U.py_init()`
   echo "# #{'-'.repeat 108}"
   echo "# (end of addons)"
   echo()

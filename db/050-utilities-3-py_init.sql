@@ -23,6 +23,7 @@
 set role dba;
 create function U.py_init() returns void language plpython3u as $$
     if 'ctx' in GD: return
+    #.......................................................................................................
     import sys
     import os
     from pathlib import Path
@@ -39,6 +40,7 @@ create function U.py_init() returns void language plpython3u as $$
     target        = AttributeDict()
     GD[ 'ctx' ]   = ctx
     ctx.plpy      = plpy
+    ctx.addons    = AttributeDict()
     ctx.execute   = plpy.execute
     ctx.notice    = plpy.notice
     #.......................................................................................................
@@ -113,6 +115,20 @@ create function U.py_init() returns void language plpython3u as $$
       ctx.log_python_path()
       raise
     intershop_main.setup( ctx )
+    #.......................................................................................................
+    def module_from_path( ctx, name, path ):
+      ### thx to https://stackoverflow.com/a/50395128/7568091 ###
+      ### thx to https://stackoverflow.com/a/67692/7568091 ###
+      import importlib
+      import importlib.util
+      spec                      = importlib.util.spec_from_file_location( name, path )
+      module                    = importlib.util.module_from_spec( spec )
+      sys.modules[ spec.name ]  = module
+      spec.loader.exec_module( module )
+      return  importlib.import_module( name )
+    #.......................................................................................................
+    ctx.module_from_path  = module_from_path
+    plpy.execute( 'select ADDONS.import_python_addons();' )
     #.......................................................................................................
     $$;
 
