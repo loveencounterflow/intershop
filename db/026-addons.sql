@@ -63,7 +63,7 @@ create function ADDONS.import_python_addons() returns void language plpython3u a
   rows  = plpy.execute( plan )
   for row in rows:
     # ctx[ row[ 'key' ] ] = row[ 'value' ]
-    ctx.log( '^5554^', "row", row )
+    # ctx.log( '^intershop/026-addons@5554^', "row", row )
     ctx.addons[ row[ 'aoid' ] ] = ctx.module_from_path( ctx, row[ 'aoid' ], row[ 'path' ] )
   #.........................................................................................................
   ### TAINT use dedicated function to set variable ###
