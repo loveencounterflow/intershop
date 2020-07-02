@@ -57,13 +57,18 @@ assign                    = Object.assign
 has_duplicates            = ( x ) -> ( new Set x ).size != x.length
 last_of                   = ( x ) -> x[ x.length - 1 ]
 keys_of                   = Object.keys
+types                     = require './types'
+{ isa
+  type_of
+  validate }              = types
+
 
 #-----------------------------------------------------------------------------------------------------------
 pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_query_object = ( q, settings... ) ->
-  switch type = CND.type_of q
+  switch type = type_of q
     when 'pod'
       return assign {}, q, settings...
     when 'text'
@@ -90,7 +95,7 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
   #.........................................................................................................
   ### acc. to https://node-postgres.com/features/connecting we have to wait here: ###
   # await pool.end()
-  result = if CND.isa_list result then ( last_of result ) else result
+  result = if isa.list result then ( last_of result ) else result
   #.........................................................................................................
   ### We return an empty list in case the query didn't return anything: ###
   return [] unless result?
@@ -99,7 +104,7 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
   (when `rowMode: 'array'` was set), we're done: ###
   R = result.rows
   return [] if R.length is 0
-  return R if CND.isa_list R[ 0 ]
+  return R if isa.list R[ 0 ]
   #.........................................................................................................
   ### Otherwise, we've got a non-empty list of row objects. If the query specified non-unique field names,
   field names will clobber each other. To avoid silent failure, we check for duplicates and
