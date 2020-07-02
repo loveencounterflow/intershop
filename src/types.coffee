@@ -12,6 +12,10 @@ debug                     = CND.get_logger 'debug',     badge
 intertype                 = new ( require 'intertype' ).Intertype module.exports
 # FS                        = require 'fs'
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'intershop_addon_location', tests:
+  "x must be 'guest' or 'host'": ( x ) -> x in [ 'guest', 'host', ]
+
 # #-----------------------------------------------------------------------------------------------------------
 # @declare 'fontmirror_clean_filename', tests:
 #   ###
