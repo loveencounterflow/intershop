@@ -20,7 +20,7 @@ PATH                      = require 'path'
 FS                        = require 'fs'
 resolve_pkg               = require 'resolve-pkg'
 #...........................................................................................................
-types                     = new ( require 'intertype' ).Intertype()
+types                     = require './types'
 { isa
   validate
   cast
