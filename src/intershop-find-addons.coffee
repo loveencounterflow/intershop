@@ -61,17 +61,25 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
 #-----------------------------------------------------------------------------------------------------------
 @find_addons = ->
   validate.nonempty_text process.env.intershop_host_path
+  addons  = {}
+  R       = { addons, }
+  R       = @_find_addons R, 'guest', process.env.intershop_guest_path
+  R       = @_find_addons R, 'host',  process.env.intershop_host_path
+  return new_datom '^intershop-addons', R
+
+#-----------------------------------------------------------------------------------------------------------
+@_find_addons = ( R, location, XXX_path ) ->
+  validate.intershop_addon_location location
   validate.nonempty_text process.env.intershop_tmp_path
-  addons              = []
-  R                   = { addons, }
   R.populate_sql_path = PATH.join process.env.intershop_tmp_path, 'populate-addons-table.sql'
-  R.host_path         = process.env.intershop_host_path
+  R.host_path         = XXX_path
   package_json        = require PATH.join R.host_path, 'package.json'
   #.........................................................................................................
-  for aoid of package_json.dependencies
+  for aoid of package_json.dependencies ? {}
     continue unless aoid.startsWith 'intershop-'
     #.......................................................................................................
-    addon             = { aoid, path: ( resolve_pkg aoid ), }
+    cwd               = if location is 'guest' then process.env.intershop_guest_path else R.host_path
+    addon             = { aoid, path: ( resolve_pkg aoid, { cwd, } ), }
     #.......................................................................................................
     unless addon.path?
       warn "^intershop/find-addons@478^ unable to locate #{aoid}; skipping"
@@ -105,9 +113,9 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebui
       addon.files[ file_id ]        = { path, relpath, target, }
     #.......................................................................................................
     @validate_ipj_targets addon
-    addons.push addon
+    R.addons[ addon.aoid ] = addon
   #.........................................................................................................
-  return new_datom '^intershop-addons', R
+  return R
 
 
 ############################################################################################################
