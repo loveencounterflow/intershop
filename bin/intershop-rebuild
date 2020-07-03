@@ -12,8 +12,13 @@ source "$intershop_guest_modules_path/utilities.sh"
 
 # #-----------------------------------------------------------------------------------------------------------
 ### TAINT use host bin path where intershop-write-buildscript and so on are available:
+echo '--={ intershop-rebuild 1 }=--'
 "$intershop_guest_bin_path/intershop-write-buildscript"
+echo '--={ intershop-rebuild 2 }=--'
 sudo_postgres_unpaged -f "$intershop_guest_sql_path/teardown.sql" 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+echo '--={ intershop-rebuild 3 }=--'
 "$intershop_sql_buildscript_path" #        2>&1 | grep -P '^.*ERROR.*$|' --color=always
+echo '--={ intershop-rebuild 4 }=--'
 "$intershop_guest_bin_path/intershop-refresh-mirage-datasources"
+echo '--={ intershop-rebuild 5 }=--'
 
