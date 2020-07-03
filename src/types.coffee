@@ -14,7 +14,8 @@ intertype                 = new ( require 'intertype' ).Intertype module.exports
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'intershop_addon_location', tests:
-  "x must be 'guest' or 'host'": ( x ) -> x in [ 'guest', 'host', ]
+  "x is a nonempty_text":                     ( x ) -> @isa.nonempty_text x
+  "x must be 'guest' or 'host'":              ( x ) -> x in [ 'guest', 'host', ]
 
 # #-----------------------------------------------------------------------------------------------------------
 # @declare 'fontmirror_clean_filename', tests:
