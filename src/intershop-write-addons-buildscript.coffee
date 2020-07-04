@@ -60,6 +60,9 @@ squel                     = ( require 'squel' ).useFlavour 'postgres'
 #-----------------------------------------------------------------------------------------------------------
 @write_buildscript = ( addons ) ->
   validate.object addons
+  echo "echo -e $orange$reverse $reset$orange '#{addons.populate_sql_path}'$reset"
+  echo "postgres_unpaged -f #{addons.populate_sql_path}"
+  #.........................................................................................................
   for aoid, addon of addons.addons
     echo()
     echo "# #{'-'.repeat 108}"
@@ -75,8 +78,7 @@ squel                     = ( require 'squel' ).useFlavour 'postgres'
           echo "postgres_unpaged -f #{path}"
         # else
         #   echo "# skipping #{target} file #{path}"
-  echo "echo -e $orange$reverse $reset$orange '#{addons.populate_sql_path}'$reset"
-  echo "postgres_unpaged -f #{addons.populate_sql_path}"
+  #.........................................................................................................
   # echo "postgres_unpaged -c 'select ADDONS.import_python_addons();'" # not necessary, done by `U.py_init()`
   echo "# #{'-'.repeat 108}"
   echo "# (end of addons)"
