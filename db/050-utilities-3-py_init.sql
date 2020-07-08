@@ -132,18 +132,18 @@ create function U.py_init() returns void language plpython3u as $$
     #.......................................................................................................
     $$;
 
--- ---------------------------------------------------------------------------------------------------------
-set role dba;
-create function log( value variadic text[] ) returns void language plpython3u as $$
-  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
-  value_ = [ str( e ) for e in value ]
-  with open( ctx.intershop_psql_output_path, 'ab' ) as o:
-    o.write( ' '.join( value_ ).encode( 'utf-8' ) + b'\n' )
-  $$;
-reset role;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- set role dba;
+-- create function log( value variadic text[] ) returns void language plpython3u as $$
+--   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+--   value_ = [ str( e ) for e in value ]
+--   with open( ctx.intershop_psql_output_path, 'ab' ) as o:
+--     o.write( ' '.join( value_ ).encode( 'utf-8' ) + b'\n' )
+--   $$;
+-- reset role;
 
--- ---------------------------------------------------------------------------------------------------------
-create function log() returns void language sql as $$ select log( '' ); $$;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- create function log() returns void language sql as $$ select log( '' ); $$;
 
 /* use log like so:
 do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
@@ -188,8 +188,8 @@ reset role;
 /* ###################################################################################################### */
 
 -- select * from U.variables where key ~ 'intershop' order by key;
-do $$ begin perform U._test_py_init(); end; $$;
-do $$ begin perform log( 'using log function OK' ); end; $$;
+-- do $$ begin perform U._test_py_init(); end; $$;
+-- do $$ begin perform log( 'using log function OK' ); end; $$;
 
 \quit
 
