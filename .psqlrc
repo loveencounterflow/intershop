@@ -1,0 +1,26 @@
+
+-- \setenv PAGER /home/flow/bin/pspg
+-- \pset null '¤'
+\set QUIET on
+\set ECHO none
+\pset null '∎'
+-- \pset format wrapped
+-- \pset columns 500
+\pset linestyle unicode
+\pset border 2
+\pset footer off
+\pset unicode_border_linestyle double
+\pset unicode_column_linestyle single
+\pset unicode_header_linestyle double
+
+-- \set PROMPT1 '%[%033[1m%]%M %n@%/%R%[%033[0m%]%# '
+\set PROMPT1 '%[%033[33;1m%]%x%[%033[0m%]%[%033[1m%]%/%[%033[0m%]%R%# '
+-- \set PROMPT1 '%[%033[1m%][%/] # '
+-- SELECT * FROM<enter>. %R shows what type of input it expects.
+-- \set PROMPT2 '... > '
+
+\set COMP_KEYWORD_CASE lower
+\set HISTCONTROL ignoredups
+\set ON_ERROR_STOP true
+
+
