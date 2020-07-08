@@ -167,10 +167,10 @@ select * from VNR.datoms order by _vnr0;
 -- select '+infinity'::float8, '-infinity'::float8;
 
 
+
 /* ###################################################################################################### */
 \echo :red ———{ :filename 4 }———:reset
 \quit
-
 
 
 
