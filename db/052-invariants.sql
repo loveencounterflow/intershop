@@ -78,13 +78,15 @@ create table INVARIANTS.tests (
     module              text    not null,
     title               text    not null,
     values              text    not null,
-    is_ok               boolean not null default false );
+    is_ok               boolean default false );
 
 -- ---------------------------------------------------------------------------------------------------------
-create view INVARIANTS.violations as select module, title, values from INVARIANTS.tests where not is_ok;
-  -- module              text not null,
-  -- title               text not null,
-  -- values              text not null );
+create view INVARIANTS.violations as select
+    module,
+    title,
+    values
+  from INVARIANTS.tests
+  where not coalesce( is_ok, false );
 
 -- ---------------------------------------------------------------------------------------------------------
 create function INVARIANTS.validate()
@@ -92,8 +94,7 @@ create function INVARIANTS.validate()
   declare
     ¶row        record;
   begin
-    perform count(*) from ( select * from INVARIANTS.violations limit 1 ) as x;
-    if found then
+    if ( select count(*) > 0 from ( select * from INVARIANTS.violations limit 1 ) as x ) then
       perform log( '^INVARIANTS 44644^ ------------------------------------------------------------------' );
       perform log( '^INVARIANTS 44644^ output of INVARIANTS.validate():' );
       for ¶row in ( select * from INVARIANTS.violations ) loop
@@ -101,8 +102,9 @@ create function INVARIANTS.validate()
         end loop;
       perform log( '^INVARIANTS 44644^ ------------------------------------------------------------------' );
       raise sqlstate 'INV01' using message = '#INV01-1 Violations Detected', hint = 'see above or below';
+    else
+      perform log( '^INVARIANTS 44645^', 'INVARIANTS.validate(): ok' );
       end if;
-    perform log( '^INVARIANTS 44645^', 'INVARIANTS.validate(): ok' );
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
