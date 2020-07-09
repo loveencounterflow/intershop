@@ -87,25 +87,6 @@ create function U.py_init() returns void language plpython3u as $$
       sys.path.insert( 0, ctx.intershop_host_modules_path )
     sys.path.insert( 0, ctx.intershop_guest_modules_path )
     #.......................................................................................................
-    def log( *P ):
-      R = []
-      for p in P:
-        if isinstance( p, str ):  R.append( p )
-        else:                     R.append( repr( p ) )
-      R = ' '.join( R )
-      with open( ctx.intershop_psql_output_path, 'ab' ) as o:
-        o.write( R.encode( 'utf-8' ) + b'\n' )
-      return R
-    #.......................................................................................................
-    def log_python_path():
-      ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
-      ctx.log( "Python path:" )
-      for idx, path in enumerate( sys.path ):
-        ctx.log( idx + 1, path )
-      ctx.log( "- - - - - ---------===(0)===--------- - - - - -"  )
-    #.......................................................................................................
-    ctx.log                 = log
-    ctx.log_python_path     = log_python_path
     ctx._absorb_environment = _absorb_environment
     #.......................................................................................................
     try:
@@ -165,24 +146,24 @@ do $$ begin perform log( ( 42 + 108 )::text ); end; $$;
 --   $$;
 -- reset role;
 
--- ---------------------------------------------------------------------------------------------------------
-set role dba;
-create function U._test_py_init() returns void language plpython3u as $$
-  plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
-  # import sys
-  # ctx.log( ctx.url_parser )
-  # ctx.log_python_path()
-  # keys = [ key for key in ctx ]
-  # keys.sort()
-  # for key in keys:
-  #   ctx.log( 'ctx.' + key )
-  # for key in dir( ctx.ipc ):
-  #   # if key.startswith( '_' ): continue
-  #   ctx.log( 'ctx.ipc.' + key )
-  for i in range( 0, 3 ):
-    ctx.log( '87321', 'logging:', repr( i ) )
-  $$;
-reset role;
+-- -- ---------------------------------------------------------------------------------------------------------
+-- set role dba;
+-- create function U._test_py_init() returns void language plpython3u as $$
+--   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
+--   # import sys
+--   # ctx.log( ctx.url_parser )
+--   # ctx.log_python_path()
+--   # keys = [ key for key in ctx ]
+--   # keys.sort()
+--   # for key in keys:
+--   #   ctx.log( 'ctx.' + key )
+--   # for key in dir( ctx.ipc ):
+--   #   # if key.startswith( '_' ): continue
+--   #   ctx.log( 'ctx.ipc.' + key )
+--   for i in range( 0, 3 ):
+--     ctx.log( '87321', 'logging:', repr( i ) )
+--   $$;
+-- reset role;
 
 
 /* ###################################################################################################### */

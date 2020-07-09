@@ -25,7 +25,6 @@ function postgres_paged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
     "$@"
   }
@@ -37,7 +36,6 @@ function postgres_unpaged () {
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
     "$@"
   }
@@ -49,7 +47,6 @@ function sudo_postgres_unpaged_hostdb () {
     -d $intershop_db_name -p $intershop_db_port                                     \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
     "$@"
   if [[ $? != 0 ]]; then exit 123; fi
@@ -61,7 +58,6 @@ function sudo_postgres_unpaged () {
     -p $intershop_db_port                                                           \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
-    --set=out="$intershop_psql_output_path"                                         \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
     "$@"
   if [[ $? != 0 ]]; then exit 123; fi
