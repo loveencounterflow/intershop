@@ -38,6 +38,7 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
 - [No More FDWs FTW](#no-more-fdws-ftw)
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
 - [VNRs](#vnrs)
+- [Invariants](#invariants)
 - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -484,6 +485,10 @@ demo](https://github.com/loveencounterflow/intershop/blob/master/db/demos/read-f
 # VNRs
 
 See [documentation/vnrs.md](documentation/vnrs.md).
+
+# Invariants
+
+See [documentation/invariants.md](documentation/invariants.md).
 
 # To Do
 
