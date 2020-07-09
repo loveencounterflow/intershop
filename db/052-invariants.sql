@@ -74,31 +74,47 @@ drop schema if exists INVARIANTS cascade;
 create schema INVARIANTS;
 
 -- ---------------------------------------------------------------------------------------------------------
-create table INVARIANTS.violations (
-  module              text not null,
-  title               text not null,
-  values              text not null );
+create table INVARIANTS.tests (
+    module              text    not null,
+    title               text    not null,
+    values              text    not null,
+    is_ok               boolean not null default false );
+
+-- ---------------------------------------------------------------------------------------------------------
+create view INVARIANTS.violations as select module, title, values from INVARIANTS.tests where not is_ok;
+  -- module              text not null,
+  -- title               text not null,
+  -- values              text not null );
 
 -- ---------------------------------------------------------------------------------------------------------
 create function INVARIANTS.validate()
   returns void stable parallel unsafe language plpgsql as $$
   declare
     ¶row        record;
-    has_errors  boolean := false;
   begin
-    for ¶row in ( select * from INVARIANTS.violations ) loop
-      has_errors := true;
-      perform log( 'INVARIANTS 44644', ¶row::text );
-      end loop;
-    if has_errors then
-      raise sqlstate 'INV01' using message = '#INV01-1 Violations Detected', hint = 'see above';
-    else
-      perform log( 'INVARIANTS 44645', 'invariants ok' );
+    perform count(*) from ( select * from INVARIANTS.violations limit 1 ) as x;
+    if found then
+      perform log( '^INVARIANTS 44644^ ------------------------------------------------------------------' );
+      perform log( '^INVARIANTS 44644^ output of INVARIANTS.validate():' );
+      for ¶row in ( select * from INVARIANTS.violations ) loop
+        perform log( '^INVARIANTS 44644^ violation:', ¶row::text );
+        end loop;
+      perform log( '^INVARIANTS 44644^ ------------------------------------------------------------------' );
+      raise sqlstate 'INV01' using message = '#INV01-1 Violations Detected', hint = 'see above or below';
       end if;
+    perform log( '^INVARIANTS 44645^', 'INVARIANTS.validate(): ok' );
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create function INVARIANTS.on_after_insert_into_violations() returns trigger language plpgsql as $$
+create function INVARIANTS.on_after_insert_into_tests_row() returns trigger language plpgsql as $$
+  begin
+    if not new.is_ok and ¶( 'intershop/invariants/showinserts' )::boolean then
+      perform log( '^INVARIANTS 44646^ violation:', new::text );
+      end if;
+    return new; end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function INVARIANTS.on_after_insert_into_tests_statement() returns trigger language plpgsql as $$
   begin
     if ¶( 'intershop/invariants/autovalidate' )::boolean then
       perform INVARIANTS.validate();
@@ -106,8 +122,10 @@ create function INVARIANTS.on_after_insert_into_violations() returns trigger lan
     return new; end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
-create trigger on_after_insert_into_violations after insert on INVARIANTS.violations
-  for each statement execute procedure INVARIANTS.on_after_insert_into_violations();
+create trigger on_after_insert_into_tests_row after insert on INVARIANTS.tests
+  for each row execute procedure INVARIANTS.on_after_insert_into_tests_row();
+create trigger on_after_insert_into_tests_statement after insert on INVARIANTS.tests
+  for each statement execute procedure INVARIANTS.on_after_insert_into_tests_statement();
 
 /* ====================================================================================================== */
 \quit
