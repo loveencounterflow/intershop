@@ -527,14 +527,14 @@ create function MIRAGE.refresh( ¶path text, ¶mode text )
       raise exception 'MIRAGE #00930 unknown pathmode ( %, % )', ¶path, ¶mode;
       end if;
     -- .....................................................................................................
-    perform log( 'MIRAGE #77384 caching:', ¶affected_dsks, format( '-> (%s)', ¶mode ), ¶short_path );
+    -- perform log( 'MIRAGE #77384 caching:', ¶affected_dsks, format( '-> (%s)', ¶mode ), ¶short_path );
     -- .....................................................................................................
     insert into MIRAGE.cache ( ch, mode, linenr, include, line, fields )
       select ¶ch, ¶mode, r.linenr, r.include, r.line, r.fields
         from MIRAGE._read_cachelinekernels( ¶path, ¶mode ) as r;
     -- .....................................................................................................
     get diagnostics ¶affected_rows = row_count;
-    perform log( format( 'MIRAGE #77384 read %s rows', to_char( ¶affected_rows, '999,999,999' ) ) );
+    -- perform log( format( 'MIRAGE #77384 read %s rows', to_char( ¶affected_rows, '999,999,999' ) ) );
     -- .....................................................................................................
     return 1; end; $$;
 
