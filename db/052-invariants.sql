@@ -12,59 +12,6 @@
 888888 8888    Y888     Y8P  d88P     888 888   T88b 8888888 d88P     888 888    Y888     888     "Y8888P"
 
 
-The INVARIANT module simplifies the creation of sanity checks for your data. It contains a table
-`INVARIANTS.violations` that is supposed to be always empty; as soon as values are inserted (and
-the `intershop.ptv` variable `intershop/invariants/autovalidate` has been set to `true`), an
-exception is raised. If `autovalidate` is off, the same effect may be achieved by executing
-
-```
-do $$ begin perform INVARIANTS.validate(); end; $$;
-```
-
-instead.
-
-The `violations` table has three text columns, `module`, `title`, and `values`, which can be used to insert
-a code to localize the test at hand, detail the purpose or expectation of the text, and a serialized
-representation of the violated expectations.
-
-For example, at some point in a module `FOOBAR` we may want to test whether a series of numbers does indeed
-contain only odd numbers; in order to test for this condition, we can either test for even numbers and
-insert all true outcomes, or else test for odd numbers and insert all false outcomes:
-
-```
-insert into INVARIANTS.violations ( select
-    'FOOBAR',
-    'all n are odd',
-    row( r1, r2 )::text
-  from generate_series( 1, 10, 3 ) as r1 ( n ),
-  lateral ( select ( n::float / 2 ) = ( n::integer / 2 ) ) as r2 ( test )
-  where r2.test );
-```
-
-The `generate_series` call will produce the series `(1,4,7,10)`, of which `4` and `10` are even and get
-inserted into the violations table; consequently, INVARIANTS will raise an exception:
-
-```
-INVARIANTS 44644 (FOOBAR,"all n are odd","(4,""(t)"")")
-INVARIANTS 44644 (FOOBAR,"all n are odd","(10,""(t)"")")
-psql:db/experiments/invariants.sql:66: ERROR:  #INV01-1 Violations Detected
-HINT:  see above
-```
-
-If we change `generate_series( 1, 10, 3 )` to `generate_series( 1, 10, 4 )`, everything will be fine
-of course and `INVARIANTS` will just output a message that tests have performed OK.
-
-Typically, your assertions will take an existing relation and select unexpected matches into the violations
-table, like this:
-
-```
-insert into INVARIANTS.violations ( select
-    'DICTIONARY', 'no entries end in a semicolon',
-    r1::text
-  from DICTS.mydict as r1
-  where ( line ~ ';$' ) );
-```
-
 */
 
 
