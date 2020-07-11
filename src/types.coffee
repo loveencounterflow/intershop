@@ -17,6 +17,11 @@ intertype                 = new ( require 'intertype' ).Intertype module.exports
   "x is a nonempty_text":                     ( x ) -> @isa.nonempty_text x
   "x must be 'guest' or 'host'":              ( x ) -> x in [ 'guest', 'host', ]
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'intershop_cli_psql_run_selector', tests:
+  "x is a nonempty_text":                     ( x ) -> @isa.nonempty_text x
+  "x must be '-c' or '-f'":                   ( x ) -> x in [ '-c', '-f', ]
+
 # #-----------------------------------------------------------------------------------------------------------
 # @declare 'fontmirror_clean_filename', tests:
 #   ###

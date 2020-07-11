@@ -27,12 +27,38 @@ MAIN                      = @
   isa }                   = @types.export()
 
 #-----------------------------------------------------------------------------------------------------------
+@get = ( key ) ->
+  unless ( entry = @settings[ key ] )?
+    throw new Error "^intershop/get@44787^ unknown variable #{rpr key}"
+  { type, value, } = entry
+  switch type
+    when 'int', 'integer'
+      validate.integer R = parseInt value, 10
+    when 'U.natural_number'
+      validate.positive_integer R = parseInt value, 10
+    when 'text'               then R = value
+    when 'json'               then R = JSON.parse value
+    when 'boolean'
+      if      value is 'true'  then R = true
+      else if value is 'false' then R = false
+      else throw new Error "^intershop/get@44787^ expected a boolean literal, got #{rpr value}"
+    else R = value
+    # when 'url'
+    # text/path/folder
+    # url
+    # text/ip-address
+    # unit
+    # text/path/file
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
 ### TAINT consider to use Multimix ###
 @new_intershop = ( path = null ) ->
   R               = {}
   R.PTV_READER    = require './ptv-reader'
   R.new_intershop = MAIN.new_intershop.bind MAIN
   R.types         = MAIN.types
+  R.get           = MAIN.get.bind R
   #.........................................................................................................
   ### TAINT validate ###
   intershop_host_path                 = path ? process.cwd()
