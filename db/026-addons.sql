@@ -64,7 +64,11 @@ create function ADDONS.import_python_addons() returns void language plpython3u a
   for row in rows:
     # ctx[ row[ 'key' ] ] = row[ 'value' ]
     # ctx.log( '^intershop/026-addons@5554^', "row", row )
-    ctx.addons[ row[ 'aoid' ] ] = ctx.module_from_path( ctx, row[ 'aoid' ], row[ 'path' ] )
+    module                      = ctx.module_from_path( ctx, row[ 'aoid' ], row[ 'path' ] )
+    ctx.addons[ row[ 'aoid' ] ] = module
+    preparer                    = getattr( module, '_prepare', None )
+    if preparer is not None:
+      preparer( ctx )
   #.........................................................................................................
   ### TAINT use dedicated function to set variable ###
   sql = """select ¶( 'intershop/addons/loaded', 'true'::text );"""
