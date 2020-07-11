@@ -21,47 +21,57 @@ echo                      = CND.echo.bind CND
 PATH                      = require 'path'
 join                      = PATH.join.bind PATH
 resolve                   = PATH.resolve.bind PATH
-@PTV_READER               = require './ptv-reader'
+MAIN                      = @
+@types                    = require './types'
+{ validate
+  isa }                   = @types.export()
 
 #-----------------------------------------------------------------------------------------------------------
-intershop_host_path                 = process.cwd()
-intershop_guest_path                = resolve join intershop_host_path,  'intershop'
-intershop_host_configuration_path   = resolve join intershop_host_path,  'intershop.ptv'
-intershop_guest_configuration_path  = resolve join intershop_guest_path, 'intershop.ptv'
-#...........................................................................................................
-@settings                                         = {}
-@settings[ 'intershop/host/path'                ] = { type: 'text/path/folder', value: intershop_host_path, }
-@settings[ 'intershop/guest/path'               ] = { type: 'text/path/folder', value: intershop_guest_path, }
-@settings[ 'intershop/host/configuration/path'  ] = { type: 'text/path/folder', value: intershop_host_configuration_path, }
-@settings[ 'intershop/guest/configuration/path' ] = { type: 'text/path/folder', value: intershop_guest_configuration_path, }
-@settings[ "os/env/#{key}"                      ] = { type: 'text', value, } for key, value of process.env
-#...........................................................................................................
-try
-  @PTV_READER.update_hash_from_path intershop_guest_configuration_path, @settings
-catch error
-  warn """
-    '^intershop@334-1^'
-    when trying to read guest configuration from
-      #{intershop_guest_configuration_path}
-    an error occurred:
-      #{error.message}"""
-  # process.exit 1
-  # throw error
-try
-  @PTV_READER.update_hash_from_path intershop_host_configuration_path,  @settings
-catch error
-  warn """
-    '^intershop@334-2^'
-    when trying to read host configuration from
-      #{intershop_host_configuration_path}
-    an error occurred:
-      #{error.message}"""
-  process.exit 1
-  throw error
+### TAINT consider to use Multimix ###
+@new_intershop = ( path = null ) ->
+  R               = {}
+  R.PTV_READER    = require './ptv-reader'
+  R.new_intershop = MAIN.new_intershop.bind MAIN
+  R.types         = MAIN.types
+  #.........................................................................................................
+  ### TAINT validate ###
+  intershop_host_path                 = path ? process.cwd()
+  intershop_guest_path                = resolve join intershop_host_path,  'intershop'
+  intershop_host_configuration_path   = resolve join intershop_host_path,  'intershop.ptv'
+  intershop_guest_configuration_path  = resolve join intershop_guest_path, 'intershop.ptv'
+  #.........................................................................................................
+  R.settings                                         = {}
+  R.settings[ 'intershop/host/path'                ] = { type: 'text/path/folder', value: intershop_host_path, }
+  R.settings[ 'intershop/guest/path'               ] = { type: 'text/path/folder', value: intershop_guest_path, }
+  R.settings[ 'intershop/host/configuration/path'  ] = { type: 'text/path/folder', value: intershop_host_configuration_path, }
+  R.settings[ 'intershop/guest/configuration/path' ] = { type: 'text/path/folder', value: intershop_guest_configuration_path, }
+  R.settings[ "os/env/#{key}"                      ] = { type: 'text', value, } for key, value of process.env
+  #.........................................................................................................
+  try
+    R.PTV_READER.update_hash_from_path intershop_guest_configuration_path, R.settings
+  catch error
+    warn """
+      '^intershop@334-1^'
+      when trying to read guest configuration from
+        #{intershop_guest_configuration_path}
+      an error occurred:
+        #{error.message}"""
+    # process.exit 1
+    # throw error
+  try
+    R.PTV_READER.update_hash_from_path intershop_host_configuration_path,  R.settings
+  catch error
+    warn """
+      '^intershop@334-2^'
+      when trying to read host configuration from
+        #{intershop_host_configuration_path}
+      an error occurred:
+        #{error.message}"""
+    process.exit 1
+    throw error
+  #.........................................................................................................
+  return R
 
-
-############################################################################################################
-unless module.parent?
-  INTERSHOP = @
-  # INTERSHOP.helo()
+#-----------------------------------------------------------------------------------------------------------
+module.exports = @new_intershop()
 
