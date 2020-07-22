@@ -109,6 +109,7 @@ show_error_with_source_context = ( error, headline ) ->
   # debug CND.cyan error.stack
   ##########################################################################################################
   stackman.callsites error, ( stackman_error, callsites ) ->
+    debug '^2223^'
     throw stackman_error if stackman_error?
     callsites.reverse()
     callsites.forEach ( callsite ) ->
@@ -137,17 +138,20 @@ show_error_with_source_context = ( error, headline ) ->
 @exit_handler = ( exception ) ->
   print               = alert
   message             = ' EXCEPTION: ' + ( exception?.message ? "an unrecoverable condition occurred" )
-  if exception?.where?
-    message += '\n--------------------\n' + exception.where + '\n--------------------'
+  if stack = exception?.where ? exception?.stack ? null
+    message += '\n--------------------\n' + stack + '\n--------------------'
   [ head, tail..., ]  = message.split '\n'
+  # debug '^222766^', { stack, }
+  # debug '^222766^', { message, tail, }
   print reverse ' ' + head + ' '
   warn line for line in tail
   if exception?.stack?
+    debug '^4445^', "show_error_with_source_context"
     show_error_with_source_context exception, ' ' + head + ' '
   else
     whisper exception?.stack ? "(exception undefined, no stack)"
-  # process.exitCode = 1
-  process.exit 111
+  process.exitCode = 1
+  # process.exit 111
 @exit_handler = @exit_handler.bind @
 
 
