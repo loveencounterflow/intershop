@@ -113,6 +113,7 @@ select * from _X_TIME.seconds_per;
 -- ---------------------------------------------------------------------------------------------------------
 create function _X_TIME.age_as_text( age_s double precision )
   returns text immutable language sql as $$
+    -- ### TAINT use exclusive upper limits to avoid double-opting for values on boundaries ###
     select ''
       || case when age_s >=        31557600                then ( age_s /  31557600 )::numeric( 30, 1 )::text || ' years'   else '' end
       || case when age_s between    2629800 and   31557600 then ( age_s /   2629800 )::numeric( 30, 1 )::text || ' months'  else '' end
@@ -212,8 +213,12 @@ create view _X_TIME.seconds_comparison as (
           './.'               as title,
           n                   as n,
           ( 10 ^ n )::bigint  as s
+          -- to_char( ( 10 ^ n )::bigint, '999,999,999,999,0' ) as s
         from v1
       union all select 'smallint',                            null,                32768
+      union all select 'one day',                             null,                86400
+      union all select 'one week',                            null,               604800
+      union all select 'one year',                            null,             31557600
       union all select 'integer',                             null,           2147483648
       union all select 'bigint',                              null,  9223372036854775807
       union all select 'age of the universe in seconds',      null,               4.3e17
