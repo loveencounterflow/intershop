@@ -29,7 +29,7 @@
     "datom": "^7.0.3",
     "executable": "^4.1.1",
     "forever-parallel": "0.0.5",
-    "intershop-rpc": "^0.4.0",
+    "intershop-rpc": "^0.5.0",
     "intertype": "^7.2.0",
     "minimatch": "^3.0.4",
     "pg": "^8.3.0",
