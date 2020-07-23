@@ -39,13 +39,14 @@ class AttributeDict(dict):
   def __setattr__(self, attr, value):
     self[attr] = value
 #...........................................................................................................
-ctx           = AttributeDict()
-target        = AttributeDict()
-GD[ 'ctx' ]   = ctx
-ctx.plpy      = plpy
-ctx.addons    = AttributeDict()
-ctx.execute   = plpy.execute
-ctx.notice    = plpy.notice
+ctx               = AttributeDict()
+target            = AttributeDict()
+GD[ 'ctx' ]       = ctx
+ctx.plpy          = plpy
+ctx.addons        = AttributeDict()
+ctx.execute       = plpy.execute
+ctx.notice        = plpy.notice
+ctx.AttributeDict = AttributeDict
 
 #-----------------------------------------------------------------------------------------------------------
 def get_variable( key ):
