@@ -20,8 +20,28 @@ intershop/mirage/parallel-limit       ::integer=          2
 intershop/mirage/dsk/pkgjson          ::url=              plain:${intershop/guest/path}/package.json
 
 #-----------------------------------------------------------------------------------------------------------
-# Used by `U.py_init()` to determin whether addons tables are already filled:
+# Used by `U.py_init()` to determine whether addons tables are already filled:
 intershop/addons/loaded               ::boolean=          false
+
+#-----------------------------------------------------------------------------------------------------------
+# Used by `U.py_init()` to extend the Python path so modules can import user-installed Python modules. The
+# value given below should be adapted to the system where intershop is running; on Debian-derived Linux
+# distros, the default value is `/home/${intershop/system/user}/.local/lib/python3.6/site-packages`.
+#
+# The value of this setting may contain zero or more paths to directories to be searched for `import`able
+# Python 3 modules; indivual paths must be separated by `:` (U+003A Colon). Like all PTV values it must be
+# written out in a single line (future versions of PTV may or may not allow line continuations). The value
+# will be split into a list of strings all of which are *prepended* to the Python `sys.path` value, ensuring
+# they take precedence over the preset value of that variable.
+#
+# Observe that this value has a type of `text/unixdirpath` on all systems FTM, so it is not currently
+# possible to add a directory that has a colon somehwere in its name (see
+# https://unix.stackexchange.com/questions/311339/why-was-colon-chosen-as-path-separator).
+intershop/plpython3u/syspathprefix ::text/unixdirpath= /home/${os/env/USER}/.local/lib/python3.6/site-packages
+
+
+
+
 
 
 
