@@ -23,9 +23,9 @@ echo                      = CND.echo.bind CND
 # prv_path                  = process.cwd()
 # process.chdir PATH.join __dirname, '../..'
 # whisper '33622', "working directory temporarily changed to #{process.cwd()}"
-INTERSHOP                 = require '..'
-O                         = INTERSHOP.settings
-PTVR                      = INTERSHOP.PTV_READER
+INTERSHOP                 = require '../lib/intershop'
+shop                      = INTERSHOP.new_intershop()
+O                         = shop.settings
 # process.chdir prv_path
 # whisper '33622', "working directory changed to #{prv_path}"
 #...........................................................................................................

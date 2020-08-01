@@ -23,17 +23,8 @@ PATH                      = require 'path'
 parallel                  = require './parallel-promise'
 DB                        = require './db'
 #...........................................................................................................
-# INTERSHOP                 = require '..'
-# O                         = INTERSHOP.settings
-# PTVR                      = INTERSHOP.PTV_READER
 INTERSHOP                 = require '../lib/intershop'
-shop                      = INTERSHOP.new_intershop process.env[ 'intershop_host_path' ]
-# for k of process.env
-#   continue if k.startsWith '_'
-#   continue if /^[A-Z]/.test k
-#   debug '^37778^', ( CND.yellow k ), ( CND.blue process.env[ k ] )
-# # debug shop.settings
-# process.exit 11
+shop                      = INTERSHOP.new_intershop()
 
 
 ### TAINT PTV reader should cast values ###

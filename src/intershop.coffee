@@ -61,7 +61,7 @@ MAIN                      = @
   R.get           = MAIN.get.bind R
   #.........................................................................................................
   ### TAINT validate ###
-  intershop_host_path                 = path ? process.cwd()
+  intershop_host_path                 = path ? process.env[ 'intershop_host_path' ] ? process.cwd()
   intershop_guest_path                = resolve join intershop_host_path,  'intershop'
   intershop_host_configuration_path   = resolve join intershop_host_path,  'intershop.ptv'
   intershop_guest_configuration_path  = resolve join intershop_guest_path, 'intershop.ptv'
