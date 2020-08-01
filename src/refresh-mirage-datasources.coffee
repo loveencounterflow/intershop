@@ -23,17 +23,21 @@ PATH                      = require 'path'
 parallel                  = require './parallel-promise'
 DB                        = require './db'
 #...........................................................................................................
-INTERSHOP                 = require '..'
-O                         = INTERSHOP.settings
-PTVR                      = INTERSHOP.PTV_READER
+# INTERSHOP                 = require '..'
+# O                         = INTERSHOP.settings
+# PTVR                      = INTERSHOP.PTV_READER
+INTERSHOP                 = require '../lib/intershop'
+shop                      = INTERSHOP.new_intershop process.env[ 'intershop_host_path' ]
+# for k of process.env
+#   continue if k.startsWith '_'
+#   continue if /^[A-Z]/.test k
+#   debug '^37778^', ( CND.yellow k ), ( CND.blue process.env[ k ] )
+# # debug shop.settings
+# process.exit 11
 
-# for path, { type, value } of O
-#   info ( path.padEnd 45 ), ( CND.grey type.padEnd 15 ), ( CND.white value )
 
 ### TAINT PTV reader should cast values ###
 ### TAINT need API (proxy?) so we get error for non-existant names ###
-dsk_parallel_limit        = parseInt O[ 'intershop/mirage/parallel-limit' ].value, 10
-debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
 
 
 #===========================================================================================================
@@ -41,9 +45,9 @@ debug '^3344^', 'dsk_parallel_limit:', dsk_parallel_limit
 #-----------------------------------------------------------------------------------------------------------
 @get_dsk_definitions = ->
   R                     = {}
-  intershop_host_path   = O[ 'intershop/host/path' ].value
+  intershop_host_path   = shop.settings[ 'intershop/host/path' ].value
   #.........................................................................................................
-  for [ settings_path, { type, value, }, ] in PTVR.match O, 'intershop/mirage/dsk/**'
+  for [ settings_path, { type, value, }, ] in shop.PTV_READER.match shop.settings, 'intershop/mirage/dsk/**'
     dsk = settings_path.replace /^intershop\/mirage\/dsk\//g, ''
     #.......................................................................................................
     unless type is 'url'
