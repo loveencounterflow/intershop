@@ -67,21 +67,6 @@ shop                      = INTERSHOP.new_intershop process.env[ 'intershop_host
     else
       ( R[ dsk ]?= [] ).push { path, mode, }
   #.........................................................................................................
-  # delete R[ 'formulas'                  ] # 2754912
-  # delete R[ 'strokeorders'              ] # 3103259
-  # delete R[ 'meanings'                  ] # 1398839
-  # delete R[ 'sims'                      ] # 807439
-  # delete R[ 'other/sawndip'             ] # 204981
-  # delete R[ 'factor-hierarchy'          ] # 105592
-  # delete R[ 'variantusage'              ] # 98000
-  # delete R[ 'figural-themes'            ] # 70162
-  # delete R[ 'other/zdic-factors'        ] # 22902
-  # delete R[ 'other/kangxi-radicals'     ] # 19906
-  # delete R[ 'other/guoxuedashi-factors' ] # 16894
-  # delete R[ 'other/kanshudo-components' ] # 4839
-  # delete R[ 'other/shuowen-radicals'    ] # 4256
-  # delete R[ 'guides-similarity'         ] # 1311
-  #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------
