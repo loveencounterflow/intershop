@@ -20,8 +20,9 @@
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function U.py_init() returns void language plpython3u as $$
-
+# plpy.notice( '^22234-1^', "U.py_init() called")
 if 'ctx' in GD: return
+plpy.notice( '^22234-2^', "U.py_init() no ctx in GD")
 
 #===========================================================================================================
 #
@@ -153,6 +154,7 @@ intershop_main.setup( ctx )
 def module_from_path( ctx, name, path ):
   ### thx to https://stackoverflow.com/a/50395128/7568091 ###
   ### thx to https://stackoverflow.com/a/67692/7568091 ###
+  plpy.notice( '^22234-3^', "module_from_path() name: {} path: {}".format( name, path))
   import importlib
   import importlib.util
   spec                      = importlib.util.spec_from_file_location( name, path )
