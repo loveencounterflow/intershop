@@ -136,6 +136,7 @@ unless module.parent?
     RMDSKS._show_dsk_definitions dsk_definitions
     await RMDSKS.procure_mirage_datasources dsk_definitions
     # await RMDSKS.clear_mirage_cache()
+    dsk_parallel_limit = parseInt shop.settings[ 'intershop/mirage/parallel-limit' ].value, 10
     await RMDSKS.refresh_dsks dsk_definitions, dsk_parallel_limit
     await RMDSKS.vacuum_mirage_cache()
     process.exit 0
