@@ -1,4 +1,22 @@
 
+
+
+
+/*
+
+https://www.postgresql.org/docs/9.1/xindex.html#XINDEX-EXAMPLE
+https://github.com/postgres/postgres/blob/master/src/tutorial/complex.source
+https://github.com/postgres/postgres/blob/master/src/tutorial/complex.c
+https://duckduckgo.com/?q=postgresql+index+search+operators+must+return+boolean&t=opera&ia=web
+
+
+*/
+
+
+
+
+
+
 -- ---------------------------------------------------------------------------------------------------------
 \ir './_trm.sql'
 \set ON_ERROR_STOP true
