@@ -33,6 +33,17 @@ create function ¶( ¶key text ) returns text stable language plpgsql as $$
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
+create function U.set_default( ¶key text, ¶value text ) returns boolean volatile language plpgsql as $$
+  declare
+    ¶row_count  integer;
+  begin
+    insert into U.variables values ( ¶key, ¶value )
+      on conflict ( key ) do nothing;
+    get diagnostics ¶row_count = row_count;
+    if ¶row_count != 1 then return true; else return false; end if;
+    end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
 create function ¶( ¶key text, ¶value anyelement ) returns void volatile language sql as $$
   insert into U.variables values ( ¶key, ¶value )
   on conflict ( key ) do update set value = ¶value; $$;
