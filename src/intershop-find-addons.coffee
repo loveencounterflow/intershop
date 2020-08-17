@@ -35,7 +35,7 @@ DATOM                     = require 'datom'
 { jr }                    = CND
 
 #-----------------------------------------------------------------------------------------------------------
-declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'ignore', 'support', 'rebuild', ]
+declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support', 'rebuild', ]
 
 #-----------------------------------------------------------------------------------------------------------
 @validate_ipj_targets = ( addon ) ->
