@@ -28,6 +28,7 @@ create table ADDONS.targets (
 
 insert into ADDONS.targets values
   ( 'app',      'Source file required by NodeJS application code'     ),
+  ( 'rpc',      'JS file that exports RPC methods'                    ),
   ( 'ignore',   'Source file managed by user'                         ),
   ( 'support',  'Supporting library functions written in plPython3u'  ),
   ( 'rebuild',  'SQL file to be read during rebuilds'                 );
