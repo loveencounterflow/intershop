@@ -38,31 +38,18 @@ insert into CACHE.products ( n, factor, result ) values
 -- ---------------------------------------------------------------------------------------------------------
 \echo :signal ———{ :filename 6 }———:reset
 create function CACHE.get_product( ¶n integer, ¶factor integer )
-  --            ##### schema_name
-  --                  ########### function_name
-  --                              ############################# parameter_names
   returns integer strict volatile language plpgsql as $$
-  --      ####### return_type
   declare
     ¶row        record;
   begin
--- #########################################################################################################
--- ###                                                                                                   ###
-    -- try to return cached value:
     select into ¶row * from CACHE.products where n = ¶n and factor = ¶factor;
-    --                                           ############################ match_names
     if ¶row.result is not null then return ¶row.result; end if;
-    -- ####################### accept_if
     if ¶row.nosuchvalue then return null; end if;
--- ###                                                                                                   ###
--- #########################################################################################################
     -- .....................................................................................................
     -- try to compute value, this may or may not be successful. There are two variants for missing values,
     -- confirmed and unconfirmed lacunae. Unconfirmed lacunae will continue to cause errors whenever they
     -- get requested, but confirmed lacunae have `nosuchvalue` set to `true` and will cause a default value
     --  of `null` to be returned:
--- #########################################################################################################
--- ### block update_cache                                                                                ###
     if ¶n != 13 then
       insert into CACHE.products ( n, factor, result ) ( select
           ¶n                    as n,
@@ -77,23 +64,13 @@ create function CACHE.get_product( ¶n integer, ¶factor integer )
           true                  as nosuchvalue );
         end if;
       end if;
--- ###                                                                                                   ###
--- #########################################################################################################
     -- .....................................................................................................
--- #########################################################################################################
--- ###                                                                                                   ###
-    -- try again to retrieve result:
     select into ¶row * from CACHE.products where n = ¶n and factor = ¶factor;
-    --                                           ############################ match_names
     if ¶row.result is not null then return ¶row.result; end if;
-    -- ####################### accept_if
     if ¶row.nosuchvalue then return null; end if;
--- ###                                                                                                   ###
--- #########################################################################################################
     -- .....................................................................................................
     raise sqlstate 'HBX02' using message = '#HBX02-1 Key Error', hint = format(
       'unable to retrieve result for ¶n: %s, ¶factor: %s', ¶n, ¶factor );
-    --                               ################################# parameter_names
     end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -119,27 +96,27 @@ create function CACHE._create_caching_function(
     ¶q      text;
   begin
     -- .....................................................................................................
-    ¶p :=  ( select string_agg( format( '%s %s',  x[ 1 ], x[ 2 ]  ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
-    ¶k :=  ( select string_agg( format( '%s %%s', x[ 1 ]          ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
-    ¶q :=  ( select string_agg( format( '%s',     x[ 1 ]          ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
+    ¶p :=  ( select string_agg( format( '%s %s',   x[ 1 ], x[ 2 ]  ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
+    ¶k :=  ( select string_agg( format( '%s: %%s', x[ 1 ]          ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
+    ¶q :=  ( select string_agg( format( '%s',      x[ 1 ]          ), ', ' ) from U.unnest_2d_1d( ¶parameter_names_and_types ) as x );
     -- .....................................................................................................
     ¶s := '';
     ¶s := ¶s || format( $$  create function %s.%s( %s )                           $$, ¶schema_name, ¶function_name, ¶p );
     ¶s := ¶s || format( $$    returns %s strict volatile language plpgsql as $f$  $$, ¶return_type );
-    ¶s := ¶s || format( $$    declare                                             $$ );
-    ¶s := ¶s || format( $$      r record;                                         $$ );
-    ¶s := ¶s || format( $$    begin                                               $$ );
+    ¶s := ¶s ||         $$    declare                                             $$;
+    ¶s := ¶s ||         $$      r record;                                         $$;
+    ¶s := ¶s ||         $$    begin                                               $$;
     -- .....................................................................................................
     ¶m := '';
     ¶m := ¶m || format( $$ select into r * from CACHE.products where %s;          $$, ¶row_match_condition );
     ¶m := ¶m || format( $$ if %s then return %s; end if;                          $$, ¶row_accept_if, ¶return_term );
-    ¶m := ¶m || format( $$ if r.nosuchvalue then return null; end if;             $$ );
+    ¶m := ¶m ||         $$ if r.nosuchvalue then return null; end if;             $$;
     -- .....................................................................................................
     ¶z := '';
-    ¶z := ¶z || format( $$ raise sqlstate 'CHX02' using                           $$ );
-    ¶z := ¶z || format( $$ message = format( '#CHX02-1 Key Error: ' ||            $$ );
+    ¶z := ¶z ||         $$ raise sqlstate 'CHX02' using                           $$;
+    ¶z := ¶z ||         $$ message = format( '#CHX02-1 Key Error: ' ||            $$;
     ¶z := ¶z || format( $$ 'unable to retrieve result for %s', %s );              $$, ¶k, ¶q );
-    ¶z := ¶z || format( $$ end; $f$;                                              $$ );
+    ¶z := ¶z ||         $$ end; $f$;                                              $$;
     -- .....................................................................................................
     return ¶s || ¶m || ¶update_cache || ¶m || ¶z;
   end; $outer$;
