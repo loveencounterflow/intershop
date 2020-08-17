@@ -41,10 +41,15 @@ function append_buildfiles_from_path () {
 #-----------------------------------------------------------------------------------------------------------
 touch "$intershop_sql_buildscript_path"
 chmod 0744 "$intershop_sql_buildscript_path"
-ls -AlF "$intershop_sql_buildscript_path"
+# ls -AlF "$intershop_sql_buildscript_path"
 cat "$intershop_sql_buildscript_header_path" > "$intershop_sql_buildscript_path"
 echo source "$intershop_guest_modules_path/utilities.sh" >> "$intershop_sql_buildscript_path"
 
+#-----------------------------------------------------------------------------------------------------------
+echo "$(node $intershop_guest_modules_path/write-intershop-ptv-as-json.js)" > "$intershop_tmp_path/intershop.ptv.json"
+echo 'intershop_ng_settings=$(cat '"$intershop_tmp_path/intershop.ptv.json"')' >> "$intershop_sql_buildscript_path"
+echo "export intershop_ng_settings" >> "$intershop_sql_buildscript_path"
+# echo "$(node $intershop_guest_modules_path)/write-intershop-ptv-as-json.js" >> "$intershop_sql_buildscript_path"
 
 #===========================================================================================================
 # ADD GUEST SQL BUILDSCRIPT LINES
