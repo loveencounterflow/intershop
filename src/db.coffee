@@ -148,6 +148,33 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
   return await @query { text, values, }, settings...
 
 #-----------------------------------------------------------------------------------------------------------
+@query_as_readstream = ( q, settings... ) -> new Promise ( resolve, reject ) =>
+  pg              = require 'pg'
+  QueryStream     = require 'pg-query-stream'
+  client          = await pool.connect()
+  release_client  = -> release_client = ( -> ); client.release()
+  #.........................................................................................................
+  try
+    options       = @_get_query_object q, settings...
+    text          = pluck options, 'text'
+    values        = pluck options, 'values'
+    ### NOTE options include batchSize, highWaterMark; see
+    https://github.com/brianc/node-postgres/blob/master/packages/pg-query-stream/index.js ###
+    query         = new QueryStream text, values, options
+    R             = client.query query
+    R.on 'end', -> release_client()
+  finally
+    release_client()
+  resolve R
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@query_as_json_readstream = ( q, settings... ) ->
+  readstream      = await @new_nodejs_readstream_raw q, settings...
+  JSONStream      = require 'jsonstream2'
+  return readstream.pipe JSONStream.stringify()
+
+#-----------------------------------------------------------------------------------------------------------
 @new_query_source = ( q, settings... ) -> new Promise ( resolve, reject ) =>
   client_released = false
   client          = null
@@ -199,6 +226,30 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
   #.........................................................................................................
   return null
 
+# # previously we used pg-query-stream:
+# QueryStream               = require 'pg-query-stream'
+#   #-----------------------------------------------------------------------------------------------------------
+#   @fetch_query_source = ( q, settings... ) ->
+#     ### TAINT when an error occurs that does not lead to process termination, the client may not be returned to the pool ###
+#     # debug '44453', Object.assign settings...
+#     on_stop = ->
+#       client.end() unless has_ended
+#       has_ended = yes
+#     #.......................................................................................................
+#     has_ended                   = no
+#     client                      = await pool.connect()
+#     { text, values, options, }  = @_get_query_object q, settings...
+#     submittable                 = new QueryStream text,values, options
+#     readstream                  = client.query submittable
+#     source                      = PS._nodejs_input_to_pull_source readstream
+#     #.......................................................................................................
+#     submittable.on  'error', ( error ) -> on_stop(); throw error
+#     readstream.on   'error', ( error ) -> on_stop(); throw error
+#     #.......................................................................................................
+#     pipeline      = []
+#     pipeline.push source
+#     pipeline.push PS.map_stop on_stop
+#     return PS.pull pipeline...
 
 
 ############################################################################################################
