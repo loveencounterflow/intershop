@@ -1,0 +1,1 @@
+../lib/write-intershop-ptv-as-json.js
