@@ -145,6 +145,10 @@ if ctx.get( 'log', None ) == None:
 if ctx.intershop_host_modules_path != ctx.intershop_guest_modules_path:
   sys.path.insert( 0, ctx.intershop_host_modules_path )
 sys.path.insert( 0, ctx.intershop_guest_modules_path )
+for sub_path in ctx.intershop_plpython3u_syspathprefix.split( ':' ):
+  if sub_path in sys.path: continue
+  sys.path.insert( 0, sub_path )
+# ctx.log_python_path( ctx )
 #...........................................................................................................
 ctx._absorb_environment = _absorb_environment
 
@@ -152,8 +156,8 @@ ctx._absorb_environment = _absorb_environment
 try:
   import intershop_main
 except ImportError:
-  log( "Unable to locate module `intershop_main`")
-  ctx.log_python_path()
+  ctx.log( "Unable to locate module `intershop_main`")
+  ctx.log_python_path( ctx )
   raise
 intershop_main.setup( ctx )
 
@@ -161,24 +165,28 @@ intershop_main.setup( ctx )
 def module_from_path( ctx, name, path ):
   ### thx to https://stackoverflow.com/a/50395128/7568091 ###
   ### thx to https://stackoverflow.com/a/67692/7568091 ###
-  plpy.notice( '^22234-3^', "module_from_path() name: {} path: {}".format( name, path))
+  # plpy.notice( '^22234-3^', "module_from_path() name: {} path: {}".format( name, path))
   import importlib
   import importlib.util
   spec                      = importlib.util.spec_from_file_location( name, path )
   module                    = importlib.util.module_from_spec( spec )
   sys.modules[ spec.name ]  = module
   spec.loader.exec_module( module )
-  return  importlib.import_module( name )
+  return importlib.import_module( name )
 #...........................................................................................................
 ctx.module_from_path  = module_from_path
 plpy.execute( 'select ADDONS.import_python_addons();' )
+ctx.log( '^33342^', "Addon modules: ", ', '.join( repr( key ) for key in ctx.addons ) )
+# ctx.log( '^33342^', "modules in `ctx.addons`:" )
+# for key in ctx.addons:
+#   ctx.log( '^33342^', " {}: {}".format( key, ctx.addons[ key ] ) )
 
 #-----------------------------------------------------------------------------------------------------------
 $$;
 
 
 
-
+-- do $$ begin perform U.py_init(); end; $$;
 
 
 /* ###################################################################################################### */
