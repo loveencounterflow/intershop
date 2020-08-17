@@ -50,6 +50,7 @@ create table ADDONS.files (
 -- ---------------------------------------------------------------------------------------------------------
 set role dba;
 create function ADDONS.import_python_addons() returns void language plpython3u as $$
+  import os.path
   plpy.execute( 'select U.py_init()' ); ctx = GD[ 'ctx' ]
   #.........................................................................................................
   sql   = """
@@ -64,9 +65,11 @@ create function ADDONS.import_python_addons() returns void language plpython3u a
   rows  = plpy.execute( plan )
   for row in rows:
     # ctx[ row[ 'key' ] ] = row[ 'value' ]
-    # ctx.log( '^intershop/026-addons@5554^', "row", row )
-    module                      = ctx.module_from_path( ctx, row[ 'aoid' ], row[ 'path' ] )
-    ctx.addons[ row[ 'aoid' ] ] = module
+    file_name                   = os.path.basename( row[ 'path' ] )
+    module_name                 = "{}/{}".format( row[ 'aoid' ], file_name )
+    ctx.log( '^intershop/026-addons@5554^', "importing {} as ctx.addons[ {} ]".format( row[ 'path' ], repr( module_name ) ) )
+    module                      = ctx.module_from_path( ctx, module_name, row[ 'path' ] )
+    ctx.addons[ module_name ]   = module
     preparer                    = getattr( module, '_prepare', None )
     if preparer is not None:
       preparer( ctx )
