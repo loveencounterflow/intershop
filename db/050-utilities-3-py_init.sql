@@ -74,6 +74,13 @@ ctx.get_variable_names  = get_variable_names
 ctx.set_variable        = set_variable
 
 #-----------------------------------------------------------------------------------------------------------
+def log_python_path( ctx ):
+  for idx, sub_path in enumerate( sys.path ):
+    ctx.log( "^4457^ Python path: {}: {}".format( idx, sub_path ) )
+#...........................................................................................................
+ctx.log_python_path     = log_python_path
+
+#-----------------------------------------------------------------------------------------------------------
 def _absorb_environment( ctx ):
   sql   = """
     select regexp_replace( key, '/', '_', 'g' ) as key, value
