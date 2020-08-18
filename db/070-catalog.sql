@@ -106,6 +106,16 @@ create view CATALOG._functions_with_defs_all as (
   inner join pg_language  pl on ( pp.prolang      = pl.oid )
   );
 
+-- ### TAINT this view contains return types, merge with _functions_with_defs_all
+create view CATALOG._functions_and_return_types as (
+  select
+      pn.nspname                    as schema_name,
+      pp.proname                    as function_name,
+      pt.typname                    as type_name
+  from pg_proc as pp
+  inner join pg_namespace pn on ( pp.pronamespace = pn.oid )
+  inner join pg_type      pt on ( pp.prorettype   = pt.oid ) );
+
 -- ---------------------------------------------------------------------------------------------------------
 create view CATALOG._functions_all as (
   select
