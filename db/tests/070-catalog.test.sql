@@ -20,26 +20,28 @@ drop schema if exists CATALOG cascade;
 
 -- select * from CATALOG.versions;
 -- select * from CATALOG._tables_and_views
-select
-    *
-  from CATALOG.catalog
-  where true
-    and ( schema not in ( 'public', 'catalog' ) )
-  order by
-    schema,
-    t,
-    name
-  ;
+-- select
+--     *
+--   from CATALOG.catalog
+--   where true
+--     and ( schema not in ( 'public', 'catalog' ) )
+--   order by
+--     schema,
+--     t,
+--     name
+--   ;
 
-select distinct
-    schema
-  from CATALOG.catalog
-  where true
-    and ( schema not in ( 'public', 'catalog' ) )
-  order by
-    schema
-  ;
+-- select distinct
+--     schema
+--   from CATALOG.catalog
+--   where true
+--     and ( schema not in ( 'public', 'catalog' ) )
+--   order by
+--     schema
+--   ;
 
+-- select * from CATALOG.catalog where schema ~ 'information_schema|pg_';
+select * from CATALOG.catalog where name ~ 'raise|error|exception';
 
 -- ---------------------------------------------------------------------------------------------------------
 \quit
