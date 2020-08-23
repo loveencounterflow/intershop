@@ -1,4 +1,9 @@
+/*
 
+### NOTE this code has migrated to `intershop-lazy`, an InterShop add-on. ###
+
+
+*/
 
 -- \set ECHO queries
 begin transaction;
@@ -17,8 +22,6 @@ begin transaction;
 -- ---------------------------------------------------------------------------------------------------------
 \echo :signal ———{ :filename 1 }———:reset
 drop schema if exists LAZY cascade; create schema LAZY;
-
--- do $$ begin raise sqlstate 'CHX03' using message = 'CHX03 module unfinished'; end; $$;
 
 -- ---------------------------------------------------------------------------------------------------------
 \echo :signal ———{ :filename 2 }———:reset
@@ -72,7 +75,7 @@ create function MYSCHEMA._update_products_cache( ¶n integer, ¶factor integer )
 \echo :signal ———{ :filename 6 }———:reset
 -- ### NOTE consider to allow variant where update method returns key, value instead of inserting itself;
 -- the latter is more general as it may insert an arbitrary number of adjacent / related / whatever items
-create function MYSCHEMA.get_product( ¶n integer, ¶factor integer )
+create function MYSCHEMA.get_product_0( ¶n integer, ¶factor integer )
   returns integer volatile strict language plpgsql as $$ declare
     ¶bucket text  :=  'MYSCHEMA.products';
     ¶key    jsonb :=  MYSCHEMA._get_product_key( ¶n, ¶factor );
@@ -83,7 +86,7 @@ create function MYSCHEMA.get_product( ¶n integer, ¶factor integer )
     perform MYSCHEMA._update_products_cache( ¶n, ¶factor );
     ¶value := ( select value from LAZY.facets where bucket = ¶bucket and ¶key = key );
     if ¶value is not null then return ¶value::integer; end if;
-    raise sqlstate 'CHX02' using message = format( '#CHX02-1 Key Error: unable to retrieve result for ¶n: %s, ¶factor: %s', ¶n, ¶factor );
+    raise sqlstate 'XXX02' using message = format( '#XXX02-1 Key Error: unable to retrieve result for ¶n: %s, ¶factor: %s', ¶n, ¶factor );
     end; $$;
 
 
@@ -113,14 +116,6 @@ create function LAZY.create_cached_getter_function(
     -- ¶z      text;
     -- ¶q      text;
   begin
-  /*
-    perform MYSCHEMA._update_products_cache( ¶n, ¶factor );
-    ¶value := ( select value from LAZY.facets where bucket = ¶bucket and ¶key = key );
-    if ¶value is not null then return ¶value::integer; end if;
-    raise sqlstate 'CHX02' using message = format( '#CHX02-1 Key Error: unable to retrieve result for ¶n: %s, ¶factor: %s', ¶n, ¶factor );
-    end; $$;
-    */
-    -- ¶p := ( select string_agg( name || ' ' || parameter_types[ r1.nr ] )
     -- .....................................................................................................
     -- ### TAINT validate both arrays have at least one element, same number of elements
     ¶p := ( select string_agg( format( '%s %s', name, parameter_types[ r1.nr ] ), ', ' )
@@ -179,35 +174,6 @@ create function LAZY.create_cached_getter_function(
     return R;
   end; $outer$;
 
-select LAZY.create_cached_getter_function(
-  function_name   => 'MYSCHEMA.get_product',            -- name of function to be created
-  parameter_names => '{¶n,¶factor}',
-  parameter_types => '{integer,integer}',
-  return_type     => 'integer',                         -- applied to cached value or value returned by caster
-  bucket          => 'MYSCHEMA.products',               -- optional, defaults to `function_name`
-  get_key         => 'MYSCHEMA._get_product_key',       -- optional, default is JSON list / object of values
-  get_update      => null,                              -- optional, this x-or `perform_update` must be given
-  perform_update  => 'MYSCHEMA._update_products_cache', -- optional, this x-or `get_update` must be given
-  caster          => null                               -- optional, to transform JSONB value in to `return_type` (after `caster()` called where present)
-  );
-
-select LAZY.create_cached_getter_function(
-  function_name   => 'MYSCHEMA.get_product',            -- name of function to be created
-  parameter_names => '{¶n,¶factor}',
-  parameter_types => '{integer,integer}',
-  return_type     => 'integer',                         -- applied to cached value or value returned by caster
-  bucket          => 'MYSCHEMA.products',               -- optional, defaults to `function_name`
-  get_key         => null,                              -- optional, default is JSON list / object of values
-  get_update      => '¶n * ¶factor',                    -- optional, this x-or `perform_update` must be given
-  perform_update  => null,                              -- optional, this x-or `get_update` must be given
-  caster          => 'cast_my_value'                    -- optional, to transform JSONB value in to `return_type` (after `caster()` called where present)
-  );
-
-/* ###################################################################################################### */
-\echo :red ———{ :filename 22 }———:reset
-\quit
-
-
 -- ---------------------------------------------------------------------------------------------------------
 \echo :signal ———{ :filename 9 }———:reset
 -- ### TAINT could/should be procedure? ###
@@ -229,16 +195,46 @@ create function LAZY.create_caching_function(
       ¶perform_update );
       end; $$;
 
+select LAZY.create_cached_getter_function(
+  function_name   => 'MYSCHEMA.get_product_1',          -- name of function to be created
+  parameter_names => '{¶n,¶factor}',
+  parameter_types => '{integer,integer}',
+  return_type     => 'integer',                         -- applied to cached value or value returned by caster
+  bucket          => 'MYSCHEMA.products',               -- optional, defaults to `function_name`
+  get_key         => 'MYSCHEMA._get_product_key',       -- optional, default is JSON list / object of values
+  get_update      => null,                              -- optional, this x-or `perform_update` must be given
+  perform_update  => 'MYSCHEMA._update_products_cache', -- optional, this x-or `get_update` must be given
+  caster          => null                               -- optional, to transform JSONB value in to `return_type` (after `caster()` called where present)
+  );
+
+select LAZY.create_cached_getter_function(
+  function_name   => 'MYSCHEMA.get_product_2',          -- name of function to be created
+  parameter_names => '{¶n,¶factor}',
+  parameter_types => '{integer,integer}',
+  return_type     => 'integer',                         -- applied to cached value or value returned by caster
+  bucket          => null,                              -- optional, defaults to `function_name`
+  get_key         => null,                              -- optional, default is JSON list / object of values
+  get_update      => '¶n * ¶factor',                    -- optional, this x-or `perform_update` must be given
+  perform_update  => null,                              -- optional, this x-or `get_update` must be given
+  caster          => 'cast_my_value'                    -- optional, to transform JSONB value in to `return_type` (after `caster()` called where present)
+  );
+
+select * from LAZY.facets order by bucket, key;
+select * from MYSCHEMA.get_product_1( 4, 12 );
+select * from MYSCHEMA.get_product_1( 5, 12 );
+select * from MYSCHEMA.get_product_1( 6, 12 );
+select * from LAZY.facets order by bucket, key;
+select * from MYSCHEMA.products;
+select * from MYSCHEMA.get_product_1( 13, 12 );
+
+/* ###################################################################################################### */
+\echo :red ———{ :filename 22 }———:reset
+\quit
+
+
 -- ---------------------------------------------------------------------------------------------------------
 \echo :signal ———{ :filename 10 }———:reset
 
-select * from LAZY.facets order by bucket, key;
-select * from MYSCHEMA.get_product( 4, 12 );
-select * from MYSCHEMA.get_product( 5, 12 );
-select * from MYSCHEMA.get_product( 6, 12 );
-select * from LAZY.facets order by bucket, key;
-select * from MYSCHEMA.products;
-select * from MYSCHEMA.get_product( 13, 12 );
 -- select * from MYSCHEMA.products order by n, factor;
 -- select * from MYSCHEMA.get_product( 13, 12 );
 -- select * from MYSCHEMA.products order by n, factor;
