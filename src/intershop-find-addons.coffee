@@ -32,7 +32,7 @@ types                     = require './types'
 DATOM                     = require 'datom'
 { new_datom }             = DATOM.export()
 #...........................................................................................................
-{ jr }                    = CND
+IORDER                    = require 'resolve-intershop-addon-installation-order'
 
 #-----------------------------------------------------------------------------------------------------------
 declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support', 'rebuild', ]
