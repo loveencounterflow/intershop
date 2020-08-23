@@ -60,6 +60,10 @@ squel                     = ( require 'squel' ).useFlavour 'postgres'
 #-----------------------------------------------------------------------------------------------------------
 @write_buildscript = ( addons ) ->
   validate.object addons
+  echo()
+  echo "##{'-'.repeat 108}"
+  echo "# ^#{__filename}/write_buildscript@46576^"
+  echo()
   echo "echo -e $orange$reverse $reset$orange '#{addons.populate_sql_path}'$reset"
   echo "postgres_unpaged -f #{addons.populate_sql_path}"
   #.........................................................................................................
