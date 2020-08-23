@@ -1,4 +1,45 @@
 
+/*
+-- ### TAINT this view contains return types, merge with _functions_with_defs_all
+create view CATALOG._functions_and_return_types as (
+  select
+      pn.nspname                    as schema_name,
+      pp.proname                    as function_name,
+      pt.typname                    as type_name
+  from pg_proc as pp
+  inner join pg_namespace pn on ( pp.pronamespace = pn.oid )
+  inner join pg_type      pt on ( pp.prorettype   = pt.oid ) );
+
+
+SELECT u.usename AS "User name",
+  u.usesysid AS "User ID",
+  CASE WHEN u.usesuper AND u.usecreatedb THEN CAST('superuser, create
+database' AS pg_catalog.text)
+       WHEN u.usesuper THEN CAST('superuser' AS pg_catalog.text)
+       WHEN u.usecreatedb THEN CAST('create database' AS
+pg_catalog.text)
+       ELSE CAST('' AS pg_catalog.text)
+  END AS "Attributes"
+FROM pg_catalog.pg_user u
+ORDER BY 1;
+
+SELECT usename AS role_name,
+  CASE
+     WHEN usesuper AND usecreatedb THEN
+     CAST('superuser, create database' AS pg_catalog.text)
+     WHEN usesuper THEN
+      CAST('superuser' AS pg_catalog.text)
+     WHEN usecreatedb THEN
+      CAST('create database' AS pg_catalog.text)
+     ELSE
+      CAST('' AS pg_catalog.text)
+  END role_attributes
+FROM pg_catalog.pg_user
+ORDER BY role_name desc;
+
+*/
+
+
 
 /*
 
@@ -106,16 +147,6 @@ create view CATALOG._functions_with_defs_all as (
   inner join pg_language  pl on ( pp.prolang      = pl.oid )
   );
 
--- ### TAINT this view contains return types, merge with _functions_with_defs_all
-create view CATALOG._functions_and_return_types as (
-  select
-      pn.nspname                    as schema_name,
-      pp.proname                    as function_name,
-      pt.typname                    as type_name
-  from pg_proc as pp
-  inner join pg_namespace pn on ( pp.pronamespace = pn.oid )
-  inner join pg_type      pt on ( pp.prorettype   = pt.oid ) );
-
 -- ---------------------------------------------------------------------------------------------------------
 create view CATALOG._functions_all as (
   select
@@ -137,9 +168,9 @@ create view CATALOG._functions as (
       remarks           as remarks
     from
       CATALOG._functions_all
-  where true
-    and schema not in ( 'information_schema' )
-    and schema !~ '^pg_'
+  -- where true
+  --   and schema not in ( 'information_schema' )
+  --   and schema !~ '^pg_'
     -- and schema !~ '^_'
   );
 
