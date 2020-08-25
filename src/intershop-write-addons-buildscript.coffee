@@ -67,7 +67,11 @@ squel                     = ( require 'squel' ).useFlavour 'postgres'
   echo "echo -e $orange$reverse $reset$orange '#{addons.populate_sql_path}'$reset"
   echo "postgres_unpaged -f #{addons.populate_sql_path}"
   #.........................................................................................................
-  for aoid, addon of addons.addons
+  # for aoid, addon of addons.addons
+  # debug ( k for k of addons.addons )
+  # debug addons.order
+  for [ aoid, _, ] in addons.order
+    addon = addons.addons[ aoid ]
     echo()
     echo "# #{'-'.repeat 108}"
     echo "# Addon: #{addon.aoid}"

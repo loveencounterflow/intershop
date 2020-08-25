@@ -32,7 +32,7 @@ types                     = require './types'
 DATOM                     = require 'datom'
 { new_datom }             = DATOM.export()
 #...........................................................................................................
-IORDER                    = require 'resolve-intershop-addon-installation-order'
+IORDER                    = require '../lib/resolve-intershop-addon-installation-order'
 
 #-----------------------------------------------------------------------------------------------------------
 declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support', 'rebuild', ]
@@ -62,9 +62,11 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support',
 @find_addons = ->
   validate.nonempty_text process.env.intershop_host_path
   addons  = {}
-  R       = { addons, }
+  R       = { order: [], addons, }
   R       = @_find_addons R, 'guest', process.env.intershop_guest_path
   R       = @_find_addons R, 'host',  process.env.intershop_host_path
+  deps    = ( name for [ name, version, ] in R.order ).join ', '
+  help "addon installation order: #{deps}"
   return new_datom '^intershop-addons', R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -115,6 +117,10 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support',
     @validate_ipj_targets addon
     R.addons[ addon.aoid ] = addon
   #.........................................................................................................
+  deps    = IORDER.get_intershop_addon_installation_order XXX_path
+  target  = ( R.order ?= [] )
+  target  = [ target..., deps... ]
+  R.order.splice R.order.length, 0, deps...
   return R
 
 

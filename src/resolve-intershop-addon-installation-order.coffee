@@ -102,9 +102,9 @@ get_tree                  = require 'npm-logical-tree'
   { packages
     parents
     duplicates }  = dependencies
-  info packages
-  urge parents
-  info duplicates
+  # info packages ### verbose ###
+  # urge parents ### verbose ###
+  # info duplicates ### verbose ###
   @_complain_about_duplicates dependencies
   return ( [ name, version, ] for [ name, version, ] in packages when /^intershop-/.test name )
 
