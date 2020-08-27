@@ -39,6 +39,7 @@ An incipient application foundation built on Postgres, with sprinkles of JavaScr
 - [The MIRAGE File Mirror Module](#the-mirage-file-mirror-module)
 - [VNRs](#vnrs)
 - [Invariants](#invariants)
+- [Catalog](#catalog)
 - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -489,6 +490,11 @@ See [documentation/vnrs.md](documentation/vnrs.md).
 # Invariants
 
 See [documentation/invariants.md](documentation/invariants.md).
+
+# Catalog
+
+See [documentation/catalog.md](documentation/catalog.md).
+
 
 # To Do
 
