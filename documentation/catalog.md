@@ -2,4 +2,7 @@
 
 # Catalog
 
-InterShop module [`CATALOG`]()
+InterShop module [`CATALOG`](../db/070-catalog.sql)
+
+
+
