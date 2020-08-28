@@ -1,5 +1,19 @@
 
 /*
+
+
+-- thx to https://stackoverflow.com/a/16349665/7568091
+SELECT n.nspname as "Schema",
+  pg_catalog.format_type(t.oid, NULL) AS "Name",
+  pg_catalog.obj_description(t.oid, 'pg_type') as "Description"
+FROM pg_catalog.pg_type t
+     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+WHERE (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid))
+  AND NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid)
+  AND pg_catalog.pg_type_is_visible(t.oid)
+ORDER BY 1, 2;
+
+
 -- ### TAINT this view contains return types, merge with _functions_with_defs_all
 create view CATALOG._functions_and_return_types as (
   select
@@ -40,6 +54,37 @@ ORDER BY role_name desc;
 */
 
 
+/*
+
+create view CATALOG.columns as ( select
+    r1.table_schema     as schema,
+    r1.table_name       as table_name,
+    r1.column_name      as column_name,
+    r1.ordinal_position as nr,
+    r1.data_type        as data_type
+   from information_schema.columns as r1 );
+
+create view CATALOG.primary_keys as ( select
+    ku.table_schema       as schema,
+    ku.table_name         as table_name,
+    ku.column_name           as column_name,
+    ku.ordinal_position   as nr,
+    r4.data_type          as data_type
+  from information_schema.table_constraints as tc
+  inner join information_schema.key_column_usage as ku
+      on tc.constraint_type     = 'PRIMARY KEY'
+      and tc.constraint_schema  = ku.table_schema
+      and tc.constraint_name    = ku.constraint_name
+  left join CATALOG.columns as r4 on true
+    and r4.schema       = ku.table_schema
+    and r4.table_name   = ku.table_name
+    and r4.column_name  = ku.column_name );
+
+-- select * from CATALOG.primary_keys order by schema, table_name, nr;
+
+
+*/
+
 
 /*
 
@@ -56,7 +101,66 @@ Y88b  d88P d8888888888     888  d8888888888  888     Y88b. .d88P Y88b  d88P
 
 
 -- ---------------------------------------------------------------------------------------------------------
-create schema CATALOG;
+drop schema if exists CATALOG cascade; create schema CATALOG;
+
+-- ---------------------------------------------------------------------------------------------------------
+create table CATALOG._must_quote ( word text not null primary key );
+insert into CATALOG._must_quote ( word ) select word from pg_get_keywords() as r1 where r1.catcode != 'U';
+
+-- ---------------------------------------------------------------------------------------------------------
+create function CATALOG._assert_allowed_identifier( text )
+  returns void immutable strict language plpgsql as $$ declare
+  begin
+    if exists ( select 1 from CATALOG._must_quote as r1 where r1.word = $1 ) then
+      raise sqlstate 'CAT22' using message = format( 'CAT22 reserved word: %L', $1 );
+      end if; end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function CATALOG._quote_if_necessary( text )
+  returns text immutable strict language sql as $$ select
+  case when $1 ~ '^[a-z_][a-z_0-9]*$' then $1
+  else format( '%I', $1 ) end; $$;
+
+-- ---------------------------------------------------------------------------------------------------------
+create function CATALOG.parse_object_identifier(
+    in            text,
+    out ucschema  text,
+    out name      text,
+    out fqname    text )
+  immutable strict language plpgsql as $$ declare
+    R text[] := parse_ident( $1 );
+  begin
+    case array_length( R, 1 )
+      when 1 then
+        ucschema  := null;
+        name    := R[ 1 ];
+      when 2 then
+        ucschema  := R[ 1 ];
+        name    := R[ 2 ];
+      else
+        raise sqlstate 'CAT53' using message = format( 'expected a text with at most one dot that ' ||
+          'identifies an optional ucschema and a db object, got %L', $1 );
+      end case;
+    perform CATALOG._assert_allowed_identifier( ucschema );
+    perform CATALOG._assert_allowed_identifier( name );
+    name      :=  CATALOG._quote_if_necessary( name );
+    ucschema  :=  CATALOG._quote_if_necessary( ucschema );
+    if ucschema !~ '^"' then ucschema := upper( ucschema ); end if;
+    if ucschema is distinct from null then  fqname  :=  ucschema || '.' || name;
+    else                                    fqname  :=  name; end if;
+    return; end; $$;
+
+comment on function CATALOG.parse_object_identifier( text ) is 'Given a text with at most one unquoted dot,
+return a record with fields `schema`, `ucschema`, `name`, and `fqname`. In case the input had no unquoted
+dot, `schema` and `ucschema` will be `null`, while `name` and `fqname` will contain (a possibly
+double-quoted version of) the input string. Otherwise, the part before the dot will be output in `schema`
+and `ucschema`, the first containg the system catalog (lowercase) version, the other the InterShop (upper
+case version) version; the part after the dot will be found in `name`, and the re-assembled fully-qualified
+concatenation of `ucschema` and `name` in `fqname`. In any event, both schema and name will be tested
+against the names returned by `pg_get_keywords()` and cause an error if found to be reserved; if they pass,
+both will be double-quoted in case they do not conform to a simple regex allowing only letters, digits, and
+underscores. `ucschema` will be upper-cased only if no quting occurred and be otherwise identical to
+`schema`. The resulting fields should be usable in SQL statements without further treatment.';
 
 -- ---------------------------------------------------------------------------------------------------------
 create function CATALOG.count_tuples( schema text, name text )
@@ -101,34 +205,6 @@ create function CATALOG.count_tuples_dsp( schema text, name text )
     end;
   $$;
 
-
--- =========================================================================================================
--- VERSIONS
--- ---------------------------------------------------------------------------------------------------------
--- drop table if exists CATALOG.versions cascade;
-create table CATALOG.versions (
-  key           text primary key,
-  version       text );
-
--- ---------------------------------------------------------------------------------------------------------
-create function CATALOG.upsert_versions( ¶key text, ¶version text ) returns void
-  language plpgsql volatile as $$
-    begin
-      insert into CATALOG.versions ( key, version ) values ( ¶key, ¶version )
-        on conflict ( key ) do update set version = ¶version;
-      end; $$;
-
--- ---------------------------------------------------------------------------------------------------------
-/* ### TAINT these values should in the future be read from options, package.json etc ### */
-insert into CATALOG.versions values
-  ( 'server', '3.0.3' ),
-  ( 'api',    '2' );
-
--- do $$ begin perform CATALOG.upsert_versions( 'sthelse', '3.141' ); end; $$;
--- do $$ begin perform CATALOG.upsert_versions( 'api',     '3'     ); end; $$;
-
--- select * from CATALOG.versions;
--- \quit
 
 -- =========================================================================================================
 --
@@ -236,12 +312,16 @@ create view CATALOG._materialized_views as (
       from v1
     );
 
+
+
+
 -- ---------------------------------------------------------------------------------------------------------
 create view CATALOG.catalog as (
   with v1 as (
               select * from CATALOG._tables_and_views
     union all select * from CATALOG._materialized_views
     union all select * from CATALOG._functions
+
     )
     select * from v1 order by t, schema, name
   );
