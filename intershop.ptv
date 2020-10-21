@@ -17,7 +17,7 @@ intershop/invariants/autovalidate     ::boolean=          true
 intershop/invariants/showinserts      ::boolean=          true
 intershop/mirage/parallel-limit       ::integer=          2
 # intershop/mirage/dsk/configuration    ::url=                ptv:${intershop/host/configuration/path}
-intershop/mirage/dsk/pkgjson          ::url=              plain:${intershop/guest/path}/package.json
+# intershop/mirage/dsk/pkgjson          ::url=              plain:${intershop/guest/path}/package.json
 
 #-----------------------------------------------------------------------------------------------------------
 # Used by `U.py_init()` to determine whether addons tables are already filled:
