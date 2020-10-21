@@ -26,6 +26,7 @@ create extension if not exists plpgsql    with schema _plpgsql;
 create extension if not exists pgcrypto   with schema _pgcrypto;
 create extension if not exists tablefunc  with schema _tablefunc;
 create extension if not exists hstore;
+create extension if not exists tsm_system_rows;
 
 -- ---------------------------------------------------------------------------------------------------------
 -- /* https://github.com/ChristophBerg/postgresql-unit */
