@@ -89,8 +89,7 @@ pluck = ( x, k ) -> R = x[ k ]; delete x[ k ]; return R
   try
     result = await pool.query @_get_query_object q, settings...
   catch error
-    warn "an exception occurred when trying to query #{rpr db} using"
-    warn q
+    error.message = "^intershop/db/query@4453^ an exception occurred when trying to query #{rpr db} using #{rpr q}: #{rpr error.message}"
     throw error
   #.........................................................................................................
   ### acc. to https://node-postgres.com/features/connecting we have to wait here: ###
