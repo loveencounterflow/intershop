@@ -24,26 +24,25 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "cnd": "^9.1.0",
+    "cnd": "9.2.1",
     "coffeescript": "^2.5.1",
-    "datom": "^7.0.3",
+    "datom": "8.0.2",
     "executable": "^4.1.1",
-    "forever-parallel": "0.0.5",
+    "forever-parallel": "0.1.0",
     "intershop-rpc": "^0.5.1",
-    "intertype": "^7.2.0",
+    "intertype": "7.6.3",
     "jsonstream2": "^3.0.0",
     "minimatch": "^3.0.4",
     "npm-logical-tree": "^1.2.1",
-    "pg": "^8.3.0",
-    "pg-cursor": "^2.3.0",
-    "pg-query-stream": "^3.2.0",
+    "pg": "8.5.1",
+    "pg-cursor": "2.5.2",
+    "pg-query-stream": "4.0.0",
     "resolve-from": "^5.0.0",
     "resolve-pkg": "^2.0.0",
     "respawn": "^2.6.0",
     "shelljs": "^0.8.4",
     "squel": "^5.13.0",
     "stackman": "^4.0.1",
-    "steampipes": "^6.4.0"
-  },
-  "devDependencies": {}
+    "steampipes": "6.7.0"
+  }
 }
