@@ -1,5 +1,5 @@
 
-\setenv PAGER mypspg
+\setenv PAGER pspg
 -- \pset null '¤'
 \set QUIET on
 \set ECHO none
