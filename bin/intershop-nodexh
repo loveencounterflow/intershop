@@ -4,8 +4,10 @@ set -euo pipefail
 # home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
 # cd "$home"
 
-node --trace-warnings --require "$intershop_guest_modules_path/exception-handler.js" "$@"
+# node --trace-warnings --require "$intershop_guest_modules_path/exception-handler.js" "$@"
 # node --require "$intershop_guest_modules_path/exception-handler.js" "$@"
+# echo 'echo ^344587^ ############ using '"$0"' #############'
+nodexh "$@"
 
 
 
