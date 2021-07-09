@@ -1,4 +1,5 @@
 #!/bin/bash
 set -euo pipefail
+echo '^333381^ ' "$intershop_guest_bin_path/intershop-nodexh" "$intershop_guest_modules_path/intershop-reconstruct.js" "$@"
 "$intershop_guest_bin_path/intershop-nodexh" "$intershop_guest_modules_path/intershop-reconstruct.js" "$@"
 

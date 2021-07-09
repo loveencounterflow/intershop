@@ -49,6 +49,11 @@ echo source "$intershop_guest_modules_path/utilities.sh" >> "$intershop_sql_buil
 echo "$(node $intershop_guest_modules_path/write-intershop-ptv-as-json.js)" > "$intershop_tmp_path/intershop.ptv.json"
 echo 'intershop_ng_settings=$(cat '"$intershop_tmp_path/intershop.ptv.json"')' >> "$intershop_sql_buildscript_path"
 echo "export intershop_ng_settings" >> "$intershop_sql_buildscript_path"
+# echo '#######################################' >> "$intershop_sql_buildscript_path"
+# echo 'echo ^/home/flow/jzr/intershop/bin/intershop-write-buildscript@46464987^ intershop_ng_settings "$intershop_ng_settings"' >> "$intershop_sql_buildscript_path"
+# echo 'echo ^/home/flow/jzr/intershop/bin/intershop-write-buildscript@46464987^ terminating' >> "$intershop_sql_buildscript_path"
+# echo 'exit 123' >> "$intershop_sql_buildscript_path"
+# echo '#######################################' >> "$intershop_sql_buildscript_path"
 # echo "$(node $intershop_guest_modules_path)/write-intershop-ptv-as-json.js" >> "$intershop_sql_buildscript_path"
 
 #===========================================================================================================
