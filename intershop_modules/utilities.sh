@@ -32,12 +32,12 @@ function postgres_paged () {
 
 #-----------------------------------------------------------------------------------------------------------
 function postgres_unpaged () {
-  PAGER='' psql                                                                     \
+  psql                                                                     \
     -U $intershop_db_user -d $intershop_db_name -p $intershop_db_port               \
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
-    "$@"
+    "$@" | cat
   }
 
 #-----------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ function sudo_postgres_unpaged_hostdb () {
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
-    "$@"
+    "$@" | cat
   if [[ $? != 0 ]]; then exit 123; fi
   }
 
@@ -59,7 +59,7 @@ function sudo_postgres_unpaged () {
     --set=intershop_db_user="$intershop_db_user"                                    \
     --set=intershop_db_name="$intershop_db_name"                                    \
     --set QUIET=on --set ON_ERROR_STOP=1                                            \
-    "$@"
+    "$@" | cat
   if [[ $? != 0 ]]; then exit 123; fi
   }
 
