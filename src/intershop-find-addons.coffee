@@ -67,6 +67,7 @@ declare 'ishop_addon_target', ( x ) -> x in [ 'app', 'rpc', 'ignore', 'support',
   R       = @_find_addons R, 'host',  process.env.intershop_host_path
   deps    = ( name for [ name, version, ] in R.order ).join ', '
   help "addon installation order: #{deps}"
+  debug '^6456456^', R
   return new_datom '^intershop-addons', R
 
 #-----------------------------------------------------------------------------------------------------------
