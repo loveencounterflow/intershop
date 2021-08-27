@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail; IFS=$'\n\t'
+
+# #-----------------------------------------------------------------------------------------------------------
+# home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/..)"
+# cd "$home"
+
+#-----------------------------------------------------------------------------------------------------------
+# sudo printf '' # make sure password prompt won't pop up later, be perhaps hard to detect
+source "$intershop_guest_modules_path/utilities.sh"
+"$intershop_guest_bin_path/_restart-rpc-server"
+
+
+# # #-----------------------------------------------------------------------------------------------------------
+# ### TAINT use host bin path where intershop-write-buildscript and so on are available:
+# "$intershop_guest_bin_path/intershop-write-buildscript"
+# sudo_postgres_unpaged -f "$intershop_guest_sql_path/teardown.sql" 2>&1 | grep -P '^.*ERROR.*$|' --color=always
+# "$intershop_sql_buildscript_path" #        2>&1 | grep -P '^.*ERROR.*$|' --color=always
+
+
